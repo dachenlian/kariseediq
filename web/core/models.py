@@ -3,6 +3,9 @@ import datetime
 
 
 class Entry(models.Model):
+    class Meta:
+        verbose_name_plural= 'entries'
+
     NOUN = 'NOUN'
     VERB = 'VERB'
     MULTI = 'MULTI'
@@ -54,6 +57,7 @@ class Entry(models.Model):
     cIndex = models.CharField(max_length=255, blank=True, default="")
     creator = models.CharField(max_length=255, blank=True, default="")
     culture = models.CharField(max_length=255, blank=True, default="")
+    dialect = models.CharField(max_length=255, blank=True, default="")
     dialectNum = models.CharField(max_length=255, blank=True, default="")
     focus = models.CharField(max_length=255, blank=True, default="")
     hasBranch = models.CharField(max_length=255, blank=True, default="")
@@ -63,9 +67,10 @@ class Entry(models.Model):
     indexPrefix = models.CharField(max_length=255, blank=True, default="")
     isPlant = models.BooleanField(blank=True, default=False)
     isRoot = models.BooleanField(blank=True, default=False)
-    itemId = models.IntegerField(blank=True, default=0)
+    itemId = models.CharField(max_length=255, blank=True, default='')
     itemName = models.CharField(max_length=255, )
     mainMeaningWordclass = models.CharField(max_length=255, blank=True, default="")
+    detail = models.CharField(max_length=255, blank=True, default="")
     meaning = models.CharField(max_length=255, blank=True, default="")
     meaningEn = models.CharField(max_length=255, blank=True, default="")
     notSure = models.CharField(max_length=255, blank=True, default="")
@@ -80,7 +85,7 @@ class Entry(models.Model):
     sound = models.CharField(max_length=255, blank=True, default="")
     source = models.CharField(max_length=255, blank=True, default="")
     tagging = models.CharField(max_length=255, blank=True, choices=TAGGING_CHOICES, default=NATURE)
-    time = models.DateField(default=datetime.date.today)
+    time = models.DateField(default=datetime.date.today, null=True, blank=True)
     toda = models.CharField(max_length=255, blank=True, default="")
     todar = models.CharField(max_length=255, blank=True, default="")
     truku = models.CharField(max_length=255, blank=True, default="")
@@ -90,3 +95,5 @@ class Entry(models.Model):
     wordClass = models.CharField(max_length=255, blank=True, choices=WORDCLASS_CHOICES, default=NOUN)
     wordRoot = models.CharField(max_length=255, blank=True, default="")
 
+    def __str__(self):
+        return self.itemName
