@@ -87,6 +87,6 @@ class Entry(models.Model):
     trukur = models.CharField(max_length=255, blank=True, default="")
     ucode = models.CharField(max_length=255, blank=True, default="")
     variant = models.CharField(max_length=255, blank=True, default="")
-    wordclass = models.CharField(max_length=255, blank=True, choices=WORDCLASS_CHOICES, default=NOUN)
+    wordClass = models.CharField(max_length=255, blank=True, choices=WORDCLASS_CHOICES, default=NOUN)
     wordRoot = models.CharField(max_length=255, blank=True, default="")
 
