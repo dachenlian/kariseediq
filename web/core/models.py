@@ -69,7 +69,7 @@ class Entry(models.Model):
     isPlant = models.BooleanField(blank=True, default=False)
     isRoot = models.BooleanField(blank=True, default=False)
     itemId = models.CharField(max_length=255, blank=True, default='')
-    itemName = models.CharField(max_length=255)
+    itemName = models.CharField(max_length=255, unique=True)
     mainMeaningWordclass = models.CharField(max_length=255, blank=True, default="")
     detail = models.CharField(max_length=255, blank=True, default="")
     meaning = models.CharField(max_length=255, blank=True, default="")
