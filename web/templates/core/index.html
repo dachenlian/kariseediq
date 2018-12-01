@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="row">
+        <div class="col">
+            <h1>Search</h1>
+            <form action="" method="get">
+                {% csrf_token %}
+                <div class="form-row align-items-center">
+                    <div class="col-md-2">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="itemFilter" id="startsWith"
+                                   value="startsWith">
+                            <label class="form-check-label" for="startsWith">Starts with</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="itemFilter" id="endsWith"
+                                   value="endsWith">
+                            <label class="form-check-label" for="endsWith">Ends with</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="itemFilter" id="contains"
+                                   value="contains" checked>
+                            <label class="form-check-label" for="contains">Contains</label>
+                        </div>
+                    </div>
+                    <div class="col-md-8 form-group">
+                        <label for="itemNameInput">Item name</label>
+                        <input type="text" id="itemNameInput" class="form-control form-control-lg" placeholder="an">
+                    </div>
+                    <div class="col-auto">
+                        <button type="submit" class="col btn btn-primary active">Search</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="row">
+    <div class="p-2 mb-2 bg-light text-dark col"><strong>資料筆數：</strong>{{ total }}</div>
+        <table class="table table-hover">
+            <thead class="thead-dark">
+            <tr>
+                <th>#</th>
+                <th>詞項</th>
+                <th>變體</th>
+                <th>意義</th>
+                <th>詞根</th>
+                <th>輸入者</th>
+                <th>輸入日期</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for entry in entries %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ entry.itemName }}</td>
+                    <td>{{ entry.variant }}</td>
+                    <td>{{ entry.meaning }}</td>
+                    <td>{{ entry.wordRoot }}</td>
+                    <td>{{ entry.creator }}</td>
+                    <td>{{ entry.time }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="7">No search results match the query.</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock content %}
