@@ -10,11 +10,6 @@ class IndexListView(ListView):
     template_name = 'core/index.html'
     ordering = ['-time']
 
-    def get_context_data(self, *, object_list=None, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['total'] = Entry.objects.all().count()
-        return context
-
 
 class EntryUpdate(UpdateView):
     model = Entry
@@ -28,15 +23,18 @@ class SearchResultsListView(ListView):
     model = Entry
     paginate_by = 25
     context_object_name = 'entries'
+    template_name = 'core/index.html'
 
     def get_queryset(self):
+        print('Q', self.request.GET.get('q'))
         item_filter = self.request.GET.get('itemFilter')
         item_name = self.request.GET.get('itemName')
 
-        if item_filter == 'contains':
-            return super().get_queryset(itemName__contains=item_name)
-        elif item_filter == 'startswith':
-            return super().get_queryset(itemName__startswith=item_name)
+        if item_filter == 'startswith':
+            query = Entry.objects.filter(itemName__startswith=item_name)
         elif item_filter == 'endswith':
-            return super().get_queryset(itemName__endswith=item_name)
+            query = Entry.objects.filter(itemName__endswith=item_name)
+        else:
+            query = Entry.objects.filter(itemName__contains=item_name)
 
+        return query.order_by('-time')
