@@ -26,7 +26,6 @@ class SearchResultsListView(ListView):
     template_name = 'core/index.html'
 
     def get_queryset(self):
-        print('Q', self.request.GET.get('q'))
         item_filter = self.request.GET.get('itemFilter')
         item_name = self.request.GET.get('itemName')
 
