@@ -9,12 +9,12 @@
                     <div class="col-md-2">
                         <div class="form-check">
                             <input class="form-check-input" type="radio" name="itemFilter" id="startsWith"
-                                   value="startsWith">
+                                   value="startswith">
                             <label class="form-check-label" for="startsWith">Starts with</label>
                         </div>
                         <div class="form-check">
                             <input class="form-check-input" type="radio" name="itemFilter" id="endsWith"
-                                   value="endsWith">
+                                   value="endswith">
                             <label class="form-check-label" for="endsWith">Ends with</label>
                         </div>
                         <div class="form-check">
@@ -25,7 +25,8 @@
                     </div>
                     <div class="col-md-8 form-group">
                         <label for="itemNameInput">Item name</label>
-                        <input type="text" id="itemNameInput" class="form-control form-control-lg" placeholder="an">
+                        <input type="text" id="itemNameInput" class="form-control form-control-lg" placeholder="an"
+                               name="itemName">
                     </div>
                     <div class="col-auto">
                         <button type="submit" class="col btn btn-primary active">Search</button>
@@ -35,7 +36,7 @@
         </div>
     </div>
     <div class="row">
-    <div class="p-2 mb-2 bg-light text-dark col"><strong>資料筆數：</strong>{{ total }}</div>
+        <div class="p-2 mb-2 bg-light text-dark col"><strong>資料筆數：</strong>{{ total }}</div>
         <table class="table table-hover">
             <thead class="thead-dark">
             <tr>
@@ -51,7 +52,7 @@
             <tbody>
             {% for entry in entries %}
                 <tr>
-                    <td>{{ forloop.counter }}</td>
+                    <td>{{ forloop.counter0|add:page_obj.start_index }}</td>
                     <td>{{ entry.itemName }}</td>
                     <td>{{ entry.variant }}</td>
                     <td>{{ entry.meaning }}</td>
@@ -67,4 +68,29 @@
             </tbody>
         </table>
     </div>
+    <nav>
+        <div class="row">
+            <div class="col">
+                {% if is_paginated %}
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item"><a class="page-link" href="?page=1">&laquo; first</a></li>
+                            <li class="page-item"><a class="page-link"
+                                                     href="?page={{ page_obj.previous_page_number }}">previous</a></li>
+                        {% endif %}
+                        <li class="page-item active">
+                            <a class="page-link" href="#">{{ page_obj.number }}</a>
+                        </li>
+                        {% if page_obj.has_next %}
+                            <li class="page-item"><a class="page-link"
+                                                     href="?page={{ page_obj.next_page_number }}">next</a>
+                            </li>
+                            <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">last
+                                &raquo;</a></li>
+                        {% endif %}
+                    </ul>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
 {% endblock content %}

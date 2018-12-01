@@ -4,5 +4,5 @@ from . import views
 app_name = 'core'
 
 urlpatterns = [
-    path('', views.SearchListView.as_view(), name='index')
+    path('', views.IndexListView.as_view(), name='index')
 ]
