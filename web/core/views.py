@@ -11,12 +11,14 @@ class IndexListView(ListView):
     ordering = ['-time']
 
 
-class EntryUpdate(UpdateView):
+class EntryUpdateView(UpdateView):
     model = Entry
-    fields = ['itemName', 'wordRoot', 'variant', 'toda', 'truku',
-              'isRoot', 'isPlant', 'meaning', 'meaningEn',
-              'sentence', 'sentenceCh', 'sentenceEn', 'wordClass',
-              ]
+    template_name = 'core/update.html'
+    fields = [
+        'itemName', 'wordRoot', 'variant', 'toda', 'truku',
+        'isRoot', 'isPlant', 'meaning', 'meaningEn',
+        'sentence', 'sentenceCh', 'sentenceEn', 'wordClass', 'tagging',
+    ]
 
 
 class SearchResultsListView(ListView):

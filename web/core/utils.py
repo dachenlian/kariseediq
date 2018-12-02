@@ -4,8 +4,8 @@ import logging
 from web.settings import BASE_DIR
 import os
 
-
 from .models import Entry
+
 
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s [%(name)-12s] [%(levelname)-8s] %(message)s',
@@ -13,7 +13,8 @@ logging.basicConfig(level=logging.DEBUG,
                     filename=os.path.join(BASE_DIR, 'debug.log'),
                     filemode='w'
                     )
-logger = logging.getLogger(__name__).addHandler(logging.StreamHandler())
+
+logger = logging.getLogger(__name__)
 
 
 def convert_to_boolean(cell):

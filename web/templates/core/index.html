@@ -1,6 +1,40 @@
 {% extends 'base.html' %}
 {% load my_tags %}
 {% block content %}
+     <div class="row">
+        <div class="col">
+            <h1>Search</h1>
+            <form action="{% url 'core:results' %}" method="get">
+                <div class="form-row align-items-center">
+                    <div class="col-md-2">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="itemFilter" id="startsWith"
+                                   value="startswith">
+                            <label class="form-check-label" for="startsWith">Starts with</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="itemFilter" id="endsWith"
+                                   value="endswith">
+                            <label class="form-check-label" for="endsWith">Ends with</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="itemFilter" id="contains"
+                                   value="contains" checked>
+                            <label class="form-check-label" for="contains">Contains</label>
+                        </div>
+                    </div>
+                    <div class="col-md-8 form-group">
+                        <label for="itemNameInput">Item name</label>
+                        <input type="text" id="itemNameInput" class="form-control form-control-lg" value="an"
+                               name="itemName">
+                    </div>
+                    <div class="col-auto">
+                        <button type="submit" class="col btn btn-primary active">Search</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
     <div class="row">
         <div class="p-2 mb-2 bg-light text-dark col">
             <strong>資料筆數：</strong>{{ view.get_queryset.count }}

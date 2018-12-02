@@ -1,5 +1,7 @@
 from django.db import models
 import datetime
+from django.urls import reverse
+from multiselectfield import MultiSelectField
 
 
 class Entry(models.Model):
@@ -85,7 +87,7 @@ class Entry(models.Model):
     sentenceEn = models.TextField(blank=True, default="")
     sound = models.CharField(max_length=255, blank=True, default="")
     source = models.CharField(max_length=255, blank=True, default="")
-    tagging = models.CharField(max_length=255, blank=True, choices=TAGGING_CHOICES, default=NATURE)
+    tagging = MultiSelectField(choices=TAGGING_CHOICES, default=NATURE)
     time = models.DateField(default=datetime.date.today, null=True, blank=True)
     toda = models.CharField(max_length=255, blank=True, default="")
     todar = models.CharField(max_length=255, blank=True, default="")
@@ -93,8 +95,11 @@ class Entry(models.Model):
     trukur = models.CharField(max_length=255, blank=True, default="")
     ucode = models.CharField(max_length=255, blank=True, default="")
     variant = models.CharField(max_length=255, blank=True, default="")
-    wordClass = models.CharField(max_length=255, blank=True, choices=WORDCLASS_CHOICES, default=NOUN)
+    wordClass = MultiSelectField(choices=WORDCLASS_CHOICES, default=NOUN)
     wordRoot = models.CharField(max_length=255, blank=True, default="")
 
     def __str__(self):
         return self.itemName
+
+    def get_absolute_url(self):
+        return reverse('core:update', kwargs={'pk': self.id})
