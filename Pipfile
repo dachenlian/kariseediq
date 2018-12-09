@@ -8,6 +8,8 @@ django = "*"
 django-rest-framework = "*"
 django-extensions = "*"
 ipython = "*"
+django-multiselectfield = "*"
+django-crispy-forms = "*"
 
 [dev-packages]
 

@@ -1,6 +1,10 @@
 from django.views.generic.list import ListView
-from django.views.generic.edit import UpdateView
+from django.views.generic.edit import UpdateView, FormView
+from django.shortcuts import get_object_or_404
+from django.forms.models import model_to_dict
+
 from core.models import Entry
+from .forms import UpdateEntryForm
 
 
 class IndexListView(ListView):
@@ -12,13 +16,15 @@ class IndexListView(ListView):
 
 
 class EntryUpdateView(UpdateView):
-    model = Entry
+    form_class = UpdateEntryForm
     template_name = 'core/update.html'
-    fields = [
-        'itemName', 'wordRoot', 'variant', 'toda', 'truku',
-        'isRoot', 'isPlant', 'meaning', 'meaningEn',
-        'sentence', 'sentenceCh', 'sentenceEn', 'wordClass', 'tagging',
-    ]
+    model = Entry
+
+    # def get_initial(self):
+    #     print(self.kwargs.get('pk'))
+    #     entry = get_object_or_404(Entry, id=self.kwargs.get('pk'))
+    #     initial = model_to_dict(entry)
+    #     return initial
 
 
 class SearchResultsListView(ListView):

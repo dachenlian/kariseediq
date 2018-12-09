@@ -54,6 +54,12 @@
 <script>$(document).ready(function () {
     $('body').bootstrapMaterialDesign();
 });</script>
+<script>
+    document.addEventListener("click", function() {
+        let row = document.getElementsByClassName("clickable-row")[0];
+        window.location = row.getAttribute('data-href')
+    })
+</script>
 {% block javascript %}
 {% endblock javascript %}
 </body>
