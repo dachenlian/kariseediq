@@ -1,7 +1,9 @@
+import csv
+
 from django.views.generic.list import ListView
-from django.views.generic.edit import UpdateView, FormView
-from django.shortcuts import get_object_or_404
-from django.forms.models import model_to_dict
+from django.views.generic.edit import UpdateView
+from django.http import HttpResponse
+
 
 from core.models import Entry
 from .forms import UpdateEntryForm
@@ -29,13 +31,16 @@ class EntryUpdateView(UpdateView):
 
 class SearchResultsListView(ListView):
     model = Entry
-    paginate_by = 25
+    paginate_by = 50
     context_object_name = 'entries'
     template_name = 'core/index.html'
 
     def get_queryset(self):
-        item_filter = self.request.GET.get('itemFilter')
-        item_name = self.request.GET.get('itemName')
+        item_filter = self.request.GET.get('itemFilter', "")
+        item_name = self.request.GET.get('itemName', "")
+
+        self.request.session['item_filter'] = item_filter
+        self.request.session['item_name'] = item_name
 
         if item_filter == 'startswith':
             query = Entry.objects.filter(itemName__startswith=item_name)
@@ -44,4 +49,15 @@ class SearchResultsListView(ListView):
         else:
             query = Entry.objects.filter(itemName__contains=item_name)
 
+        self.request.session['queryset'] = query.values(UpdateEntryForm.Meta.fields)
         return query.order_by('-time')
+
+
+def output_search_to_csv(request):
+    queryset = request.session.get('item_filter')
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="search_results.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(Entry._meta.get_fields())

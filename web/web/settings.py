@@ -129,3 +129,5 @@ REST_FRAMEWORK = {
 }
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
