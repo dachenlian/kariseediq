@@ -7,5 +7,5 @@ urlpatterns = [
     path('', views.IndexListView.as_view(), name='index'),
     path('results', views.SearchResultsListView.as_view(), name='results'),
     path('entries/<int:pk>', views.EntryUpdateView.as_view(), name='update'),
-
+    path('export/', views.export_search_to_csv, name='export')
 ]

@@ -41,6 +41,11 @@
             {% if view.request.GET.itemName %}
                 | <strong>Search params: </strong>{{ view.request.GET.itemName }}, {{ view.request.GET.itemFilter }}
             {% endif %}
+        {% if request.session.queryset %}
+                <span class="align-middle">
+                <a class="btn btn-info py-0" href="{% url 'core:export' %}">Export to CSV</a>
+                </span>
+        {% endif %}
         </div>
         <table class="table table-hover">
             <thead class="thead-dark">

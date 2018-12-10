@@ -3,6 +3,7 @@ import csv
 from django.views.generic.list import ListView
 from django.views.generic.edit import UpdateView
 from django.http import HttpResponse
+from django.shortcuts import redirect
 
 
 from core.models import Entry
@@ -49,15 +50,22 @@ class SearchResultsListView(ListView):
         else:
             query = Entry.objects.filter(itemName__contains=item_name)
 
-        self.request.session['queryset'] = query.values(UpdateEntryForm.Meta.fields)
+        fields = UpdateEntryForm.Meta.fields
+        self.request.session['queryset'] = list(query.values(*fields))
+        # print(self.request.session.get('queryset'))
         return query.order_by('-time')
 
 
-def output_search_to_csv(request):
-    queryset = request.session.get('item_filter')
+def export_search_to_csv(request):
+    queryset = request.session.get('queryset')
+    fieldnames = UpdateEntryForm.Meta.fields
 
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="search_results.csv"'
 
-    writer = csv.writer(response)
-    writer.writerow(Entry._meta.get_fields())
+    writer = csv.DictWriter(response, fieldnames=fieldnames)
+    writer.writeheader()
+    writer.writerows(queryset)
+    return response
+
+    # return redirect('core:index')
