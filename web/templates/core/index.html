@@ -37,15 +37,17 @@
     </div>
     <div class="row">
         <div class="p-2 mb-2 bg-light text-dark col">
+        <p class="py-0 my-0 align-middle">
             <strong>資料筆數：</strong>{{ view.get_queryset.count }}
             {% if view.request.GET.itemName %}
                 | <strong>Search params: </strong>{{ view.request.GET.itemName }}, {{ view.request.GET.itemFilter }}
             {% endif %}
-        {% if request.session.queryset %}
+            {% if request.session.queryset %}
                 <span class="align-middle">
                 <a class="btn btn-info py-0" href="{% url 'core:export' %}">Export to CSV</a>
                 </span>
-        {% endif %}
+            {% endif %}
+        </p>
         </div>
         <table class="table table-hover">
             <thead class="thead-dark">
