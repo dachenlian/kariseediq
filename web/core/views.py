@@ -65,7 +65,10 @@ def export_search_to_csv(request):
 
     writer = csv.DictWriter(response, fieldnames=fieldnames)
     writer.writeheader()
-    writer.writerows(queryset)
+    for row in queryset:
+        row['wordClass'] = ",".join(row['wordClass'])
+        row['tagging'] = ",".join(row['tagging'])
+        writer.writerow(row)
     return response
 
     # return redirect('core:index')
