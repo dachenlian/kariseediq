@@ -37,9 +37,10 @@ class UpdateEntryForm(ModelForm):
                   'sentenceCh', 'sentenceEn', 'wordClass', 'tagging')
         labels = {
             'itemName': 'Item name',
-            'wordClass': 'Word root',
+            'wordClass': 'Word class',
             'isPlant': 'Is plant',
             'isRoot': 'Is root',
+            'meaning': 'Meaning (Chinese)',
             'meaningEn': 'Meaning (English)',
             'sentenceEn': 'Sentence (English)',
             'sentenceCh': 'Sentence (Chinese)',
