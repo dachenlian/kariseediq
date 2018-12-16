@@ -37,7 +37,7 @@ class Entry(models.Model):
     AGRICULTURE = 'AGRICULTURE'
     RELIGION = 'RELIGION'
     FOOD = 'FOOD'
-    TAGGING_CHOICES = (
+    TAG_CHOICES = (
         (HAN_BORROWED, '漢語借字'),
         (JP_BORROWED, '日語借字'),
         (MIN_BORROWED, '閩南語借字'),
@@ -82,7 +82,7 @@ class Entry(models.Model):
     sentence_ch = models.TextField(blank=True, default="")
     sentence_en = models.TextField(blank=True, default="")
     source = models.CharField(max_length=255, blank=True, default="")  # 參照
-    tag = MultiSelectField(choices=TAGGING_CHOICES, default=NATURE)  # 標籤
+    tag = MultiSelectField(choices=TAG_CHOICES, default=NATURE)  # 標籤
     toda = models.CharField(max_length=255, blank=True, default="")
     toda_root = models.CharField(max_length=255, blank=True, default="")  # todar
     truku = models.CharField(max_length=255, blank=True, default="")

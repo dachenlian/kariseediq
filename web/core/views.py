@@ -3,7 +3,7 @@ import csv
 from django.views.generic.list import ListView
 from django.views.generic.edit import UpdateView
 from django.http import HttpResponse
-from django.shortcuts import redirect
+from django.shortcuts import get_object_or_404
 
 
 from core.models import Entry
@@ -23,11 +23,15 @@ class EntryUpdateView(UpdateView):
     template_name = 'core/update.html'
     model = Entry
 
-    # def get_initial(self):
-    #     print(self.kwargs.get('pk'))
-    #     entry = get_object_or_404(Entry, id=self.kwargs.get('pk'))
-    #     initial = model_to_dict(entry)
-    #     return initial
+    def get_initial(self):
+        print('Inside initial!')
+        initial = super().get_initial()
+        print(initial)
+        tags = list(get_object_or_404(Entry, pk=self.kwargs.get(self.pk_url_kwarg)).tag)
+        print(tags)
+        initial['tag'] = tags
+        print(initial)
+        return initial
 
 
 class SearchResultsListView(ListView):

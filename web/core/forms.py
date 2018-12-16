@@ -14,6 +14,7 @@ class Row(Div):
 
 # https://stackoverflow.com/questions/12144475/displaying-multiple-rows-and-columns-in-django-crispy-forms
 class UpdateEntryForm(ModelForm):
+    # tag = forms.MultipleChoiceField(choices=Entry.TAG_CHOICES)
 
     class Meta:
         model = Entry
@@ -33,6 +34,5 @@ class UpdateEntryForm(ModelForm):
             'sentence': forms.TextInput,
             'sentence_ch': forms.TextInput,
             'sentence_en': forms.TextInput,
-            'tag': forms.SelectMultiple(attrs={'class': 'form-control'}),
             'word_class': forms.Select,
         }
