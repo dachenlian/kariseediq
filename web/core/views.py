@@ -15,7 +15,7 @@ class IndexListView(ListView):
     paginate_by = 100
     context_object_name = 'entries'
     template_name = 'core/index.html'
-    ordering = ['-time']
+    ordering = ['-created_date']
 
 
 class EntryUpdateView(UpdateView):
@@ -37,23 +37,23 @@ class SearchResultsListView(ListView):
     template_name = 'core/index.html'
 
     def get_queryset(self):
-        item_filter = self.request.GET.get('itemFilter', "")
-        item_name = self.request.GET.get('itemName', "")
+        item_filter = self.request.GET.get('item_filter', "")
+        item_name = self.request.GET.get('item_name', "")
 
         self.request.session['item_filter'] = item_filter
         self.request.session['item_name'] = item_name
 
         if item_filter == 'startswith':
-            query = Entry.objects.filter(itemName__startswith=item_name)
+            query = Entry.objects.filter(item_name__startswith=item_name)
         elif item_filter == 'endswith':
-            query = Entry.objects.filter(itemName__endswith=item_name)
+            query = Entry.objects.filter(item_name__endswith=item_name)
         else:
-            query = Entry.objects.filter(itemName__contains=item_name)
+            query = Entry.objects.filter(item_name__contains=item_name)
 
         fields = UpdateEntryForm.Meta.fields
         self.request.session['queryset'] = list(query.values(*fields))
         # print(self.request.session.get('queryset'))
-        return query.order_by('-time')
+        return query.order_by('created_date')
 
 
 def export_search_to_csv(request):
@@ -66,8 +66,8 @@ def export_search_to_csv(request):
     writer = csv.DictWriter(response, fieldnames=fieldnames)
     writer.writeheader()
     for row in queryset:
-        row['wordClass'] = ",".join(row['wordClass'])
-        row['tagging'] = ",".join(row['tagging'])
+        row['word_class'] = ",".join(row['word_class'])
+        row['tag'] = ",".join(row['tag'])
         writer.writerow(row)
     return response
 

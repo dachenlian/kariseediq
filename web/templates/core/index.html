@@ -8,17 +8,17 @@
                 <div class="form-row align-items-center">
                     <div class="col-md-2">
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="itemFilter" id="startsWith"
+                            <input class="form-check-input" type="radio" name="item_filter" id="startsWith"
                                    value="startswith">
                             <label class="form-check-label" for="startsWith">Starts with</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="itemFilter" id="endsWith"
+                            <input class="form-check-input" type="radio" name="item_filter" id="endsWith"
                                    value="endswith">
                             <label class="form-check-label" for="endsWith">Ends with</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="itemFilter" id="contains"
+                            <input class="form-check-input" type="radio" name="item_filter" id="contains"
                                    value="contains" checked>
                             <label class="form-check-label" for="contains">Contains</label>
                         </div>
@@ -26,7 +26,7 @@
                     <div class="col-md-8 form-group">
                         <label for="itemNameInput">Item name</label>
                         <input type="text" id="itemNameInput" class="form-control form-control-lg" value="an"
-                               name="itemName">
+                               name="item_name">
                     </div>
                     <div class="col-auto">
                         <button type="submit" class="col btn btn-primary active">Search</button>
@@ -39,8 +39,8 @@
         <div class="p-2 mb-2 bg-light text-dark col">
         <p class="py-0 my-0 align-middle">
             <strong>資料筆數：</strong>{{ view.get_queryset.count }}
-            {% if view.request.GET.itemName %}
-                | <strong>Search params: </strong>{{ view.request.GET.itemName }}, {{ view.request.GET.itemFilter }}
+            {% if view.request.GET.item_name %}
+                | <strong>Search params: </strong>{{ view.request.GET.item_name }}, {{ view.request.GET.item_filter }}
             {% endif %}
             {% if request.session.queryset %}
                 <span class="align-middle">
@@ -65,12 +65,12 @@
             {% for entry in entries %}
                 <tr onclick="window.location='{% url 'core:update' pk=entry.id %}';">
                     <td>{{ forloop.counter0|add:page_obj.start_index }}</td>
-                    <td>{{ entry.itemName }}</td>
+                    <td>{{ entry.item_name }}</td>
                     <td>{{ entry.variant }}</td>
                     <td>{{ entry.meaning }}</td>
-                    <td>{{ entry.wordRoot }}</td>
-                    <td>{{ entry.creator }}</td>
-                    <td>{{ entry.time }}</td>
+                    <td>{{ entry.word_root }}</td>
+                    <td>{{ entry.user }}</td>
+                    <td>{{ entry.created_date }}</td>
                 </tr>
             {% empty %}
                 <tr>

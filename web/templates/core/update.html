@@ -8,10 +8,10 @@
                 {% csrf_token %}
                 <div class="form-row">
                     <div class="col">
-                        {{ form.itemName|as_crispy_field }}
+                        {{ form.item_name|as_crispy_field }}
                     </div>
                     <div class="col">
-                        {{ form.wordRoot|as_crispy_field }}
+                        {{ form.item_root|as_crispy_field }}
                     </div>
                 </div>
                 <div class="form-row">
@@ -32,7 +32,7 @@
                         {{ form.meaning|as_crispy_field }}
                     </div>
                     <div class="col">
-                        {{ form.meaningEn|as_crispy_field }}
+                        {{ form.meaning_en|as_crispy_field }}
                     </div>
                 </div>
                 <div class="form-row">
@@ -42,24 +42,20 @@
                 </div>
                 <div class="form-row">
                     <div class="col">
-                        {{ form.sentenceCh|as_crispy_field }}
+                        {{ form.sentence_ch|as_crispy_field }}
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="col">
-                        {{ form.sentenceEn|as_crispy_field }}
+                        {{ form.sentence_en|as_crispy_field }}
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col my-auto">
-                        {{ form.isPlant|as_crispy_field }}
-                        {{ form.isRoot|as_crispy_field }}
-                    </div>
                     <div class="col">
-                        {{ form.wordClass|as_crispy_field }}
+                        {{ form.word_class|as_crispy_field }}
                     </div>
                     <div class="col my-auto">
-                        {{ form.tagging|as_crispy_field }}
+                        {{ form.tag|as_crispy_field }}
                     </div>
                 </div>
                 <div class="row justify-content-center">

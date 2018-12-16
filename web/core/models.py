@@ -59,7 +59,8 @@ class Entry(models.Model):
 
     item_name = models.CharField(max_length=255, unique=True)  # 詞項
     item_root = models.CharField(max_length=255, blank=True, default="")
-    user = models.ForeignKey(User, null=True, on_delete=models.SET_NULL, related_name='entries')
+    user = models.CharField(max_length=255, blank=True, default="")
+    # user = models.ForeignKey(User, null=True, on_delete=models.SET_NULL, related_name='entries')
     created_date = models.DateField(default=datetime.date.today)
     modified_date = models.DateTimeField(auto_now=True)
     is_root = models.BooleanField(blank=True, default=False)

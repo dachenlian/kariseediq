@@ -28,11 +28,21 @@ def load_into_db(file):
 
         for row in reader:
             new_entry = dict(zip(header, row))
-            if Entry.objects.filter(itemName=new_entry['itemName']).count():
-                logger.warning(f"{new_entry['itemName']} already exists.\n{new_entry}")
+            if Entry.objects.filter(item_name=new_entry['item_name']).count():
+                logger.warning(f"{new_entry['item_name']} already exists.\n{new_entry}")
                 continue
+
             if not new_entry['frequency']:
                 new_entry['frequency'] = 0
+
+            if new_entry['is_root'].lower() == 'yes':
+                new_entry['is_root'] = True
+            else:
+                new_entry['is_root'] = False
+            if new_entry['has_picture'] == 1:
+                new_entry['has_picture'] = True
+            else:
+                new_entry['has_picture'] = False
             try:
                 new_entry['created_date'] = datetime.datetime.strptime(new_entry['created_date'], '%m/%d/%Y')
             except ValueError as e:
