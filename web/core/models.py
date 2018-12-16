@@ -2,6 +2,7 @@ from django.db import models
 import datetime
 from django.urls import reverse
 from multiselectfield import MultiSelectField
+from django.contrib.auth.models import User
 
 
 class Entry(models.Model):
@@ -56,50 +57,41 @@ class Entry(models.Model):
         (FOOD, '食物'),
     )
 
-    book = models.CharField(max_length=255, blank=True, default="")
-    cIndex = models.CharField(max_length=255, blank=True, default="")
-    creator = models.CharField(max_length=255, blank=True, default="")
-    culture = models.CharField(max_length=255, blank=True, default="")
-    dialect = models.CharField(max_length=255, blank=True, default="")
-    dialectNum = models.CharField(max_length=255, blank=True, default="")
-    focus = models.CharField(max_length=255, blank=True, default="")
-    hasBranch = models.CharField(max_length=255, blank=True, default="")
-    idom = models.CharField(max_length=255, blank=True, default="")
-    idomCh = models.CharField(max_length=255, blank=True, default="")
-    idomEn = models.CharField(max_length=255, blank=True, default="")
-    indexPrefix = models.CharField(max_length=255, blank=True, default="")
-    isPlant = models.BooleanField(blank=True, default=False)
-    isRoot = models.BooleanField(blank=True, default=False)
-    itemId = models.CharField(max_length=255, blank=True, default='')
-    itemName = models.CharField(max_length=255, unique=True)
-    mainMeaningWordclass = models.CharField(max_length=255, blank=True, default="")
-    detail = models.CharField(max_length=255, blank=True, default="")
+    item_name = models.CharField(max_length=255, unique=True)  # 詞項
+    item_root = models.CharField(max_length=255, blank=True, default="")
+    user = models.ForeignKey(User, null=True, on_delete=models.SET_NULL, related_name='entries')
+    created_date = models.DateField(default=datetime.date.today)
+    modified_date = models.DateTimeField(auto_now=True)
+    is_root = models.BooleanField(blank=True, default=False)
     meaning = models.CharField(max_length=255, blank=True, default="")
-    meaningEn = models.CharField(max_length=255, blank=True, default="")
-    notSure = models.CharField(max_length=255, blank=True, default="")
-    occurrence = models.IntegerField(blank=True, default=0)
-    period = models.CharField(max_length=255, blank=True, default="")
-    picture = models.CharField(max_length=255, blank=True, default="")
-    question = models.CharField(max_length=255, blank=True, default="")
-    remark = models.CharField(max_length=255, blank=True, default="")
+    meaning_en = models.CharField(max_length=255, blank=True, default="")
+    main_meaning_word_class = models.CharField(max_length=255, blank=True, default="")
+    word_class = MultiSelectField(choices=WORDCLASS_CHOICES, default=NOUN)
+    cultural_notes = models.CharField(max_length=255, blank=True, default="")
+    focus = models.CharField(max_length=255, blank=True, default="")
+    phrase = models.CharField(max_length=255, blank=True, default="")  # 詞組
+    phrase_ch = models.CharField(max_length=255, blank=True, default="")
+    phrase_en = models.CharField(max_length=255, blank=True, default="")
+    char_strokes_first = models.CharField(max_length=255, blank=True, default="")
+    char_strokes_all = models.CharField(max_length=255, blank=True, default="")
+    frequency = models.IntegerField(blank=True, default=0)
+    has_picture = models.BooleanField(default=False)
+    grammar_notes = models.CharField(max_length=255, blank=True, default="")  # 語法註記
     sentence = models.TextField(blank=True, default="")
-    sentenceCh = models.TextField(blank=True, default="")
-    sentenceEn = models.TextField(blank=True, default="")
-    sound = models.CharField(max_length=255, blank=True, default="")
-    source = models.CharField(max_length=255, blank=True, default="")
-    tagging = MultiSelectField(choices=TAGGING_CHOICES, default=NATURE)
-    time = models.DateField(default=datetime.date.today, null=True, blank=True)
+    sentence_ch = models.TextField(blank=True, default="")
+    sentence_en = models.TextField(blank=True, default="")
+    source = models.CharField(max_length=255, blank=True, default="")  # 參照
+    tag = MultiSelectField(choices=TAGGING_CHOICES, default=NATURE)  # 標籤
     toda = models.CharField(max_length=255, blank=True, default="")
-    todar = models.CharField(max_length=255, blank=True, default="")
+    toda_root = models.CharField(max_length=255, blank=True, default="")  # todar
     truku = models.CharField(max_length=255, blank=True, default="")
-    trukur = models.CharField(max_length=255, blank=True, default="")
-    ucode = models.CharField(max_length=255, blank=True, default="")
+    truku_root = models.CharField(max_length=255, blank=True, default="")  # trukur
     variant = models.CharField(max_length=255, blank=True, default="")
-    wordClass = MultiSelectField(choices=WORDCLASS_CHOICES, default=NOUN)
-    wordRoot = models.CharField(max_length=255, blank=True, default="")
 
     def __str__(self):
-        return self.itemName
+        return self.item_name
 
     def get_absolute_url(self):
         return reverse('core:update', kwargs={'pk': self.id})
+
+

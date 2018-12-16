@@ -10,6 +10,8 @@ django-extensions = "*"
 ipython = "*"
 django-multiselectfield = "*"
 django-crispy-forms = "*"
+wordcloud = "*"
+matplotlib = "*"
 
 [dev-packages]
 

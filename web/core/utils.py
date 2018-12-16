@@ -31,15 +31,13 @@ def load_into_db(file):
             if Entry.objects.filter(itemName=new_entry['itemName']).count():
                 logger.warning(f"{new_entry['itemName']} already exists.\n{new_entry}")
                 continue
-            new_entry['isRoot'] = convert_to_boolean(new_entry['isRoot'])
-            new_entry['isPlant'] = convert_to_boolean(new_entry['isPlant'])
-            if not new_entry['occurrence']:
-                new_entry['occurrence'] = 0
+            if not new_entry['frequency']:
+                new_entry['frequency'] = 0
             try:
-                new_entry['time'] = datetime.datetime.strptime(new_entry['time'], '%m/%d/%Y')
+                new_entry['created_date'] = datetime.datetime.strptime(new_entry['created_date'], '%m/%d/%Y')
             except ValueError as e:
                 print(e)
                 print(row)
-                new_entry['time'] = datetime.datetime.min
+                new_entry['created_date'] = datetime.datetime.min
 
             Entry(**new_entry).save()
