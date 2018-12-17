@@ -13,7 +13,7 @@ class Entry(models.Model):
     VERB = 'VERB'
     MULTI = 'MULTI'
     OTHER = 'OTHER'
-    WORDCLASS_CHOICES = (
+    WORD_CLASS_CHOICES = (
         (NOUN, '名詞'),
         (VERB, '動詞'),
         (MULTI, '多重詞性'),
@@ -67,7 +67,7 @@ class Entry(models.Model):
     meaning = models.CharField(max_length=255, blank=True, default="")
     meaning_en = models.CharField(max_length=255, blank=True, default="")
     main_meaning_word_class = models.CharField(max_length=255, blank=True, default="")
-    word_class = MultiSelectField(choices=WORDCLASS_CHOICES, default=NOUN)
+    word_class = models.CharField(max_length=255, choices=WORD_CLASS_CHOICES, default=NOUN)
     cultural_notes = models.CharField(max_length=255, blank=True, default="")
     focus = models.CharField(max_length=255, blank=True, default="")
     phrase = models.CharField(max_length=255, blank=True, default="")  # 詞組
@@ -82,7 +82,7 @@ class Entry(models.Model):
     sentence_ch = models.TextField(blank=True, default="")
     sentence_en = models.TextField(blank=True, default="")
     source = models.CharField(max_length=255, blank=True, default="")  # 參照
-    tag = MultiSelectField(choices=TAG_CHOICES, default=NATURE)  # 標籤
+    tag = MultiSelectField(choices=TAG_CHOICES, default="", null=True, blank=True)  # 標籤
     toda = models.CharField(max_length=255, blank=True, default="")
     toda_root = models.CharField(max_length=255, blank=True, default="")  # todar
     truku = models.CharField(max_length=255, blank=True, default="")

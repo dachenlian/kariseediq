@@ -3,6 +3,7 @@ import datetime
 import logging
 from web.settings import BASE_DIR
 import os
+import re
 
 from .models import Entry
 
@@ -21,6 +22,18 @@ def convert_to_boolean(cell):
     return cell.lower() == 'yes'
 
 
+TAG_DICT = dict((y, x) for x, y in Entry.TAG_CHOICES)
+WORD_CLASS_DICT = dict((y, x) for x, y in Entry.WORD_CLASS_CHOICES)
+
+
+def convert_tags(tags):
+    if not tags:
+        return None
+    split = (t.strip() for t in re.split(r'[，,、]', tags))
+    converted = (TAG_DICT.get(t) for t in split if t in TAG_DICT)
+    return ",".join(converted)
+
+
 def load_into_db(file):
     with open(file) as fp:
         reader = csv.reader(fp)
@@ -31,6 +44,13 @@ def load_into_db(file):
             if Entry.objects.filter(item_name=new_entry['item_name']).count():
                 logger.warning(f"{new_entry['item_name']} already exists.\n{new_entry}")
                 continue
+
+            new_entry['word_class'] = WORD_CLASS_DICT.get(new_entry['word_class'].strip(), WORD_CLASS_DICT['其他'])
+            try:
+                new_entry['tag'] = convert_tags(new_entry['tag'])
+            except TypeError as e:
+                print(f'{e}:, {new_entry}')
+                break
 
             if not new_entry['frequency']:
                 new_entry['frequency'] = 0
