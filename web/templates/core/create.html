@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <h1>New entry</h1>
+    <form method="post">
+    {% csrf_token %}
+    {{ form|crispy }}
+    <button type="submit">Create</button>
+    </form>
+{% endblock content %}
+{% block javascript %}
+    <script>
+    let timer, delay = 500;
+        $('#id_item_name').on('input', function(e) {
+            const item_name = $(this).val();
+            clearTimeout(timer);
+            timer = setTimeout(function() {
+                $.ajax({
+                    url: "{% url 'core:validate_item_name' %}",
+                    data: {
+                        'item_name': item_name
+                    },
+                    dataType: 'json',
+                    success: function(data) {
+                        if (data.is_taken) {
+                            alert('This item already exists')
+                        }
+                    }
+                });
+            }, delay);
+        });
+    </script>
+{% endblock javascript %}

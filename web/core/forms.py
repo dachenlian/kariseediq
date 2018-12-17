@@ -34,5 +34,10 @@ class UpdateEntryForm(ModelForm):
             'sentence': forms.TextInput,
             'sentence_ch': forms.TextInput,
             'sentence_en': forms.TextInput,
-            'word_class': forms.Select,
         }
+
+
+class CreateEntryForm(ModelForm):
+    class Meta:
+        model = Entry
+        fields = UpdateEntryForm.Meta.fields

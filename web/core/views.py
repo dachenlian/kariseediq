@@ -1,13 +1,13 @@
 import csv
 
 from django.views.generic.list import ListView
-from django.views.generic.edit import UpdateView
-from django.http import HttpResponse
+from django.views.generic.edit import UpdateView, CreateView
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 
 
 from core.models import Entry
-from .forms import UpdateEntryForm
+from .forms import UpdateEntryForm, CreateEntryForm
 
 
 class IndexListView(ListView):
@@ -16,6 +16,11 @@ class IndexListView(ListView):
     context_object_name = 'entries'
     template_name = 'core/index.html'
     ordering = ['-created_date']
+
+
+class CreateEntryView(CreateView):
+    template_name = 'core/create.html'
+    form_class = CreateEntryForm
 
 
 class EntryUpdateView(UpdateView):
@@ -75,4 +80,12 @@ def export_search_to_csv(request):
         writer.writerow(row)
     return response
 
-    # return redirect('core:index')
+
+def validate_item_name(request):
+    item_name = request.GET.get('item_name', None)
+    data = {
+        'is_taken': Entry.objects.filter(item_name__iexact=item_name).exists()
+    }
+    if data['is_taken']:
+        data['error_message'] = 'This item already exists.'
+    return JsonResponse(data)
