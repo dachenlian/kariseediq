@@ -5,7 +5,7 @@ from crispy_forms.layout import Layout, Field, Div
 from multiselectfield import MultiSelectFormField
 
 from django.forms import ModelForm
-from .models import Entry
+from .models import Entry, Example
 
 
 class Row(Div):
@@ -13,7 +13,7 @@ class Row(Div):
 
 
 # https://stackoverflow.com/questions/12144475/displaying-multiple-rows-and-columns-in-django-crispy-forms
-class UpdateEntryForm(ModelForm):
+class EntryForm(ModelForm):
     # tag = forms.MultipleChoiceField(choices=Entry.TAG_CHOICES)
 
     class Meta:
@@ -29,7 +29,17 @@ class UpdateEntryForm(ModelForm):
         }
 
 
-class CreateEntryForm(ModelForm):
+class ExampleForm(ModelForm):
     class Meta:
-        model = Entry
-        fields = UpdateEntryForm.Meta.fields
+        model = Example
+        fields = '__all__'
+        labels = {
+            'sentence_en': 'Sentence (English)',
+            'sentence_ch': 'Sentence (Chinese)',
+        }
+        widgets = {
+            'sentence': forms.TextInput,
+            'sentence_en': forms.TextInput,
+            'sentence_ch': forms.TextInput,
+        }
+

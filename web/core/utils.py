@@ -49,21 +49,15 @@ def load_into_db(file):
             try:
                 new_entry['tag'] = convert_tags(new_entry['tag'])
             except TypeError as e:
-                print(f'{e}:, {new_entry}')
+                logger.exception(e)
                 break
 
             if not new_entry['frequency']:
                 new_entry['frequency'] = 0
 
-            if new_entry['is_root'].lower() == 'yes':
-                new_entry['is_root'] = True
-            else:
-                new_entry['is_root'] = False
+            new_entry['is_root'] = new_entry['is_root'].lower() == 'yes'
+            new_entry['has_picture'] = new_entry['has_picture'] == 1
 
-            if new_entry['has_picture'] == 1:
-                new_entry['has_picture'] = True
-            else:
-                new_entry['has_picture'] = False
             try:
                 new_entry['created_date'] = datetime.datetime.strptime(new_entry['created_date'], '%m/%d/%Y')
             except ValueError as e:

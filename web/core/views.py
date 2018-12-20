@@ -1,13 +1,16 @@
 import csv
 
+from django.shortcuts import render
 from django.views.generic.list import ListView
+from django.views.generic import View
 from django.views.generic.edit import UpdateView, CreateView
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
+from django.forms import formset_factory
 
 
-from core.models import Entry
-from .forms import UpdateEntryForm, CreateEntryForm
+from core.models import Entry, Example
+from .forms import EntryForm, ExampleForm
 
 
 class IndexListView(ListView):
@@ -18,25 +21,30 @@ class IndexListView(ListView):
     ordering = ['-created_date']
 
 
-class CreateEntryView(CreateView):
+class EntryCreateView(CreateView):
     template_name = 'core/create.html'
-    form_class = CreateEntryForm
+    form_class = EntryForm
 
 
-class EntryUpdateView(UpdateView):
-    form_class = UpdateEntryForm
-    template_name = 'core/update.html'
-    model = Entry
+class EntryExampleUpdateView(View):
+    ExampleFormSet = formset_factory(ExampleForm)
 
-    def get_initial(self):
-        print('Inside initial!')
-        initial = super().get_initial()
-        print(initial)
-        tags = list(get_object_or_404(Entry, pk=self.kwargs.get(self.pk_url_kwarg)).tag)
-        print(tags)
-        initial['tag'] = tags
-        print(initial)
-        return initial
+    def get(self, request, *args, **kwargs):
+        entry = get_object_or_404(Entry, pk=kwargs.get('pk'))
+        example = get_object_or_404(Example, entry=entry)
+
+        entry_form = EntryForm(instance=entry)
+        example_form = ExampleForm(instance=example)
+
+        context = {
+            'entry_form': entry_form,
+            'example_form': example_form
+        }
+        return render(self.request, template_name='core/update.html', context=context)
+
+    def post(self, request, *args, **kwargs):
+        entry_form = EntryForm(request.POST)
+        example_form = ExampleForm(request.POST)
 
 
 class SearchResultsListView(ListView):
@@ -59,7 +67,7 @@ class SearchResultsListView(ListView):
         else:
             query = Entry.objects.filter(item_name__contains=item_name)
 
-        fields = UpdateEntryForm.Meta.fields
+        fields = EntryForm.Meta.fields
         self.request.session['queryset'] = list(query.values(*fields))
         # print(self.request.session.get('queryset'))
         return query.order_by('created_date')
@@ -67,7 +75,7 @@ class SearchResultsListView(ListView):
 
 def export_search_to_csv(request):
     queryset = request.session.get('queryset')
-    fieldnames = UpdateEntryForm.Meta.fields
+    fieldnames = EntryForm.Meta.fields
 
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="search_results.csv"'
