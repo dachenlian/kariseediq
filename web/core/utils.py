@@ -5,7 +5,7 @@ from web.settings import BASE_DIR
 import os
 import re
 
-from .models import Entry
+from .models import Entry, Example
 
 
 logging.basicConfig(level=logging.DEBUG,
@@ -59,6 +59,7 @@ def load_into_db(file):
                 new_entry['is_root'] = True
             else:
                 new_entry['is_root'] = False
+
             if new_entry['has_picture'] == 1:
                 new_entry['has_picture'] = True
             else:
@@ -66,8 +67,19 @@ def load_into_db(file):
             try:
                 new_entry['created_date'] = datetime.datetime.strptime(new_entry['created_date'], '%m/%d/%Y')
             except ValueError as e:
-                print(e)
-                print(row)
+                logger.exception(e)
                 new_entry['created_date'] = datetime.datetime.min
 
-            Entry(**new_entry).save()
+            sentence = new_entry.pop('sentence')
+            sentence_en = new_entry.pop('sentence_en')
+            sentence_ch = new_entry.pop('sentence_ch')
+
+            entry = Entry.objects.create(**new_entry)
+
+            Example.objects.create(
+                entry=entry,
+                sentence=sentence,
+                sentence_ch=sentence_ch,
+                sentence_en=sentence_en,
+            )
+

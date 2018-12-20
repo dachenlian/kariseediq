@@ -2,7 +2,6 @@ from django.db import models
 import datetime
 from django.urls import reverse
 from multiselectfield import MultiSelectField
-from django.contrib.auth.models import User
 
 
 class Entry(models.Model):
@@ -78,9 +77,6 @@ class Entry(models.Model):
     frequency = models.IntegerField(blank=True, default=0)
     has_picture = models.BooleanField(default=False)
     grammar_notes = models.CharField(max_length=255, blank=True, default="")  # 語法註記
-    sentence = models.TextField(blank=True, default="")
-    sentence_ch = models.TextField(blank=True, default="")
-    sentence_en = models.TextField(blank=True, default="")
     source = models.CharField(max_length=255, blank=True, default="")  # 參照
     tag = MultiSelectField(choices=TAG_CHOICES, default="", null=True, blank=True)  # 標籤
     toda = models.CharField(max_length=255, blank=True, default="")
@@ -96,3 +92,9 @@ class Entry(models.Model):
         return reverse('core:update', kwargs={'pk': self.id})
 
 
+class Example(models.Model):
+    """Example sentence for a particular dictionary entry."""
+    entry = models.ForeignKey(Entry, on_delete=models.CASCADE)
+    sentence = models.TextField(blank=True, default="")
+    sentence_en = models.TextField(blank=True, default="")
+    sentence_ch = models.TextField(blank=True, default="")

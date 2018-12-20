@@ -19,21 +19,13 @@ class UpdateEntryForm(ModelForm):
     class Meta:
         model = Entry
         fields = ('item_name', 'item_root', 'variant', 'toda', 'truku',
-                  'toda_root', 'truku_root', 'meaning', 'meaning_en', 'focus', 'sentence',
-                  'sentence_ch', 'sentence_en', 'word_class', 'tag', 'grammar_notes', 'cultural_notes')
+                  'toda_root', 'truku_root', 'meaning', 'meaning_en', 'focus',
+                  'word_class', 'tag', 'grammar_notes', 'cultural_notes')
         labels = {
             'item_name': 'Item name',
             'word_class': 'Word class',
             'meaning': 'Meaning (Chinese)',
-            'meaning_en': 'Meaning (English)',
-            'sentence_en': 'Sentence (English)',
-            'sentence_ch': 'Sentence (Chinese)',
             'word_root': 'Word root',
-        }
-        widgets = {
-            'sentence': forms.TextInput,
-            'sentence_ch': forms.TextInput,
-            'sentence_en': forms.TextInput,
         }
 
 
