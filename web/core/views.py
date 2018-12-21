@@ -27,18 +27,18 @@ class EntryCreateView(CreateView):
 
 
 class EntryExampleUpdateView(View):
-    ExampleFormSet = formset_factory(ExampleForm)
+
+    ExampleFormSet = formset_factory(ExampleForm, extra=2)
 
     def get(self, request, *args, **kwargs):
         entry = get_object_or_404(Entry, pk=kwargs.get('pk'))
-        example = get_object_or_404(Example, entry=entry)
 
         entry_form = EntryForm(instance=entry)
-        example_form = ExampleForm(instance=example)
+        formset = self.ExampleFormSet(initial=Example.objects.filter(entry=entry).values())
 
         context = {
             'entry_form': entry_form,
-            'example_form': example_form
+            'example_form': formset
         }
         return render(self.request, template_name='core/update.html', context=context)
 

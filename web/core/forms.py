@@ -32,7 +32,7 @@ class EntryForm(ModelForm):
 class ExampleForm(ModelForm):
     class Meta:
         model = Example
-        fields = '__all__'
+        fields = ['sentence', 'sentence_en', 'sentence_ch']
         labels = {
             'sentence_en': 'Sentence (English)',
             'sentence_ch': 'Sentence (Chinese)',
