@@ -1,6 +1,8 @@
 import csv
+import logging
 
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.contrib import messages
 from django.views.generic.list import ListView
 from django.views.generic import View
 from django.views.generic.edit import UpdateView, CreateView
@@ -11,6 +13,8 @@ from django.forms import inlineformset_factory
 
 from core.models import Entry, Example
 from .forms import EntryForm, ExampleForm
+
+logger = logging.getLogger(__name__)
 
 
 class IndexListView(ListView):
@@ -48,8 +52,14 @@ class EntryExampleUpdateView(View):
         return render(self.request, template_name='core/update.html', context=context)
 
     def post(self, request, *args, **kwargs):
-        entry_form = EntryForm(request.POST)
-        example_form = ExampleForm(request.POST)
+        entry = get_object_or_404(Entry, pk=kwargs.get('pk'))
+        entry_form = EntryForm(request.POST, instance=entry)
+        formset = self.ExampleFormSet(request.POST, instance=entry)
+        if entry_form.is_valid() and formset.is_valid():
+            entry_form.save()
+            formset.save()
+            messages.success(request, "Entry updated!")
+        return redirect(entry)
 
 
 class SearchResultsListView(ListView):

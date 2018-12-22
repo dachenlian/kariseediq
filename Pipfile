@@ -12,6 +12,8 @@ django-multiselectfield = "*"
 django-crispy-forms = "*"
 wordcloud = "*"
 matplotlib = "*"
+django-extra-views = "*"
+django-debug-toolbar = "*"
 
 [dev-packages]
 
