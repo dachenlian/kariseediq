@@ -5,54 +5,9 @@
         <div class="col">
             <h1>Update entry</h1>
             <form action="">
-                {{ entry_form|crispy }}
-                {{ example_form|crispy }}
+                {% csrf_token %}
+                {% include 'core/form_snippet.html' %}
             </form>
-{#            <form action="" method="post">#}
-{#                {% csrf_token %}#}
-{#                <div class="form-row">#}
-{#                    <div class="col">#}
-{#                        {{ form.item_name|as_crispy_field }}#}
-{#                    </div>#}
-{#                    <div class="col">#}
-{#                        {{ form.item_root|as_crispy_field }}#}
-{#                    </div>#}
-{#                </div>#}
-{#                <div class="form-row">#}
-{#                    <div class="col">#}
-{#                        {{ form.variant|as_crispy_field }}#}
-{#                    </div>#}
-{#                </div>#}
-{#                <div class="form-row">#}
-{#                    <div class="col">#}
-{#                        {{ form.toda|as_crispy_field }}#}
-{#                    </div>#}
-{#                    <div class="col">#}
-{#                        {{ form.truku|as_crispy_field }}#}
-{#                    </div>#}
-{#                </div>#}
-{#                <div class="form-row">#}
-{#                    <div class="col">#}
-{#                        {{ form.meaning|as_crispy_field }}#}
-{#                    </div>#}
-{#                    <div class="col">#}
-{#                        {{ form.meaning_en|as_crispy_field }}#}
-{#                    </div>#}
-{#                </div>#}
-{#                <div class="row">#}
-{#                    <div class="col">#}
-{#                        {{ form.word_class|as_crispy_field }}#}
-{#                    </div>#}
-{#                    <div class="col my-auto">#}
-{#                        {{ form.tag|as_crispy_field }}#}
-{#                    </div>#}
-{#                </div>#}
-{#                <div class="row justify-content-center">#}
-{#                    <div class="col-auto">#}
-{#                        <button class="btn btn-primary" type="submit">Update</button>#}
-{#                    </div>#}
-{#                </div>#}
-{#            </form>#}
         </div>
     </div>
 

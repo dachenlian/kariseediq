@@ -6,7 +6,7 @@ from django.views.generic import View
 from django.views.generic.edit import UpdateView, CreateView
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
-from django.forms import formset_factory
+from django.forms import inlineformset_factory
 
 
 from core.models import Entry, Example
@@ -28,17 +28,22 @@ class EntryCreateView(CreateView):
 
 class EntryExampleUpdateView(View):
 
-    ExampleFormSet = formset_factory(ExampleForm, extra=2)
+    ExampleFormSet = inlineformset_factory(
+        parent_model=Entry,
+        model=Example,
+        form=ExampleForm,
+        extra=2,
+    )
 
     def get(self, request, *args, **kwargs):
         entry = get_object_or_404(Entry, pk=kwargs.get('pk'))
 
         entry_form = EntryForm(instance=entry)
-        formset = self.ExampleFormSet(initial=Example.objects.filter(entry=entry).values())
+        formset = self.ExampleFormSet(instance=entry)
 
         context = {
-            'entry_form': entry_form,
-            'example_form': formset
+            'form': entry_form,
+            'formset': formset
         }
         return render(self.request, template_name='core/update.html', context=context)
 

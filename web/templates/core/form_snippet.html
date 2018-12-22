@@ -1,0 +1,61 @@
+{% load crispy_forms_tags %}
+
+<div class="form-row">
+    <div class="col">
+        {{ form.item_name|as_crispy_field }}
+    </div>
+    <div class="col">
+        {{ form.variant|as_crispy_field }}
+    </div>
+    <div class="col">
+        {{ form.toda|as_crispy_field }}
+    </div>
+    <div class="col">
+        {{ form.truku|as_crispy_field }}
+    </div>
+</div>
+<div class="form-row">
+    <div class="col">
+        {{ form.item_root|as_crispy_field }}
+    </div>
+    <div class="col">
+        {{ form.toda_root|as_crispy_field }}
+    </div>
+    <div class="col">
+        {{ form.truku_root|as_crispy_field }}
+    </div>
+</div>
+<div class="form-row">
+    <div class="col">
+        {{ form.meaning|as_crispy_field }}
+    </div>
+    <div class="col">
+        {{ form.meaning_en|as_crispy_field }}
+    </div>
+</div>
+<div class="form-row">
+    <div class="col">
+        {{ form.grammar_notes|as_crispy_field }}
+    </div>
+    <div class="col">
+        {{ form.cultural_notes|as_crispy_field }}
+    </div>
+</div>
+<div class="form-row">
+    <div class="col">
+        {{ form.word_class|as_crispy_field }}
+    </div>
+    <div class="col">
+        {{ form.tag|as_crispy_field }}
+    </div>
+</div>
+{{ formset.management_form }}
+{% for form in formset %}
+    <strong>Example #{{ forloop.counter }}</strong>
+    <div class="form-group">
+        {{ form|crispy }}
+    </div>
+{% endfor %}
+<div class="row justify-content-center">
+    <button class="btn btn-primary btn-lg active w-50" type="submit">Submit</button>
+</div>
