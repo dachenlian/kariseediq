@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 {% load crispy_forms_tags %}
 {% block content %}
     <h1>New entry</h1>
@@ -34,4 +35,5 @@
             }, delay);
         });
     </script>
+    {{ form.media }}
 {% endblock javascript %}

@@ -20,6 +20,10 @@ class EntryForm(ModelForm):
             'meaning_en': 'Meaning (English)',
             'word_root': 'Word root',
         }
+        widgets = {
+            'item_root': forms.widgets.TextInput(attrs={'class': 'basicAutoComplete', 'autocomplete': 'off'})
+            # 'item_root': autocomplete.ListSelect2(url='core:focus_autocomplete')
+        }
 
 
 class EntryUpdateForm(EntryForm):
@@ -50,3 +54,5 @@ ExampleFormSet = inlineformset_factory(
     form=ExampleForm,
     extra=2,
 )
+
+

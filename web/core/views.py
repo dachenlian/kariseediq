@@ -5,9 +5,9 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.views.generic.list import ListView
 from django.views.generic import View
-
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
+from django.db.models import Q
 
 from core.models import Entry
 from .forms import EntryForm, EntryUpdateForm, ExampleFormSet
@@ -87,6 +87,7 @@ class SearchResultsListView(ListView):
     def get_queryset(self):
         item_filter = self.request.GET.get('item_filter', "")
         item_name = self.request.GET.get('item_name', "")
+        tags = self.request.GET.get('tags')
 
         self.request.session['item_filter'] = item_filter
         self.request.session['item_name'] = item_name
@@ -102,6 +103,24 @@ class SearchResultsListView(ListView):
         self.request.session['queryset'] = list(query.values(*fields))
         # print(self.request.session.get('queryset'))
         return query.order_by('created_date')
+
+
+class EntryRootAutoComplete(View):
+    def get(self, *args, **kwargs):
+        logger.debug('Autocomplete Called')
+        q = self.request.GET.get('q')
+        logger.debug(q)
+        if q:
+            queryset = Entry.objects.filter(
+                Q(item_root__icontains=q) &
+                Q(is_root=True)).\
+                values_list('item_root', flat=True)
+        else:
+            queryset = None
+
+        logger.debug(queryset)
+
+        return JsonResponse(list(queryset), safe=False)
 
 
 def export_search_to_csv(request):
@@ -128,3 +147,4 @@ def validate_item_name(request):
     if data['is_taken']:
         data['error_message'] = 'This item already exists.'
     return JsonResponse(data)
+
