@@ -15,6 +15,7 @@ from core.models import Entry, Example
 from .forms import EntryForm, ExampleForm
 
 logger = logging.getLogger(__name__)
+print(logger)
 
 
 class IndexListView(ListView):
