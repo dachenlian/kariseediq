@@ -26,6 +26,7 @@ class IndexListView(ListView):
 
 class EntryCreateView(View):
     template_name = 'core/create.html'
+    success_message = 'New entry saved!'
 
     def get(self, request, *args, **kwargs):
         entry_form = EntryForm()
@@ -40,9 +41,12 @@ class EntryCreateView(View):
         entry_form = EntryForm(request.POST)
         formset = ExampleFormSet(request.POST)
         if entry_form.is_valid() and formset.is_valid():
-            entry = entry_form.save()
+            logger.debug(entry_form.cleaned_data)
+            entry = entry_form.save(commit=False)
+            entry.is_root = entry_form.cleaned_data.get('is_root')
+            entry.save()
             formset.save()
-            messages.success('New entry saved!')
+            messages.success(request, self.success_message)
             return redirect(entry)
         messages.error(request, 'An error occurred. Please try again.')
         return redirect('core:create')
@@ -63,12 +67,15 @@ class EntryExampleUpdateView(View):
         return render(self.request, template_name='core/update.html', context=context)
 
     def post(self, request, *args, **kwargs):
-        logger.debug(request.POST.get('test'))
+        logger.debug('Inside Update view.')
         entry = get_object_or_404(Entry, pk=kwargs.get('pk'))
         entry_form = EntryUpdateForm(request.POST, instance=entry)
         formset = ExampleFormSet(request.POST, instance=entry)
         if entry_form.is_valid() and formset.is_valid():
-            entry_form.save()
+            logger.debug(entry_form.cleaned_data)
+            entry = entry_form.save(commit=False)
+            entry.is_root = entry_form.cleaned_data.get('is_root')
+            entry.save()
             formset.save()
             messages.success(request, "Entry updated!")
         else:

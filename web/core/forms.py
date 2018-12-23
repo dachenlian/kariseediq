@@ -25,6 +25,17 @@ class EntryForm(ModelForm):
             # 'item_root': autocomplete.ListSelect2(url='core:focus_autocomplete')
         }
 
+    def clean(self):
+        cleaned_data = super().clean()
+        item_name = cleaned_data.get('item_name')
+        item_root = cleaned_data.get('item_root')
+
+        if item_name == item_root:
+            cleaned_data['is_root'] = True
+        else:
+            cleaned_data['is_root'] = False
+        return cleaned_data
+
 
 class EntryUpdateForm(EntryForm):
 
