@@ -8,6 +8,22 @@ class Entry(models.Model):
     class Meta:
         verbose_name_plural = 'entries'
 
+    GRAMMATICAL_GENDER = 'GRAMMATICAL_GENDER'
+    AGENT_FOCUS = 'AGENT_FOCUS'
+    PATIENT_FOCUS = 'PATIENT_FOCUS'
+    LOCATIVE_FOCUS = 'LOCATIVE_FOCUS'
+    REFERENCE_FOCUS = 'REFERENCE_FOCUS'
+    ZERO_FOCUS = 'ZERO_FOCUS'
+
+    FOCUS_CHOICES = (
+        (GRAMMATICAL_GENDER, '名詞性標記'),
+        (AGENT_FOCUS, '主事焦點'),
+        (PATIENT_FOCUS, '受事焦點'),
+        (LOCATIVE_FOCUS, '處所焦點'),
+        (REFERENCE_FOCUS, '參考焦點'),
+        (ZERO_FOCUS, '零焦點標記'),
+    )
+
     NOUN = 'NOUN'
     VERB = 'VERB'
     MULTI = 'MULTI'
@@ -59,7 +75,6 @@ class Entry(models.Model):
     item_name = models.CharField(max_length=255, unique=True)  # 詞項
     item_root = models.CharField(max_length=255, blank=True, default="")
     user = models.CharField(max_length=255, blank=True, default="")
-    # user = models.ForeignKey(User, null=True, on_delete=models.SET_NULL, related_name='entries')
     created_date = models.DateField(default=datetime.date.today)
     modified_date = models.DateTimeField(auto_now=True)
     is_root = models.BooleanField(blank=True, default=False)
@@ -68,7 +83,7 @@ class Entry(models.Model):
     main_meaning_word_class = models.CharField(max_length=255, blank=True, default="")
     word_class = models.CharField(max_length=255, choices=WORD_CLASS_CHOICES, default=NOUN)
     cultural_notes = models.CharField(max_length=255, blank=True, default="")
-    focus = models.CharField(max_length=255, blank=True, default="")
+    focus = models.CharField(max_length=255, blank=True, default="", choices=FOCUS_CHOICES)
     phrase = models.CharField(max_length=255, blank=True, default="")  # 詞組
     phrase_ch = models.CharField(max_length=255, blank=True, default="")
     phrase_en = models.CharField(max_length=255, blank=True, default="")

@@ -12,7 +12,7 @@ from django.forms import inlineformset_factory
 
 
 from core.models import Entry, Example
-from .forms import EntryForm, ExampleForm
+from .forms import EntryForm, EntryUpdateForm, ExampleForm
 
 logger = logging.getLogger(__name__)
 print(logger)
@@ -43,7 +43,7 @@ class EntryExampleUpdateView(View):
     def get(self, request, *args, **kwargs):
         entry = get_object_or_404(Entry, pk=kwargs.get('pk'))
 
-        entry_form = EntryForm(instance=entry)
+        entry_form = EntryUpdateForm(instance=entry)
         formset = self.ExampleFormSet(instance=entry)
 
         context = {
@@ -53,13 +53,18 @@ class EntryExampleUpdateView(View):
         return render(self.request, template_name='core/update.html', context=context)
 
     def post(self, request, *args, **kwargs):
+        logger.debug(request.POST.get('test'))
         entry = get_object_or_404(Entry, pk=kwargs.get('pk'))
-        entry_form = EntryForm(request.POST, instance=entry)
+        entry_form = EntryUpdateForm(request.POST, instance=entry)
         formset = self.ExampleFormSet(request.POST, instance=entry)
         if entry_form.is_valid() and formset.is_valid():
             entry_form.save()
             formset.save()
             messages.success(request, "Entry updated!")
+        else:
+            logger.warning(entry_form.errors)
+            logger.warning(formset.errors)
+
         return redirect(entry)
 
 

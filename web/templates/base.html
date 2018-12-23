@@ -77,6 +77,17 @@
 <script>$(document).ready(function () {
     $('body').bootstrapMaterialDesign();
 });</script>
+<script>
+    $('#id_word_class').on('change', function() {
+        const wordClass = this.value;
+        const focus = $('#id_focus');
+        if (wordClass === 'NOUN') {
+            focus.prop('disabled', true);
+        } else {
+           focus.prop('disabled', false);
+        }
+    });
+</script>
 {% block javascript %}
 {% endblock javascript %}
 </body>

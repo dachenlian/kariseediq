@@ -8,14 +8,7 @@ import re
 from .models import Entry, Example
 
 
-logging.basicConfig(level=logging.DEBUG,
-                    format='%(asctime)s [%(name)-12s] [%(levelname)-8s] %(message)s',
-                    datefmt='%m-%d %H:%M',
-                    filename=os.path.join(BASE_DIR, 'debug.log'),
-                    filemode='w'
-                    )
-
-logger = logging.getLogger(__name__)
+logger = logging.getLogger()
 
 
 def convert_to_boolean(cell):
@@ -24,6 +17,7 @@ def convert_to_boolean(cell):
 
 TAG_DICT = dict((y, x) for x, y in Entry.TAG_CHOICES)
 WORD_CLASS_DICT = dict((y, x) for x, y in Entry.WORD_CLASS_CHOICES)
+FOCUS_DICT = dict((y, x) for x, y in Entry.FOCUS_CHOICES)
 
 
 def convert_tags(tags):
@@ -32,6 +26,12 @@ def convert_tags(tags):
     split = (t.strip() for t in re.split(r'[，,、]', tags))
     converted = (TAG_DICT.get(t) for t in split if t in TAG_DICT)
     return ",".join(converted)
+
+
+def convert_focus(focus):
+    if not focus:
+        return ""
+    return FOCUS_DICT.get(focus)
 
 
 def load_into_db(file):
@@ -48,6 +48,12 @@ def load_into_db(file):
             new_entry['word_class'] = WORD_CLASS_DICT.get(new_entry['word_class'].strip(), WORD_CLASS_DICT['其他'])
             try:
                 new_entry['tag'] = convert_tags(new_entry['tag'])
+            except TypeError as e:
+                logger.exception(e)
+                break
+
+            try:
+                new_entry['focus'] = convert_focus(new_entry['focus'])
             except TypeError as e:
                 logger.exception(e)
                 break

@@ -22,6 +22,13 @@ class EntryForm(ModelForm):
         }
 
 
+class EntryUpdateForm(EntryForm):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['item_name'].disabled = True
+
+
 class ExampleForm(ModelForm):
     class Meta:
         model = Example
