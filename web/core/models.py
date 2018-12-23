@@ -81,7 +81,7 @@ class Entry(models.Model):
     meaning = models.CharField(max_length=255, blank=True, default="")
     meaning_en = models.CharField(max_length=255, blank=True, default="")
     main_meaning_word_class = models.CharField(max_length=255, blank=True, default="")
-    word_class = models.CharField(max_length=255, choices=WORD_CLASS_CHOICES, default=NOUN)
+    word_class = models.CharField(max_length=255, choices=WORD_CLASS_CHOICES, default=WORD_CLASS_CHOICES[3][0])
     cultural_notes = models.CharField(max_length=255, blank=True, default="")
     focus = models.CharField(max_length=255, blank=True, default="", choices=FOCUS_CHOICES)
     phrase = models.CharField(max_length=255, blank=True, default="")  # 詞組

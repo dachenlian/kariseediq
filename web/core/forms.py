@@ -1,6 +1,6 @@
 from django import forms
+from django.forms import ModelForm, inlineformset_factory
 
-from django.forms import ModelForm
 from .models import Entry, Example
 
 
@@ -43,3 +43,10 @@ class ExampleForm(ModelForm):
             'sentence_en': forms.TextInput,
         }
 
+
+ExampleFormSet = inlineformset_factory(
+    parent_model=Entry,
+    model=Example,
+    form=ExampleForm,
+    extra=2,
+)

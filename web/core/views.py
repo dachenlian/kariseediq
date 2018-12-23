@@ -5,14 +5,12 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.views.generic.list import ListView
 from django.views.generic import View
-from django.views.generic.edit import UpdateView, CreateView
+
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
-from django.forms import inlineformset_factory
 
-
-from core.models import Entry, Example
-from .forms import EntryForm, EntryUpdateForm, ExampleForm
+from core.models import Entry
+from .forms import EntryForm, EntryUpdateForm, ExampleFormSet
 
 logger = logging.getLogger(__name__)
 print(logger)
@@ -26,25 +24,37 @@ class IndexListView(ListView):
     ordering = ['-created_date']
 
 
-class EntryCreateView(CreateView):
+class EntryCreateView(View):
     template_name = 'core/create.html'
-    form_class = EntryForm
+
+    def get(self, request, *args, **kwargs):
+        entry_form = EntryForm()
+        formset = ExampleFormSet()
+        context = {
+            'form': entry_form,
+            'formset': formset
+        }
+        return render(self.request, template_name=self.template_name, context=context)
+
+    def post(self, request, *args, **kwargs):
+        entry_form = EntryForm(request.POST)
+        formset = ExampleFormSet(request.POST)
+        if entry_form.is_valid() and formset.is_valid():
+            entry = entry_form.save()
+            formset.save()
+            messages.success('New entry saved!')
+            return redirect(entry)
+        messages.error(request, 'An error occurred. Please try again.')
+        return redirect('core:create')
 
 
 class EntryExampleUpdateView(View):
-
-    ExampleFormSet = inlineformset_factory(
-        parent_model=Entry,
-        model=Example,
-        form=ExampleForm,
-        extra=2,
-    )
 
     def get(self, request, *args, **kwargs):
         entry = get_object_or_404(Entry, pk=kwargs.get('pk'))
 
         entry_form = EntryUpdateForm(instance=entry)
-        formset = self.ExampleFormSet(instance=entry)
+        formset = ExampleFormSet(instance=entry)
 
         context = {
             'form': entry_form,
@@ -56,7 +66,7 @@ class EntryExampleUpdateView(View):
         logger.debug(request.POST.get('test'))
         entry = get_object_or_404(Entry, pk=kwargs.get('pk'))
         entry_form = EntryUpdateForm(request.POST, instance=entry)
-        formset = self.ExampleFormSet(request.POST, instance=entry)
+        formset = ExampleFormSet(request.POST, instance=entry)
         if entry_form.is_valid() and formset.is_valid():
             entry_form.save()
             formset.save()

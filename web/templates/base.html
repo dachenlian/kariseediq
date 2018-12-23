@@ -13,7 +13,7 @@
     <link rel="stylesheet"
           href="https://unpkg.com/bootstrap-material-design@4.1.1/dist/css/bootstrap-material-design.min.css"
           integrity="sha384-wXznGJNEXNG1NFsbm0ugrLFMQPWswR3lds2VeinahP8N0zJw9VWSopbjv2x7WCvX" crossorigin="anonymous">
-
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="{% static 'core/web.css' %}">
     <title>KariSeediq</title>
     {% block header %}
@@ -78,14 +78,12 @@
     $('body').bootstrapMaterialDesign();
 });</script>
 <script>
-    $('#id_word_class').on('change', function() {
-        const wordClass = this.value;
+    const wordClass = $('#id_word_class');
+
+    wordClass.on('change', function () {
+        const wordClassValue = this.value;
         const focus = $('#id_focus');
-        if (wordClass === 'NOUN') {
-            focus.prop('disabled', true);
-        } else {
-           focus.prop('disabled', false);
-        }
+        (wordClassValue === 'NOUN') ? focus.prop('disabled', true) : focus.prop('disabled', false);
     });
 </script>
 {% block javascript %}
