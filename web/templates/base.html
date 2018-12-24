@@ -15,6 +15,9 @@
           integrity="sha384-wXznGJNEXNG1NFsbm0ugrLFMQPWswR3lds2VeinahP8N0zJw9VWSopbjv2x7WCvX" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="{% static 'core/web.css' %}">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.2/css/bootstrap-select.min.css">
 
     <title>KariSeediq</title>
     {% block header %}
@@ -68,6 +71,8 @@
 <script src="https://unpkg.com/bootstrap-material-design@4.1.1/dist/js/bootstrap-material-design.js"
         integrity="sha384-CauSuKpEqAFajSpkdjv3z9t8E7RlpJ1UP0lKM/+NdtSarroVKu069AlsRPKkFBz9"
         crossorigin="anonymous"></script>
+
+<!-- Latest compiled and minified JavaScript -->
 <script>$(document).ready(function () {
     $('body').bootstrapMaterialDesign();
 });</script>
@@ -82,17 +87,18 @@
     });
 </script>
 <script src="https://cdn.rawgit.com/xcash/bootstrap-autocomplete/v2.0.0/dist/latest/bootstrap-autocomplete.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.2/js/bootstrap-select.min.js"></script>
 <script>
-    $('.basicAutoComplete').autoComplete({
+    $('#id_item_root').autoComplete({
         resolverSettings: {
             url: "{% url 'core:focus_autocomplete' %}"
         }
-    })
+    });
 </script>
 <script>
     $.ajax({
         url: "{% url 'core:pending' %}",
-        success: function(result) {
+        success: function (result) {
             const pendingBadge = $('#pendingBadge');
             const count = result['pending_count'];
             pendingBadge.text(count)

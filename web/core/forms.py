@@ -21,8 +21,8 @@ class EntryForm(ModelForm):
             'word_root': 'Word root',
         }
         widgets = {
-            'item_root': forms.widgets.TextInput(attrs={'class': 'basicAutoComplete', 'autocomplete': 'off'})
-            # 'item_root': autocomplete.ListSelect2(url='core:focus_autocomplete')
+            'item_root': forms.widgets.TextInput(attrs={'class': 'basicAutoComplete', 'autocomplete': 'off'}),
+            'tag': forms.widgets.SelectMultiple(attrs={'class': 'selectpicker', 'title': '-------'})
         }
 
     def clean(self):

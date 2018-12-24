@@ -60,7 +60,7 @@ LOGGING = {
     'disable_existing_loggers': False,
     'formatters': {
         'verbose': {
-            'format': '{asctime} - {levelname} - {name}: {message}',
+            'format': '{asctime} - {levelname} - {name}:{lineno} - {funcName}(): {message}',
             'style': '{',
             'datefmt': '%Y-%m-%d %H:%M:%S',
         },

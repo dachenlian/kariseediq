@@ -1,14 +1,14 @@
 import csv
 import logging
 
-from django.shortcuts import render, redirect
-from django.urls import reverse_lazy
 from django.contrib import messages
-from django.views.generic.list import ListView
-from django.views.generic import View, DeleteView
+from django.db.models import Q
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
-from django.db.models import Q
+from django.shortcuts import render, redirect
+from django.urls import reverse_lazy
+from django.views.generic import View, DeleteView
+from django.views.generic.list import ListView
 
 from core.models import Entry
 from .forms import EntryForm, EntryUpdateForm, ExampleFormSet
@@ -186,4 +186,3 @@ def validate_item_name(request):
     if data['is_taken']:
         data['error_message'] = 'This item already exists.'
     return JsonResponse(data)
-
