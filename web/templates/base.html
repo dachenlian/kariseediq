@@ -30,10 +30,14 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
             <li class="nav-item active">
-                <a class="nav-link" href="/">Home</a>
+                <a class="nav-link" href="{% url 'core:index' %}">Home</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="{% url 'core:create' %}">New Entry</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'core:pending' %}">
+                    Pending <span id="pendingBadge" class="badge badge-secondary align-middle"></span></a>
             </li>
         </ul>
     </div>
@@ -84,6 +88,16 @@
             url: "{% url 'core:focus_autocomplete' %}"
         }
     })
+</script>
+<script>
+    $.ajax({
+        url: "{% url 'core:pending' %}",
+        success: function(result) {
+            const pendingBadge = $('#pendingBadge');
+            const count = result['pending_count'];
+            pendingBadge.text(count)
+        }
+    });
 </script>
 {% block javascript %}
 {% endblock javascript %}

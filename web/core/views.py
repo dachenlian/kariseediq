@@ -86,6 +86,27 @@ class EntryExampleUpdateView(View):
         return redirect(entry)
 
 
+class EntryPendingListView(ListView):
+    model = Entry
+    paginate_by = 50
+    context_object_name = 'entries'
+    template_name = 'core/pending.html'
+
+    def get(self, request, *args, **kwargs):
+        if request.is_ajax():
+            logger.debug('Ajax request received!')
+            queryset = self.get_queryset()
+            return JsonResponse({'pending_count': len(queryset)})
+        else:
+            return super().get(request, *args, **kwargs)
+
+    def get_queryset(self):
+        item_roots = Entry.objects.all().values_list('item_root', flat=True)
+        item_names = Entry.objects.all().values_list('item_name', flat=True)
+        roots_without_entries = item_roots.exclude(item_root__in=item_names)
+        return sorted(filter(bool, set(roots_without_entries)))
+
+
 class SearchResultsListView(ListView):
     model = Entry
     paginate_by = 50
