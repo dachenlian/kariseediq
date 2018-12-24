@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+  web:
+    volumes:
+      - ./web/:/app/web/
+    command: >
+      bash -c "python manage.py makemigrations --noinput
+      && python manage.py migrate --noinput
+      && python manage.py collectstatic --noinput
+      && python -u manage.py runserver 0.0.0.0:8000"
