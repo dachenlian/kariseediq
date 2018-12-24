@@ -2,9 +2,10 @@ import csv
 import logging
 
 from django.shortcuts import render, redirect
+from django.urls import reverse_lazy
 from django.contrib import messages
 from django.views.generic.list import ListView
-from django.views.generic import View
+from django.views.generic import View, DeleteView
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
@@ -110,6 +111,16 @@ class SearchResultsListView(ListView):
         self.request.session['queryset'] = list(query.values(*fields))
         # print(self.request.session.get('queryset'))
         return query.order_by('created_date')
+
+
+class EntryDeleteView(DeleteView):
+    model = Entry
+    success_url = reverse_lazy('core:index')
+    success_message = 'Entry successfully deleted!'
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(request, self.success_message)
+        return super().delete(request, *args, **kwargs)
 
 
 class EntryRootAutoComplete(View):

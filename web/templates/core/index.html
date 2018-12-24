@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load my_tags %}
 {% block content %}
-     <div class="row">
+    <div class="row">
         <div class="col">
             <h1>Search</h1>
             <form action="{% url 'core:results' %}" method="get">
@@ -37,17 +37,18 @@
     </div>
     <div class="row">
         <div class="p-2 mb-2 bg-light text-dark col">
-        <p class="py-0 my-0 align-middle">
-            <strong>資料筆數：</strong>{{ view.get_queryset.count }}
-            {% if view.request.GET.item_name %}
-                | <strong>Search params: </strong>{{ view.request.GET.item_name }}, {{ view.request.GET.item_filter }}
-            {% endif %}
-            {% if request.session.queryset %}
-                <span class="align-middle">
+            <p class="py-0 my-0 align-middle">
+                <strong>資料筆數：</strong>{{ view.get_queryset.count }}
+                {% if view.request.GET.item_name %}
+                    | <strong>Search params: </strong>{{ view.request.GET.item_name }},
+                    {{ view.request.GET.item_filter }}
+                {% endif %}
+                {% if request.session.queryset %}
+                    <span class="align-middle">
                 <a class="btn btn-info py-0" href="{% url 'core:export' %}">Export to CSV</a>
                 </span>
-            {% endif %}
-        </p>
+                {% endif %}
+            </p>
         </div>
         <table class="table table-hover">
             <thead class="thead-dark">
@@ -59,18 +60,25 @@
                 <th>詞根</th>
                 <th>輸入者</th>
                 <th>輸入日期</th>
+                <th>刪除</th>
             </tr>
             </thead>
             <tbody>
             {% for entry in entries %}
-                <tr onclick="window.location='{% url 'core:update' pk=entry.id %}';">
-                    <td>{{ forloop.counter0|add:page_obj.start_index }}</td>
-                    <td>{{ entry.item_name }}</td>
-                    <td>{{ entry.variant }}</td>
-                    <td>{{ entry.meaning }}</td>
-                    <td>{{ entry.word_root }}</td>
-                    <td>{{ entry.user }}</td>
-                    <td>{{ entry.created_date }}</td>
+                <tr>
+                    <td class="align-middle">{{ forloop.counter0|add:page_obj.start_index }}</td>
+                    <td style="cursor: pointer" onclick="window.location='{% url 'core:update' pk=entry.id %}';"
+                        class="align-middle">{{ entry.item_name }}</td>
+                    <td class="align-middle">{{ entry.variant }}</td>
+                    <td class="align-middle">{{ entry.meaning }}</td>
+                    <td class="align-middle">{{ entry.word_root }}</td>
+                    <td class="align-middle">{{ entry.user }}</td>
+                    <td class="align-middle">{{ entry.created_date }}</td>
+                    <td class="align-middle">
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#deleteModal"
+                                data-pk="{{ entry.id }}">Delete
+                        </button>
+                    </td>
                 </tr>
             {% empty %}
                 <tr>
@@ -108,4 +116,41 @@
             </div>
         </div>
     </nav>
+    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Delete entry?</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Delete</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock content %}
+{% block javascript %}
+    <script>
+    $('#deleteModal').on('show.bs.modal', function(event) {
+        let button = $(event.relatedTarget);
+        let pk = button.data('pk');
+        let url = "{% url 'core:delete' pk=1 %}".replace(1, `${pk}`);
+        let modal = $(this);
+        let entry = $(button).closest('tr').find('td:nth-child(2)').text();
+        let form = modal.find('form');
+
+        form.prop('action', url);
+        modal.find('.modal-title').text('Delete ' + entry + '?')
+    })
+    </script>
+{% endblock javascript %}
