@@ -16,6 +16,7 @@ django-extra-views = "*"
 django-debug-toolbar = "*"
 whitenoise = "*"
 gunicorn = "*"
+python-dotenv = "*"
 
 [dev-packages]
 

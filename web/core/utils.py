@@ -1,8 +1,6 @@
 import csv
 import datetime
 import logging
-from web.settings import BASE_DIR
-import os
 import re
 
 from .models import Entry, Example
