@@ -122,11 +122,20 @@ class SearchResultsListView(ListView):
         self.request.session['item_name'] = item_name
 
         if item_filter == 'startswith':
-            query = Entry.objects.filter(item_name__startswith=item_name)
+            query = Entry.objects.filter(Q(item_name__startswith=item_name) |
+                                         Q(meaning__istartswith=item_name) |
+                                         Q(variant__istartswith=item_name)
+                                         )
         elif item_filter == 'endswith':
-            query = Entry.objects.filter(item_name__endswith=item_name)
+            query = Entry.objects.filter(Q(item_name__endswith=item_name) |
+                                         Q(meaning__iendswith=item_name) |
+                                         Q(variant__iendswith=item_name)
+                                         )
         else:
-            query = Entry.objects.filter(item_name__contains=item_name)
+            query = Entry.objects.filter(Q(item_name__contains=item_name) |
+                                         Q(meaning__icontains=item_name) |
+                                         Q(variant__icontains=item_name)
+                                         )
 
         fields = EntryForm.Meta.fields
         self.request.session['queryset'] = list(query.values(*fields))

@@ -1,5 +1,6 @@
 from django import forms
 from django.forms import ModelForm, inlineformset_factory
+from django.core.exceptions import ValidationError
 
 from .models import Entry, Example
 
@@ -35,6 +36,12 @@ class EntryForm(ModelForm):
         else:
             cleaned_data['is_root'] = False
         return cleaned_data
+
+    # def clean_item_name(self):
+    #     data = self.cleaned_data['item_name']
+    #     if any(char.isdigit() for char in data):
+    #         raise ValidationError('Item name cannot contain numbers')
+    #     return data
 
 
 class EntryUpdateForm(EntryForm):
