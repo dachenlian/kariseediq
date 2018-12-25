@@ -96,6 +96,13 @@
     });
 </script>
 <script>
+    $('#id_item_name').autoComplete({
+        resolverSettings: {
+            url: "{% url 'core:item_name_autocomplete' %}"
+        }
+    });
+</script>
+<script>
     $.ajax({
         url: "{% url 'core:pending' %}",
         success: function (result) {

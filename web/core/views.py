@@ -139,7 +139,6 @@ class SearchResultsListView(ListView):
 
         fields = EntryForm.Meta.fields
         self.request.session['queryset'] = list(query.values(*fields))
-        # print(self.request.session.get('queryset'))
         return query.order_by('created_date')
 
 
@@ -163,6 +162,21 @@ class EntryRootAutoComplete(View):
                 Q(item_root__icontains=q) &
                 Q(is_root=True)).\
                 values_list('item_root', flat=True)
+        else:
+            queryset = None
+
+        logger.debug(queryset)
+
+        return JsonResponse(list(queryset), safe=False)
+
+
+class EntryItemNameAutoComplete(View):
+    def get(self, *args, **kwargs):
+        logger.debug('Item name autocomplete Called')
+        q = self.request.GET.get('q')
+        logger.debug(q)
+        if q:
+            queryset = Entry.objects.filter(item_name__icontains=q).values_list('item_name', flat=True)
         else:
             queryset = None
 

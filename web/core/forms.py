@@ -22,6 +22,7 @@ class EntryForm(ModelForm):
             'word_root': 'Word root',
         }
         widgets = {
+            'item_name': forms.widgets.TextInput(attrs={'class': 'basicAutoComplete', 'autocomplete': 'off'}),
             'item_root': forms.widgets.TextInput(attrs={'class': 'basicAutoComplete', 'autocomplete': 'off'}),
             'tag': forms.widgets.SelectMultiple(attrs={'class': 'selectpicker', 'title': '-------'})
         }
