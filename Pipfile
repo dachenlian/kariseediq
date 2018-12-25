@@ -14,6 +14,8 @@ wordcloud = "*"
 matplotlib = "*"
 django-extra-views = "*"
 django-debug-toolbar = "*"
+whitenoise = "*"
+gunicorn = "*"
 
 [dev-packages]
 

@@ -13,5 +13,4 @@ urlpatterns = [
     path('export/', views.export_search_to_csv, name='export'),
     path('ajax/validate_item_name/', views.validate_item_name, name='validate_item_name'),
     path('ajax/focus_autocomplete/', views.EntryRootAutoComplete.as_view(), name='focus_autocomplete'),
-    path('ajax/tag_options/', views.tag_options, name='tag_options'),
 ]
