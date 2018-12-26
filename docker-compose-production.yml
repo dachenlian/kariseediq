@@ -6,4 +6,7 @@ services:
       bash -c "python manage.py makemigrations --noinput
       && python manage.py migrate --noinput
       && python manage.py collectstatic --noinput
-      && gunicorn --workers 4 web.wsgi"
+      && gunicorn --workers 4 web.wsgi --bind 0.0.0.0:8000"
+    environment:
+      - DJANGO_SETTINGS_MODULE=web.settings.production
+      - DJANGO_LOG_LEVEL=INFO

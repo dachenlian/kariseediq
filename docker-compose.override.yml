@@ -9,3 +9,6 @@ services:
       && python manage.py migrate --noinput
       && python manage.py collectstatic --noinput
       && python -u manage.py runserver 0.0.0.0:8000"
+    environment:
+      - DJANGO_SETTINGS_MODULE=web.settings.local
+      - DJANGO_LOG_LEVEL=DEBUG
