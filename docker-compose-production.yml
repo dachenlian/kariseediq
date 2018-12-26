@@ -2,3 +2,8 @@ version: '3'
 
 services:
   web:
+    command: >
+      bash -c "python manage.py makemigrations --noinput
+      && python manage.py migrate --noinput
+      && python manage.py collectstatic --noinput
+      && gunicorn --workers 4 web.wsgi"

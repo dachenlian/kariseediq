@@ -88,7 +88,7 @@ class EntryExampleUpdateView(View):
 
 class EntryPendingListView(ListView):
     model = Entry
-    paginate_by = 50
+    paginate_by = 1000
     context_object_name = 'entries'
     template_name = 'core/pending.html'
 
@@ -101,10 +101,12 @@ class EntryPendingListView(ListView):
             return super().get(request, *args, **kwargs)
 
     def get_queryset(self):
-        item_roots = Entry.objects.all().values_list('item_root', flat=True)
+        item_roots = Entry.objects.all().values_list('item_name', 'item_root')
         item_names = Entry.objects.all().values_list('item_name', flat=True)
         roots_without_entries = item_roots.exclude(item_root__in=item_names)
-        return sorted(filter(bool, set(roots_without_entries)))
+        roots_without_entries = sorted(filter(bool, set(roots_without_entries)))
+        logger.debug(len(roots_without_entries))
+        return roots_without_entries
 
 
 class SearchResultsListView(ListView):

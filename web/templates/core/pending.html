@@ -14,13 +14,15 @@
                     <tr>
                         <th>#</th>
                         <th>詞項</th>
+                        <th>詞根</th>
                     </tr>
                     </thead>
                     <tbody>
                     {% for entry in entries %}
                         <tr>
                             <td>{{ forloop.counter }}</td>
-                            <td>{{ entry }}</td>
+                            <td>{{ entry.0 }}</td>
+                            <td>{{ entry.1 }}</td>
                         </tr>
                     {% endfor %}
                     </tbody>
