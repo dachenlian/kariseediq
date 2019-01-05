@@ -90,7 +90,8 @@ class Entry(models.Model):
     char_strokes_first = models.CharField(max_length=255, blank=True, default="")
     char_strokes_all = models.CharField(max_length=255, blank=True, default="")
     frequency = models.IntegerField(blank=True, default=0)
-    has_picture = models.BooleanField(default=False)
+    picture = models.ImageField(upload_to='pictures/', blank=True)
+    sound = models.FileField(upload_to='sound/', blank=True)
     grammar_notes = models.CharField(max_length=255, blank=True, default="")  # 語法註記
     source = models.CharField(max_length=255, blank=True, default="")  # 參照
     tag = MultiSelectField(choices=TAG_CHOICES, default="", null=True, blank=True)  # 標籤

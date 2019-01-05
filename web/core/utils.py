@@ -6,7 +6,7 @@ import re
 from .models import Entry, Example
 
 
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 
 
 def convert_to_boolean(cell):
@@ -38,6 +38,7 @@ def load_into_db(file):
         header = next(reader)
 
         for row in reader:
+            row = [r.lower().strip() for r in row]
             new_entry = dict(zip(header, row))
             if Entry.objects.filter(item_name=new_entry['item_name']).count():
                 logger.warning(f"{new_entry['item_name']} already exists.\n{new_entry}")
@@ -59,14 +60,13 @@ def load_into_db(file):
             if not new_entry['frequency']:
                 new_entry['frequency'] = 0
 
-            new_entry['is_root'] = new_entry['is_root'].lower() == 'yes'
-            new_entry['has_picture'] = new_entry['has_picture'] == 1
-
             try:
                 new_entry['created_date'] = datetime.datetime.strptime(new_entry['created_date'], '%m/%d/%Y')
             except ValueError as e:
                 logger.exception(e)
                 new_entry['created_date'] = datetime.datetime.min
+
+            new_entry['is_root'] = convert_to_boolean(new_entry['is_root'])
 
             sentence = new_entry.pop('sentence')
             sentence_en = new_entry.pop('sentence_en')
