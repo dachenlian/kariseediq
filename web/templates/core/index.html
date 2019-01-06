@@ -2,12 +2,14 @@
 {% load my_tags %}
 {% block content %}
     <div class="row">
-        <div class="col">
-            <h1>Search</h1>
-            <form action="{% url 'core:results' %}" method="get">
-                {% include 'core/search_form_snippet.html' %}
-            </form>
-        </div>
+        {% if 'results' in request.path %}
+            <div class="col">
+                <h1>Filter results</h1>
+                <form action="{% url 'core:results' %}" method="get">
+                    {% include 'core/search_form_snippet.html' %}
+                </form>
+            </div>
+        {% endif %}
     </div>
     <div class="row">
         <div class="p-2 mb-2 bg-light text-dark col">
@@ -33,6 +35,7 @@
                     <th>變體</th>
                     <th>意義</th>
                     <th>詞根</th>
+                    <th>參照</th>
                     <th>輸入者</th>
                     <th>輸入日期</th>
                     <th>刪除</th>
@@ -47,6 +50,7 @@
                         <td class="align-middle">{{ entry.variant }}</td>
                         <td class="align-middle">{{ entry.meaning }}</td>
                         <td class="align-middle">{{ entry.item_root }}</td>
+                        <td class="align-middle">{{ entry.source }}</td>
                         <td class="align-middle">{{ entry.user }}</td>
                         <td class="align-middle">{{ entry.created_date }}</td>
                         <td class="align-middle">
