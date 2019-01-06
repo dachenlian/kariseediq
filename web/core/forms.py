@@ -11,7 +11,7 @@ class EntryForm(ModelForm):
 
     class Meta:
         model = Entry
-        fields = ('item_name', 'item_root', 'variant', 'toda', 'truku',
+        fields = ('item_name', 'item_root', 'variant', 'toda', 'truku', 'sound', 'picture',
                   'toda_root', 'truku_root', 'meaning', 'meaning_en', 'focus',
                   'word_class', 'tag', 'grammar_notes', 'cultural_notes')
         labels = {

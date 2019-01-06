@@ -51,6 +51,12 @@
     <div class="col">
         {{ form.tag|as_crispy_field }}
     </div>
+    <div class="col">
+        {{ form.sound|as_crispy_field }}
+    </div>
+    <div class="col">
+        {{ form.picture|as_crispy_field }}
+    </div>
 </div>
 {{ formset.management_form }}
 {% for form in formset %}
