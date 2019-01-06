@@ -1,0 +1,27 @@
+<div class="form-row align-items-center">
+    <div class="col-md-2">
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="item_filter" id="startsWith"
+                   value="startswith" checked>
+            <label class="form-check-label" for="startsWith">Starts with</label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="item_filter" id="endsWith"
+                   value="endswith">
+            <label class="form-check-label" for="endsWith">Ends with</label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="item_filter" id="contains"
+                   value="contains">
+            <label class="form-check-label" for="contains">Contains</label>
+        </div>
+    </div>
+    <div class="col-md-8 form-group">
+        <label for="itemNameInput">Item name</label>
+        <input type="text" id="itemNameInput" class="form-control form-control-lg"
+               name="item_name">
+    </div>
+    <div class="col-auto">
+        <button style="line-height: 50%" type="submit" class="col btn btn-primary active"><i class="material-icons">search</i></button>
+    </div>
+</div>

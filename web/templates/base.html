@@ -25,16 +25,20 @@
 </head>
 <body>
 <nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark">
-    <a class="navbar-brand" href="/">KariSeediq</a>
+    <a style="line-height:50%" class="navbar-brand" href="/"><i class="material-icons">home</i></a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
             aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
-            <li class="nav-item active">
-                <a class="nav-link" href="{% url 'core:index' %}">Home</a>
-            </li>
+{#            <li class="nav-item active">#}
+{#                {% if 'results' in request.path %}#}
+{#                    <a class="nav-link" href="{% url 'core:index' %}">New Search</a>#}
+{#                {% else %}#}
+{#                    <a class="nav-link" href="{% url 'core:index' %}">Home</a>#}
+{#                {% endif %}#}
+{#            </li>#}
             <li class="nav-item">
                 <a class="nav-link" href="{% url 'core:create' %}">New Entry</a>
             </li>
@@ -43,6 +47,19 @@
                     Pending <span id="pendingBadge" class="badge badge-secondary align-middle"></span></a>
             </li>
         </ul>
+        <form action="{% url 'core:results' %}" class="form-inline">
+            <div class="form-group">
+                <label for="itemFilterNav"></label>
+                <select name="item_filter" id="itemFilterNav" class="custom-select custom-select-sm mx-auto">
+                    <option value="startswith">Starts with</option>
+                    <option value="endswith">Ends with</option>
+                    <option value="contains">Contains</option>
+                </select>
+            </div>
+            <input type="search" name="item_name" placeholder="Search" class="form-control mx-sm-2">
+            <input type="hidden" name="reset" value="True">
+            <button class="btn btn-outline-light my-2 my-sm-0" type="submit">Search</button>
+        </form>
     </div>
 </nav>
 <div class="container">

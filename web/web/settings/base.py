@@ -177,5 +177,6 @@ REST_FRAMEWORK = {
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 SESSION_ENGINE = "django.contrib.sessions.backends.file"
+SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'

@@ -1,5 +1,6 @@
 import csv
 import logging
+import pickle
 
 from django.contrib import messages
 from django.db.models import Q
@@ -116,32 +117,40 @@ class SearchResultsListView(ListView):
     template_name = 'core/index.html'
 
     def get_queryset(self):
+        reset = self.request.GET.get('reset')
+        if reset:
+            logger.debug('Filtering queryset!')
+            qs = Entry.objects.all()
+        else:
+            qs = self.request.session.get('query')
+
         item_filter = self.request.GET.get('item_filter', "")
         item_name = self.request.GET.get('item_name', "")
-        tags = self.request.GET.get('tags')
+        # tags = self.request.GET.get('tags')
 
         self.request.session['item_filter'] = item_filter
         self.request.session['item_name'] = item_name
 
         if item_filter == 'startswith':
-            query = Entry.objects.filter(Q(item_name__startswith=item_name) |
-                                         Q(meaning__istartswith=item_name) |
-                                         Q(variant__istartswith=item_name)
-                                         )
+            qs = qs.filter(Q(item_name__istartswith=item_name) |
+                           Q(meaning__istartswith=item_name) |
+                           Q(variant__istartswith=item_name)
+                           )
+            logger.debug(qs)
         elif item_filter == 'endswith':
-            query = Entry.objects.filter(Q(item_name__endswith=item_name) |
-                                         Q(meaning__iendswith=item_name) |
-                                         Q(variant__iendswith=item_name)
-                                         )
+            qs = qs.filter(Q(item_name__iendswith=item_name) |
+                           Q(meaning__iendswith=item_name) |
+                           Q(variant__iendswith=item_name)
+                           )
         else:
-            query = Entry.objects.filter(Q(item_name__contains=item_name) |
-                                         Q(meaning__icontains=item_name) |
-                                         Q(variant__icontains=item_name)
-                                         )
+            qs = qs.filter(Q(item_name__icontains=item_name) |
+                           Q(meaning__icontains=item_name) |
+                           Q(variant__icontains=item_name)
+                           )
 
         fields = EntryForm.Meta.fields
-        self.request.session['queryset'] = list(query.values(*fields))
-        return query.order_by('created_date')
+        self.request.session['query'] = qs
+        return qs.order_by('created_date')
 
 
 class EntryDeleteView(DeleteView):
@@ -162,7 +171,7 @@ class EntryRootAutoComplete(View):
         if q:
             queryset = Entry.objects.filter(
                 Q(item_root__icontains=q) &
-                Q(is_root=True)).\
+                Q(is_root=True)). \
                 values_list('item_root', flat=True)
         else:
             queryset = None
@@ -188,7 +197,7 @@ class EntryItemNameAutoComplete(View):
 
 
 def export_search_to_csv(request):
-    queryset = request.session.get('queryset')
+    queryset = request.session.get('query')
     fieldnames = EntryForm.Meta.fields
 
     response = HttpResponse(content_type='text/csv')
