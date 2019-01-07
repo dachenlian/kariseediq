@@ -4,6 +4,7 @@ import pickle
 
 from django.contrib import messages
 from django.db.models import Q
+from django.db.models.functions import Lower
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render, redirect
@@ -23,7 +24,9 @@ class IndexListView(ListView):
     paginate_by = 100
     context_object_name = 'entries'
     template_name = 'core/index.html'
-    ordering = ['-created_date']
+
+    def get_queryset(self):
+        return Entry.objects.all().order_by(Lower('item_name'))
 
 
 class EntryCreateView(View):
@@ -150,7 +153,7 @@ class SearchResultsListView(ListView):
 
         fields = EntryForm.Meta.fields
         self.request.session['query'] = qs
-        return qs.order_by('created_date')
+        return qs.order_by(Lower('item_name'))
 
 
 class EntryDeleteView(DeleteView):

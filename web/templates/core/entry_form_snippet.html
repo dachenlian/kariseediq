@@ -24,6 +24,9 @@
     <div class="col">
         {{ form.truku_root|as_crispy_field }}
     </div>
+    <div class="col">
+        {{ form.source|as_crispy_field }}
+    </div>
 </div>
 <div class="form-row">
     <div class="col">
@@ -31,6 +34,17 @@
     </div>
     <div class="col">
         {{ form.meaning_en|as_crispy_field }}
+    </div>
+</div>
+<div class="form-row">
+    <div class="col">
+        {{ form.phrase|as_crispy_field }}
+    </div>
+    <div class="col">
+        {{ form.phrase_en|as_crispy_field }}
+    </div>
+    <div class="col">
+        {{ form.phrase_ch|as_crispy_field }}
     </div>
 </div>
 <div class="form-row">
