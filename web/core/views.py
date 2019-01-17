@@ -120,12 +120,18 @@ class SearchResultsListView(ListView):
     template_name = 'core/index.html'
 
     def get_queryset(self):
+        logger.debug(self.request.GET)
         reset = self.request.GET.get('reset')
         if reset:
             logger.debug('Filtering queryset!')
             qs = Entry.objects.all()
         else:
             qs = self.request.session.get('query')
+
+        only_roots = self.request.GET.get('root_filter')
+        if only_roots:
+            logger.debug('ONLY ROOTS')
+            qs = qs.filter(is_root=True)
 
         item_filter = self.request.GET.get('item_filter', "")
         item_name = self.request.GET.get('item_name', "")
