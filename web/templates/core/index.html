@@ -14,10 +14,10 @@
     <div class="row">
         <div class="p-2 mb-2 bg-light text-dark col">
             <p class="py-0 my-0 align-middle">
-                <strong>資料筆數：</strong>{{ view.get_queryset.count }}
-                {% if view.request.GET.item_name %}
-                    | <strong>Search params: </strong>{{ view.request.GET.item_name }},
-                    {{ view.request.GET.item_filter }}
+                {% if 'results' in request.path %}
+                    <strong>Search params: </strong>{{ view.request.session.query_history|safe }}
+                {% else %}
+                    <strong>資料筆數：</strong>{{ view.get_queryset.count }}
                 {% endif %}
                 {% if request.session.queryset %}
                     <span class="align-middle">

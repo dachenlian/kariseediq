@@ -3,6 +3,8 @@ import datetime
 import logging
 import re
 
+from django.http.request import HttpRequest
+
 from .models import Entry, Example
 
 
@@ -80,4 +82,21 @@ def load_into_db(file):
                 sentence_ch=sentence_ch,
                 sentence_en=sentence_en,
             )
+
+
+def gen_query_history(request: HttpRequest, qs_length: int):
+    logger.debug('Generating query history...')
+    history = request.session.get('query_history', "").split('<br>')
+    search_name = request.GET.get('search_name', "")
+    search_filter = request.GET.get('search_filter', "")
+    search_root = request.session.get('search_root', False)
+
+    query_str = f"{len(history)}. ({qs_length} hits) " \
+        f"<strong>Item</strong>: {search_name} | " \
+        f"<strong>filter</strong>: {search_filter} | " \
+        f"<strong>Only roots</strong>: {search_root}"
+    history.append(query_str)
+    request.session['query_history'] = "<br>".join(history)
+    logger.debug(history)
+    return request
 

@@ -14,6 +14,7 @@ from django.views.generic.list import ListView
 
 from core.models import Entry
 from .forms import EntryForm, EntryUpdateForm, ExampleFormSet
+from core import utils
 
 logger = logging.getLogger(__name__)
 print(logger)
@@ -115,50 +116,54 @@ class EntryPendingListView(ListView):
 
 class SearchResultsListView(ListView):
     model = Entry
-    paginate_by = 50
+    paginate_by = 100
     context_object_name = 'entries'
     template_name = 'core/index.html'
 
     def get_queryset(self):
         logger.debug(self.request.GET)
-        reset = self.request.GET.get('reset')
+        reset = self.request.GET.get('search_reset')
         if reset:
-            logger.debug('Filtering queryset!')
+            logger.debug('Resetting queryset!')
+            self.request.session.pop('search_root', None)
+            self.request.session.pop('query_history', None)
             qs = Entry.objects.all()
         else:
             qs = self.request.session.get('query')
 
-        only_roots = self.request.GET.get('root_filter')
-        if only_roots:
-            logger.debug('ONLY ROOTS')
+        search_root = self.request.GET.get('search_root')
+        if search_root:
+            logger.debug('Filtering roots')
+            self.request.session['search_root'] = search_root
             qs = qs.filter(is_root=True)
 
-        item_filter = self.request.GET.get('item_filter', "")
-        item_name = self.request.GET.get('item_name', "")
+        search_filter = self.request.GET.get('search_filter', "")
+        search_name = self.request.GET.get('search_name', "")
         # tags = self.request.GET.get('tags')
 
-        self.request.session['item_filter'] = item_filter
-        self.request.session['item_name'] = item_name
+        self.request.session['search_filter'] = search_filter
+        self.request.session['search_name'] = search_name
 
-        if item_filter == 'startswith':
-            qs = qs.filter(Q(item_name__istartswith=item_name) |
-                           Q(meaning__istartswith=item_name) |
-                           Q(variant__istartswith=item_name)
+        if search_filter == 'startswith':
+            qs = qs.filter(Q(item_name__istartswith=search_name) |
+                           Q(meaning__istartswith=search_name) |
+                           Q(variant__istartswith=search_name)
                            )
-            logger.debug(qs)
-        elif item_filter == 'endswith':
-            qs = qs.filter(Q(item_name__iendswith=item_name) |
-                           Q(meaning__iendswith=item_name) |
-                           Q(variant__iendswith=item_name)
+        elif search_filter == 'endswith':
+            qs = qs.filter(Q(item_name__iendswith=search_name) |
+                           Q(meaning__iendswith=search_name) |
+                           Q(variant__iendswith=search_name)
                            )
         else:
-            qs = qs.filter(Q(item_name__icontains=item_name) |
-                           Q(meaning__icontains=item_name) |
-                           Q(variant__icontains=item_name)
+            qs = qs.filter(Q(item_name__icontains=search_name) |
+                           Q(meaning__icontains=search_name) |
+                           Q(variant__icontains=search_name)
                            )
 
         fields = EntryForm.Meta.fields
         self.request.session['query'] = qs
+        utils.gen_query_history(self.request, qs.count())
+
         return qs.order_by(Lower('item_name'))
 
 
