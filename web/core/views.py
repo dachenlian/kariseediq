@@ -125,13 +125,13 @@ class SearchResultsListView(ListView):
         reset = self.request.GET.get('search_reset')
         if reset:
             logger.debug('Resetting queryset!')
-            self.request.session.pop('search_root', None)
-            self.request.session.pop('query_history', None)
+            self.request.session.pop('search_root', False)
+            self.request.session.pop('query_history', False)
             qs = Entry.objects.all()
         else:
-            qs = self.request.session.get('query')
+            qs = self.request.session.get('queryset')
 
-        search_root = self.request.GET.get('search_root')
+        search_root = self.request.GET.get('search_root', False) == 'True'
         if search_root:
             logger.debug('Filtering roots')
             self.request.session['search_root'] = search_root
@@ -160,9 +160,7 @@ class SearchResultsListView(ListView):
                            Q(variant__icontains=search_name)
                            )
 
-        fields = EntryForm.Meta.fields
         self.request.session['queryset'] = qs
-        logger.debug(type(qs))
         utils.gen_query_history(self.request, qs.count())
 
         return qs.order_by(Lower('item_name'))

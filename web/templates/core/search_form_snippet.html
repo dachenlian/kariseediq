@@ -17,7 +17,8 @@
         </div>
     </div>
     <div class="col-md-2 form-group">
-        <input type="checkbox" name="search_root" value="True" id="rootFilterTwo" class="form-check-input">
+        <input type="checkbox" name="search_root" value="True" id="rootFilterTwo" class="form-check-input"
+        {% if request.session.search_root %} checked disabled{% endif %}>
         <label class="form-check-label" for="rootFilterTwo">Only roots</label>
     </div>
     <div class="col-md-7 form-group">
