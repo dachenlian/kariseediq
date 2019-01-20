@@ -161,7 +161,8 @@ class SearchResultsListView(ListView):
                            )
 
         fields = EntryForm.Meta.fields
-        self.request.session['query'] = qs
+        self.request.session['queryset'] = qs
+        logger.debug(type(qs))
         utils.gen_query_history(self.request, qs.count())
 
         return qs.order_by(Lower('item_name'))
@@ -211,8 +212,8 @@ class EntryItemNameAutoComplete(View):
 
 
 def export_search_to_csv(request):
-    queryset = request.session.get('query')
     fieldnames = EntryForm.Meta.fields
+    queryset = request.session.get('queryset').values(*fieldnames)
 
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="search_results.csv"'
