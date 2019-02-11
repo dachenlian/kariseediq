@@ -8,12 +8,12 @@ class Entry(models.Model):
     class Meta:
         verbose_name_plural = 'entries'
 
-    GRAMMATICAL_GENDER = 'GRAMMATICAL_GENDER'
-    AGENT_FOCUS = 'AGENT_FOCUS'
-    PATIENT_FOCUS = 'PATIENT_FOCUS'
-    LOCATIVE_FOCUS = 'LOCATIVE_FOCUS'
-    REFERENCE_FOCUS = 'REFERENCE_FOCUS'
-    ZERO_FOCUS = 'ZERO_FOCUS'
+    GRAMMATICAL_GENDER = '名詞性標記'
+    AGENT_FOCUS = '主事焦點'
+    PATIENT_FOCUS = '受事焦點'
+    LOCATIVE_FOCUS = '處所焦點'
+    REFERENCE_FOCUS = '參考焦點'
+    ZERO_FOCUS = '零焦點標記'
 
     FOCUS_CHOICES = (
         (GRAMMATICAL_GENDER, '名詞性標記'),
@@ -24,10 +24,10 @@ class Entry(models.Model):
         (ZERO_FOCUS, '零焦點標記'),
     )
 
-    NOUN = 'NOUN'
-    VERB = 'VERB'
-    MULTI = 'MULTI'
-    OTHER = 'OTHER'
+    NOUN = '名詞'
+    VERB = '動詞'
+    MULTI = '多重詞性'
+    OTHER = '其他'
     WORD_CLASS_CHOICES = (
         (NOUN, '名詞'),
         (VERB, '動詞'),
@@ -35,23 +35,23 @@ class Entry(models.Model):
         (OTHER, '其他'),
     )
 
-    HAN_BORROWED = 'HAN_BORROWED'
-    JP_BORROWED = 'JP_BORROWED'
-    MIN_BORROWED = 'MIN_BORROWED'
-    PLANT = 'PLANT'
-    NATURE = 'NATURE'
-    QUANTIFIER = 'QUANTIFIER'
-    HUNTING = 'HUNTING'
-    TEXTILE = 'TEXTILE'
-    TRANSPORTATION = 'TRANSPORTATION'
-    RELATIVE = 'RELATIVE'
-    EVERYDAY = 'EVERYDAY'
-    ANIMAL = 'ANIMAL'
-    BUILDING = 'BUILDING'
-    BODY = 'BODY'
-    AGRICULTURE = 'AGRICULTURE'
-    RELIGION = 'RELIGION'
-    FOOD = 'FOOD'
+    HAN_BORROWED = '漢語借字'
+    JP_BORROWED = '日語借字'
+    MIN_BORROWED = '閩南語借字'
+    PLANT = '植物'
+    NATURE = '自然'
+    QUANTIFIER = '計量'
+    HUNTING = '狩獵'
+    TEXTILE = '織布服飾'
+    TRANSPORTATION = '交通'
+    RELATIVE = '親屬稱謂'
+    EVERYDAY = '日常生活（含用品）'
+    ANIMAL = '動物'
+    BUILDING = '建築'
+    BODY = '身體'
+    AGRICULTURE = '農耕'
+    RELIGION = '宗教'
+    FOOD = '食物'
     TAG_CHOICES = (
         (HAN_BORROWED, '漢語借字'),
         (JP_BORROWED, '日語借字'),
@@ -110,7 +110,7 @@ class Entry(models.Model):
 
 class Example(models.Model):
     """Example sentence for a particular dictionary entry."""
-    entry = models.ForeignKey(Entry, on_delete=models.CASCADE)
+    entry = models.ForeignKey(Entry, on_delete=models.CASCADE, related_name='examples')
     sentence = models.TextField(blank=True, default="")
     sentence_en = models.TextField(blank=True, default="")
     sentence_ch = models.TextField(blank=True, default="")
