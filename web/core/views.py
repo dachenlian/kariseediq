@@ -1,6 +1,5 @@
 import csv
 import logging
-import pickle
 
 from django.contrib import messages
 from django.db.models import Q
@@ -210,8 +209,12 @@ class EntryItemNameAutoComplete(View):
 
 
 def export_search_to_csv(request):
-    fieldnames = EntryForm.Meta.fields
-    queryset = request.session.get('queryset').values(*fieldnames)
+    fieldnames = list(EntryForm.Meta.fields)
+
+    queryset = request.session.get('queryset').values('id', *fieldnames)
+
+    queryset = utils.get_related(queryset)
+    fieldnames.extend(['sentence', 'sentence_en', 'sentence_ch'])
 
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="search_results.csv"'

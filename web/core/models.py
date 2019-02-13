@@ -114,3 +114,6 @@ class Example(models.Model):
     sentence = models.TextField(blank=True, default="")
     sentence_en = models.TextField(blank=True, default="")
     sentence_ch = models.TextField(blank=True, default="")
+
+    def __str__(self):
+        return f'{self.sentence} / {self.sentence_ch}'
