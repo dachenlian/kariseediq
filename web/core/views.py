@@ -222,7 +222,6 @@ def export_search_to_csv(request):
     writer = csv.DictWriter(response, fieldnames=fieldnames)
     writer.writeheader()
     for row in queryset:
-        row['word_class'] = ",".join(row['word_class'])
         row['tag'] = ",".join(row['tag'])
         writer.writerow(row)
     return response
