@@ -86,7 +86,7 @@ def gen_query_history(request: HttpRequest):
 
 def get_related(qs: List[dict]) -> list:
     """
-    Get data from related models.
+    Get data from related models, such as examples.
     :param qs:
     :return:
     """

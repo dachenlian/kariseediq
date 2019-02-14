@@ -217,6 +217,7 @@ def export_search_to_csv(request, query_idx):
 
     queryset = query_dict['queryset'].values('id', *fieldnames)
     query_str = query_dict['query_str']
+    # some chars aren't allowed in files
     query_str = query_str.replace(' | ', '_')
     query_str = re.sub(r'<strong>(.+?)</strong>:', r'\1=', query_str)
 
