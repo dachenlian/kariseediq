@@ -12,60 +12,76 @@
         {% endif %}
     </div>
     <div class="row">
-        <div class="p-2 mb-2 bg-light text-dark col">
+        <div class="col">
             <p class="py-0 my-0 align-middle">
                 {% if 'results' in request.path %}
-                    <strong>Search params: </strong>{{ view.request.session.query_history|safe }}
+                    <p><strong>Search history:</strong></p>
+                    <table class="table">
+                        <thead class="thead-light">
+                        <tr>
+                            <th>#</th>
+                            <th>Download</th>
+                            <th>Query</th>
+                        </tr>
+                        {% for hist in view.request.session.history_list %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td><a href="{% url 'core:export' query_idx=forloop.counter0 %}"
+                                ><i style="font-size:2em;" class="material-icons">file_download</i></a></td>
+                                <td>{{ hist.query_str|safe }}</td>
+                            </tr>
+                        {% endfor %}
+                        </thead>
+                    </table>
                 {% else %}
                     <strong>資料筆數：</strong>{{ view.get_queryset.count }}
                 {% endif %}
-                {% if request.session.queryset %}
-                    <span class="align-middle">
-                <a class="btn btn-info py-0" href="{% url 'core:export' %}">Export to CSV</a>
-                </span>
-                {% endif %}
-            </p>
         </div>
-        <div class="table-responsive">
-            <table class="table table-hover">
-                <thead class="thead-dark">
-                <tr>
-                    <th>#</th>
-                    <th>詞項</th>
-                    <th>變體</th>
-                    <th>意義</th>
-                    <th>詞根</th>
-                    <th>參照</th>
-                    <th>輸入者</th>
-                    <th>輸入日期</th>
-                    <th>刪除</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for entry in entries %}
+    </div>
+    <div class="row">
+        <div class="col">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="thead-dark">
                     <tr>
-                        <td class="align-middle">{{ forloop.counter0|add:page_obj.start_index }}</td>
-                        <td style="cursor: pointer" onclick="window.location='{% url 'core:update' pk=entry.id %}';"
-                            class="align-middle">{{ entry.item_name }}</td>
-                        <td class="align-middle">{{ entry.variant }}</td>
-                        <td class="align-middle">{{ entry.meaning }}</td>
-                        <td class="align-middle">{{ entry.item_root }}</td>
-                        <td class="align-middle">{{ entry.source }}</td>
-                        <td class="align-middle">{{ entry.user }}</td>
-                        <td class="align-middle">{{ entry.created_date }}</td>
-                        <td class="align-middle">
-                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#deleteModal"
-                                    data-pk="{{ entry.id }}"><i class="material-icons">delete</i>
-                            </button>
-                        </td>
+                        <th>#</th>
+                        <th>詞項</th>
+                        <th>變體</th>
+                        <th>意義</th>
+                        <th>詞根</th>
+                        <th>參照</th>
+                        <th>輸入者</th>
+                        <th>輸入日期</th>
+                        <th>刪除</th>
                     </tr>
-                {% empty %}
-                    <tr>
-                        <td colspan="7">No search results match the query.</td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                    {% for entry in entries %}
+                        <tr>
+                            <td class="align-middle">{{ forloop.counter0|add:page_obj.start_index }}</td>
+                            <td style="cursor: pointer" onclick="window.location='{% url 'core:update' pk=entry.id %}';"
+                                class="align-middle">{{ entry.item_name }}</td>
+                            <td class="align-middle">{{ entry.variant }}</td>
+                            <td class="align-middle">{{ entry.meaning }}</td>
+                            <td class="align-middle">{{ entry.item_root }}</td>
+                            <td class="align-middle">{{ entry.source }}</td>
+                            <td class="align-middle">{{ entry.user }}</td>
+                            <td class="align-middle">{{ entry.created_date }}</td>
+                            <td class="align-middle">
+                                <button type="button" class="btn btn-primary" data-toggle="modal"
+                                        data-target="#deleteModal"
+                                        data-pk="{{ entry.id }}"><i class="material-icons">delete</i>
+                                </button>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="7">No search results match the query.</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
     <nav>

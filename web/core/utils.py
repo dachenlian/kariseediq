@@ -59,20 +59,28 @@ def load_into_db(file):
             )
 
 
-def gen_query_history(request: HttpRequest, qs_length: int):
+def gen_query_history(request: HttpRequest):
     logger.debug('Generating query history...')
-    history = request.session.get('query_history', "").split('<br>')
+    qs_length = len(request.session.get('queryset'))
+
+    history_list = request.session.get('history_list', [])
+
     search_name = request.GET.get('search_name', "")
     search_filter = request.GET.get('search_filter', "")
     search_root = request.session.get('search_root', False)
 
-    query_str = f"{len(history)}. ({qs_length} hits) " \
+    query_str = f"({qs_length} hits) " \
         f"<strong>Item</strong>: {search_name} | " \
         f"<strong>filter</strong>: {search_filter} | " \
         f"<strong>Only roots</strong>: {search_root}"
-    history.append(query_str)
-    request.session['query_history'] = "<br>".join(history)
-    logger.debug(history)
+
+    query_dict = {
+        'query_str': query_str,
+        'queryset': request.session.get('queryset')
+    }
+    history_list.append(query_dict)
+    request.session['history_list'] = history_list
+    logger.debug(history_list)
     return request
 
 

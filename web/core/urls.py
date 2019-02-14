@@ -10,8 +10,8 @@ urlpatterns = [
     path('entries/<int:pk>/', views.EntryExampleUpdateView.as_view(), name='update'),
     path('entries/<int:pk>/delete/', views.EntryDeleteView.as_view(), name='delete'),
     path('entries/pending/', views.EntryPendingListView.as_view(), name='pending'),
-    path('export/', views.export_search_to_csv, name='export'),
-    path('ajax/validate_item_name/', views.validate_item_name, name='validate_item_name'),
-    path('ajax/focus_autocomplete/', views.EntryRootAutoComplete.as_view(), name='focus_autocomplete'),
-    path('ajax/item_name_autocomplete/', views.EntryItemNameAutoComplete.as_view(), name='item_name_autocomplete')
+    path('export/<int:query_idx>/', views.export_search_to_csv, name='export'),
+    path('ajax/validate-item-name/', views.validate_item_name, name='validate_item_name'),
+    path('ajax/focus-autocomplete/', views.EntryRootAutoComplete.as_view(), name='focus_autocomplete'),
+    path('ajax/item-name-autocomplete/', views.EntryItemNameAutoComplete.as_view(), name='item_name_autocomplete')
 ]

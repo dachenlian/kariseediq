@@ -1,5 +1,6 @@
 import csv
 import logging
+import re
 
 from django.contrib import messages
 from django.db.models import Q
@@ -125,7 +126,7 @@ class SearchResultsListView(ListView):
         if reset:
             logger.debug('Resetting queryset!')
             self.request.session.pop('search_root', False)
-            self.request.session.pop('query_history', False)
+            self.request.session.pop('history_list', False)
             qs = Entry.objects.all()
         else:
             qs = self.request.session.get('queryset')
@@ -138,7 +139,6 @@ class SearchResultsListView(ListView):
 
         search_filter = self.request.GET.get('search_filter', "")
         search_name = self.request.GET.get('search_name', "")
-        # tags = self.request.GET.get('tags')
 
         self.request.session['search_filter'] = search_filter
         self.request.session['search_name'] = search_name
@@ -159,10 +159,12 @@ class SearchResultsListView(ListView):
                            Q(variant__icontains=search_name)
                            )
 
-        self.request.session['queryset'] = qs
-        utils.gen_query_history(self.request, qs.count())
+        qs = qs.order_by(Lower('item_name'))
 
-        return qs.order_by(Lower('item_name'))
+        self.request.session['queryset'] = qs
+        utils.gen_query_history(self.request)
+
+        return qs
 
 
 class EntryDeleteView(DeleteView):
@@ -195,7 +197,7 @@ class EntryRootAutoComplete(View):
 
 class EntryItemNameAutoComplete(View):
     def get(self, *args, **kwargs):
-        logger.debug('Item name autocomplete Called')
+        logger.debug('Item name autocomplete called')
         q = self.request.GET.get('q')
         logger.debug(q)
         if q:
@@ -208,16 +210,21 @@ class EntryItemNameAutoComplete(View):
         return JsonResponse(list(queryset), safe=False)
 
 
-def export_search_to_csv(request):
+def export_search_to_csv(request, query_idx):
     fieldnames = list(EntryForm.Meta.fields)
 
-    queryset = request.session.get('queryset').values('id', *fieldnames)
+    query_dict = request.session.get('history_list')[query_idx]
+
+    queryset = query_dict['queryset'].values('id', *fieldnames)
+    query_str = query_dict['query_str']
+    query_str = query_str.replace(' | ', '_')
+    query_str = re.sub(r'<strong>(.+?)</strong>:', r'\1=', query_str)
 
     queryset = utils.get_related(queryset)
     fieldnames.extend(['sentence', 'sentence_en', 'sentence_ch'])
 
     response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="search_results.csv"'
+    response['Content-Disposition'] = f'attachment; filename="{query_str}.csv"'
 
     writer = csv.DictWriter(response, fieldnames=fieldnames)
     writer.writeheader()
