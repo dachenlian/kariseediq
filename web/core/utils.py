@@ -27,7 +27,7 @@ def load_into_db(file):
         reader = csv.reader(fp)
         header = next(reader)
 
-        for row in reader:
+        for idx, row in enumerate(reader):
             row = [r.lower().strip() for r in row]
             new_entry = dict(zip(header, row))
             if Entry.objects.filter(item_name=new_entry['item_name']).count():
@@ -57,6 +57,8 @@ def load_into_db(file):
                 sentence_ch=sentence_ch,
                 sentence_en=sentence_en,
             )
+        if idx % 500 == 0:
+            logger.debug(f'Processed{idx} rows...')
 
 
 def gen_query_history(request: HttpRequest):
