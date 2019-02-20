@@ -20,13 +20,17 @@
                         <thead class="thead-light">
                         <tr>
                             <th>#</th>
-                            <th>Download</th>
+                            <th class="text-center">Download
+                                <a tabindex=0 data-container="body" data-toggle="popover" data-trigger="focus" title="Opening in Excel"
+                                data-content="Data tab > From Text > file.csv >1. Delimited 2. File origin: UTF-8 3. Delimiters: comma > Finish">
+                                    <i style="font-size:15px; cursor: pointer; color: darkslategrey;" class="material-icons"
+                                >help</i></a></th>
                             <th>Query</th>
                         </tr>
                         {% for hist in view.request.session.history_list %}
                             <tr>
                                 <td>{{ forloop.counter }}</td>
-                                <td><a href="{% url 'core:export' query_idx=forloop.counter0 %}"
+                                <td class="text-center"><a href="{% url 'core:export' query_idx=forloop.counter0 %}"
                                 ><i style="font-size:2em;" class="material-icons">file_download</i></a></td>
                                 <td>{{ hist.query_str|safe }}</td>
                             </tr>
@@ -147,6 +151,11 @@
 
             form.prop('action', url);
             modal.find('.modal-title').text('Delete ' + entry + '?')
-        })
+        });
+    $(function() {
+        $('[data-toggle="popover"]').popover({
+            trigger: 'focus'
+        });
+    });
     </script>
 {% endblock javascript %}
