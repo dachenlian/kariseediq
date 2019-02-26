@@ -40,10 +40,14 @@
                 <a class="nav-link" href="{% url 'core:pending' %}">
                     Pending <span id="pendingBadge" class="badge badge-secondary align-middle"></span></a>
             </li>
-{#            <li class="nav-item">#}
-{#                <a class="nav-link" href="{% url 'core:pending' %}">#}
-{#                    Roots </a>#}
-{#            </li>#}
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'freq:upload' %}">
+                    FreqDist</a>
+            </li>
+            {#            <li class="nav-item">#}
+            {#                <a class="nav-link" href="{% url 'core:pending' %}">#}
+            {#                    Roots </a>#}
+            {#            </li>#}
         </ul>
         <form action="{% url 'core:results' %}" class="form-inline">
             <div class="form-check-inline text-white">

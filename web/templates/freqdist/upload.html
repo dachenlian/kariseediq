@@ -2,9 +2,23 @@
 {% load static %}
 
 {% block content %}
+    <div id="modal-progress" class="modal fade" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Uploading...</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="progress">
+                        <div class="progress-bar" role="progressbar" style="width: 0%;">0%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     {# 1. BUTTON TO TRIGGER THE ACTION #}
     <button type="button" class="btn btn-primary js-upload-text">
-        <span class="glyphicon glyphicon-cloud-upload"></span> Upload photos
+        <span class="glyphicon glyphicon-cloud-upload"></span> Upload text
     </button>
 
     {# 2. FILE INPUT TO BE USED BY THE PLUG-IN #}
@@ -30,9 +44,9 @@
     </table>
 {% endblock content %}
 {% block javascript %}
-    <script src="{% static 'freqdist/js/jquery-file-upload/vendor/jquery.ui.widget.js' %}"></script>
-    <script src="{% static 'freqdist/js/jquery-file-upload/jquery.iframe-transport.js' %}"></script>
-    <script src="{% static 'freqdist/js/jquery-file-upload/jquery.fileupload.js' %}"></script>
+    <script src="{% static 'freqdist/js/jquery-file-upload/js/vendor/jquery.ui.widget.js' %}"></script>
+    <script src="{% static 'freqdist/js/jquery-file-upload/js/jquery.iframe-transport.js' %}"></script>
+    <script src="{% static 'freqdist/js/jquery-file-upload/js/jquery.fileupload.js' %}"></script>
 
     {# PHOTOS PAGE SCRIPTS #}
     <script src="{% static 'freqdist/js/upload.js' %}"></script>
