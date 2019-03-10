@@ -93,7 +93,7 @@ class Entry(models.Model):
     picture = models.ImageField(upload_to='pictures/', blank=True)
     sound = models.FileField(upload_to='sound/', blank=True)
     grammar_notes = models.CharField(max_length=255, blank=True, default="")  # 語法註記
-    source = models.CharField(max_length=255, blank=True, default="")  # 參照
+    refer_to = models.CharField(max_length=255, blank=True, default="")  # 參照
     tag = MultiSelectField(choices=TAG_CHOICES, default="", null=True, blank=True)  # 標籤
     toda = models.CharField(max_length=255, blank=True, default="")
     toda_root = models.CharField(max_length=255, blank=True, default="")  # todar

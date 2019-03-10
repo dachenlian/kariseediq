@@ -12,7 +12,7 @@ class EntryForm(ModelForm):
     class Meta:
         model = Entry
         fields = ('item_name', 'item_root', 'variant', 'toda', 'truku', 'sound', 'picture',
-                  'phrase', 'phrase_en', 'phrase_ch', 'source',
+                  'phrase', 'phrase_en', 'phrase_ch', 'refer_to',
                   'toda_root', 'truku_root', 'meaning', 'meaning_en', 'focus',
                   'word_class', 'tag', 'grammar_notes', 'cultural_notes')
         labels = {
@@ -25,7 +25,9 @@ class EntryForm(ModelForm):
         widgets = {
             'item_name': forms.widgets.TextInput(attrs={'class': 'basicAutoComplete', 'autocomplete': 'off'}),
             'item_root': forms.widgets.TextInput(attrs={'class': 'basicAutoComplete', 'autocomplete': 'off'}),
-            'tag': forms.widgets.SelectMultiple(attrs={'class': 'selectpicker', 'title': '-------'})
+            'tag': forms.widgets.SelectMultiple(attrs={'class': 'selectpicker', 'title': '-------'}),
+            'grammar_notes': forms.widgets.Textarea(attrs={'rows': 5, 'cols': 40}),
+            'cultural_notes': forms.widgets.Textarea(attrs={'rows': 5, 'cols': 40}),
         }
 
     def clean(self):

@@ -57,8 +57,8 @@ def load_into_db(file):
                 sentence_ch=sentence_ch,
                 sentence_en=sentence_en,
             )
-        if idx % 500 == 0:
-            logger.debug(f'Processed{idx} rows...')
+            if idx % 500 == 0:
+                logger.debug(f'Processed {idx} rows...')
 
 
 def gen_query_history(request: HttpRequest):
