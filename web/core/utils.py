@@ -11,11 +11,11 @@ from .models import Entry, Example
 logger = logging.getLogger(__name__)
 
 
-def convert_to_bool(cell):
+def _convert_to_bool(cell):
     return cell.lower() == 'yes'
 
 
-def parse_date(str_date):
+def _parse_date(str_date):
     try:
         parsed = datetime.datetime.strptime(str_date, '%m/%d/%Y')
     except ValueError as e:
@@ -47,8 +47,8 @@ def load_into_db(file):
             if not new_entry['frequency']:
                 new_entry['frequency'] = 0
 
-            new_entry['created_date'] = parse_date(new_entry['created_date'])
-            new_entry['is_root'] = convert_to_bool(new_entry['is_root'])
+            new_entry['created_date'] = _parse_date(new_entry['created_date'])
+            new_entry['is_root'] = _convert_to_bool(new_entry['is_root'])
             new_entry['refer_to'] = new_entry.pop('source')
             new_entry['tag'] = _add_tag(new_entry, 'Kcjason2', '植物')
 
@@ -76,12 +76,12 @@ def gen_query_history(request: HttpRequest):
 
     search_name = request.GET.get('search_name', "")
     search_filter = request.GET.get('search_filter', "")
-    search_root = request.session.get('search_root', False)
+    search_root = request.session.get('search_root', '')
 
     query_str = f"({qs_length} hits) " \
         f"<strong>Item</strong>: {search_name} | " \
-        f"<strong>filter</strong>: {search_filter} | " \
-        f"<strong>Only roots</strong>: {search_root}"
+        f"<strong>Filter</strong>: {search_filter} | " \
+        f"<strong>Roots</strong>: {search_root}"
 
     query_dict = {
         'query_str': query_str,
