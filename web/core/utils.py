@@ -11,15 +11,25 @@ from .models import Entry, Example
 logger = logging.getLogger(__name__)
 
 
-def convert_to_boolean(cell):
+def convert_to_bool(cell):
     return cell.lower() == 'yes'
 
 
-# def convert_tags(tags):
-#     if not tags:
-#         return None
-#     split = (t.strip() for t in re.split(r'[，,、]', tags))
-#     return ",".join(converted)
+def parse_date(str_date):
+    try:
+        parsed = datetime.datetime.strptime(str_date, '%m/%d/%Y')
+    except ValueError as e:
+        logger.exception(e)
+        return datetime.datetime.min
+    else:
+        return parsed
+
+
+def _add_tag(entry: dict, user: str, tag: str) -> list:
+    tags = [e.strip() for e in entry.get('tag', '').split(',')]
+    if entry['user'] == user and tag not in tags:
+        tags.append(tag)
+    return tags
 
 
 def load_into_db(file):
@@ -27,23 +37,20 @@ def load_into_db(file):
         reader = csv.reader(fp)
         header = next(reader)
 
-        for idx, row in enumerate(reader):
-            row = [r.lower().strip() for r in row]
+        for idx, row in enumerate(reader, 1):
+            row = [r.lower().strip().capitalize() for r in row]
             new_entry = dict(zip(header, row))
-            if Entry.objects.filter(item_name=new_entry['item_name']).count():
+            if Entry.objects.filter(item_name=new_entry['item_name']).exists():
                 logger.warning(f"{new_entry['item_name']} already exists.\n{new_entry}")
                 continue
 
             if not new_entry['frequency']:
                 new_entry['frequency'] = 0
 
-            try:
-                new_entry['created_date'] = datetime.datetime.strptime(new_entry['created_date'], '%m/%d/%Y')
-            except ValueError as e:
-                logger.exception(e)
-                new_entry['created_date'] = datetime.datetime.min
-
-            new_entry['is_root'] = convert_to_boolean(new_entry['is_root'])
+            new_entry['created_date'] = parse_date(new_entry['created_date'])
+            new_entry['is_root'] = convert_to_bool(new_entry['is_root'])
+            new_entry['refer_to'] = new_entry.pop('source')
+            new_entry['tag'] = _add_tag(new_entry, 'Kcjason2', '植物')
 
             sentence = new_entry.pop('sentence')
             sentence_en = new_entry.pop('sentence_en')
