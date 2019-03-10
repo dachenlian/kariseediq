@@ -131,12 +131,16 @@ class SearchResultsListView(ListView):
         else:
             qs = self.request.session.get('queryset')
 
-        search_root = self.request.GET.get('search_root', False) == 'True'
+        search_root = self.request.GET.get('search_root', "")
         if search_root:
-            logger.debug('Filtering roots')
-            self.request.session['search_root'] = search_root
-            qs = qs.filter(is_root=True)
+            if search_root == 'exclude':
+                logger.debug('Filtering roots.')
+                qs = qs.filter(is_root=False)
+            elif search_root == 'only':
+                logger.debug('Only including roots.')
+                qs = qs.filter(is_root=True)
 
+            self.request.session['search_root'] = search_root
         search_filter = self.request.GET.get('search_filter', "")
         search_name = self.request.GET.get('search_name', "")
 

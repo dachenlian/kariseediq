@@ -44,15 +44,15 @@
                 <a class="nav-link" href="{% url 'freq:upload' %}">
                     FreqDist</a>
             </li>
-            {#            <li class="nav-item">#}
-            {#                <a class="nav-link" href="{% url 'core:pending' %}">#}
-            {#                    Roots </a>#}
-            {#            </li>#}
         </ul>
         <form action="{% url 'core:results' %}" class="form-inline">
-            <div class="form-check-inline text-white">
-                <input type="checkbox" name="search_root" class="form-check-input" value="True" id="rootFilter">
-                <label style="color:white !important;" for="rootFilter" class="form-check-label">Only roots</label>
+            <div class="form-check form-check-inline text-white">
+                <input type="radio" name="search_root" class="form-check-input" value="only" id="rootFilter1">
+                <label style="color:white !important;" for="rootFilter1" class="form-check-label">Only roots</label>
+            </div>
+            <div class="form-check form-check-inline text-white">
+                <input type="radio" name="search_root" class="form-check-input" value="exclude" id="rootFilter2">
+                <label style="color:white !important;" for="rootFilter2" class="form-check-label">Exclude roots</label>
             </div>
             <div class="form-group">
                 <label for="itemFilterNav"></label>
