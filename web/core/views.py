@@ -12,7 +12,6 @@ from django.urls import reverse_lazy
 from django.views.generic import View, DeleteView
 from django.views.generic.list import ListView
 
-from core.models import Entry
 from .forms import EntryForm, EntryUpdateForm, ExampleFormSet
 from core import utils
 

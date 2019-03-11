@@ -2,7 +2,7 @@ from django import forms
 from django.forms import ModelForm, inlineformset_factory
 from django.core.exceptions import ValidationError
 
-from .models import Entry, Example
+from .models import Headword, Sense, Phrase, Example
 
 
 # https://stackoverflow.com/questions/12144475/displaying-multiple-rows-and-columns-in-django-crispy-forms

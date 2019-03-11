@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     'core',
     'django_extensions',
     'rest_framework',
-    'api',
+    # 'api',
     'freqdist',
     'crispy_forms',
     'extra_views',

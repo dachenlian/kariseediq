@@ -1,5 +1,6 @@
 import csv
 import datetime
+import re
 from typing import List
 import logging
 
@@ -25,24 +26,45 @@ def _parse_date(str_date):
         return parsed
 
 
-def _clean_entry(entry):
-
-    entry['created_date'] = _parse_date(entry['created_date'])
-    entry['refer_to'] = entry.pop('source')
-    entry['tag'] = _add_tag(entry, 'Kcjason2', '植物')
-    entry['is_root'] = _convert_to_bool(entry.pop('is_root'))
-
-    if not entry['frequency']:
-        entry['frequency'] = 0
-
-    return entry
-
-
 def _add_tag(entry: dict, user: str, tag: str) -> list:
     tags = [e.strip() for e in entry.get('tag', '').split(',')]
     if entry['user'] == user and tag not in tags:
         tags.append(tag)
     return tags
+
+def _contains_digit(s):
+    return any(c.isdigit() for c in s)
+
+
+def _split_item_name(s):
+    if _contains_digit(s):
+        m = re.match(r'([A-Za-z\-\s]+)_?(\d)?', s)
+        headword, sense = m.group(1).strip(), m.group(2).strip()
+    else:
+        headword = s.strip()
+        sense = 1
+    return headword, sense
+
+
+def _clean_entry(entry: dict) -> dict:
+
+    headword, headword_sense_no = _split_item_name(entry.pop('item_name'))
+    root, root_sense_no = _split_item_name(entry.pop('item_root'))
+
+    entry['headword'] = headword
+    entry['headword_sense_no'] = headword_sense_no
+    entry['root'] = root
+    entry['root_sense_no'] = root_sense_no
+    entry['created_date'] = _parse_date(entry['created_date'])
+    entry['refer_to'] = entry.pop('source')
+    entry['tag'] = _add_tag(entry, 'Kcjason2', '植物')
+    entry['is_root'] = _convert_to_bool(entry.pop('is_root'))
+
+
+    if not entry['frequency']:
+        entry['frequency'] = 0
+
+    return entry
 
 
 def load_into_db(file):
@@ -53,20 +75,19 @@ def load_into_db(file):
         for idx, row in enumerate(reader, 1):
             row = [r.lower().strip().capitalize() for r in row]
             new_entry = _clean_entry(dict(zip(header, row)))
-            headword = new_entry.pop('item_name')
-            is_root = new_entry.pop('is_root')
-            root = new_entry.pop('item_root')
+            headword = new_entry.pop('headword')
 
             headword, created = Headword.objects.get_or_create(headword=headword,
-                                                               is_root=is_root,
-                                                               root=root,
+                                                               user=new_entry.get('user'),
                                                                created_date=new_entry.get('created_date'))
-            if Sense.objects.filter(headword=headword, meaning=new_entry.get('meaning')).exists():
+            if Sense.objects.filter(headword=headword,
+                                    headword_sense_no=new_entry.get('headword_sense_no'),
+                                    meaning=new_entry.get('meaning')
+                                    ).exists():
                 logger.warning(f"{new_entry['item_name']} with sense meaning {new_entry.get('meaning')}"
                                f" already exists.")
                 continue
 
-            new_entry['sense_no'] =
             sentence = new_entry.pop('sentence')
             sentence_en = new_entry.pop('sentence_en')
             sentence_ch = new_entry.pop('sentence_ch')

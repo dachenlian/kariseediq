@@ -6,11 +6,10 @@ from multiselectfield import MultiSelectField
 
 class Headword(models.Model):
     headword = models.CharField(max_length=255)
-    is_root = models.BooleanField(blank=True, default=False)
-    root = models.CharField(max_length=255, blank=True, default="")
     user = models.CharField(max_length=255, blank=True, default="")
     created_date = models.DateField(default=datetime.date.today)
     modified_date = models.DateTimeField(auto_now=True)
+    variant = models.CharField(max_length=255, blank=True, default="")
 
 
 class Sense(models.Model):
@@ -80,7 +79,10 @@ class Sense(models.Model):
     )
 
     headword = models.ForeignKey(Headword, related_name='senses', on_delete=models.CASCADE)
-    sense_no = models.PositiveSmallIntegerField(unique=True)
+    headword_sense_no = models.PositiveSmallIntegerField(unique=True)
+    is_root = models.BooleanField(blank=True, default=False)
+    root = models.CharField(max_length=255, blank=True, default="")
+    root_sense_no = models.PositiveSmallIntegerField(blank=True)
     user = models.CharField(max_length=255, blank=True, default="")
     created_date = models.DateField(default=datetime.date.today)
     modified_date = models.DateTimeField(auto_now=True)
@@ -102,7 +104,6 @@ class Sense(models.Model):
     toda_root = models.CharField(max_length=255, blank=True, default="")  # todar
     truku = models.CharField(max_length=255, blank=True, default="")
     truku_root = models.CharField(max_length=255, blank=True, default="")  # trukur
-    variant = models.CharField(max_length=255, blank=True, default="")
 
     def __str__(self):
         return f"{self.headword} ({self.sense_no}): {self.meaning}"
