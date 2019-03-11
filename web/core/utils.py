@@ -30,7 +30,10 @@ def _clean_entry(entry):
     entry['created_date'] = _parse_date(entry['created_date'])
     entry['refer_to'] = entry.pop('source')
     entry['tag'] = _add_tag(entry, 'Kcjason2', '植物')
-    entry['is_root'] =_convert_to_bool(entry.pop('is_root'))
+    entry['is_root'] = _convert_to_bool(entry.pop('is_root'))
+
+    if not entry['frequency']:
+        entry['frequency'] = 0
 
     return entry
 
@@ -49,35 +52,45 @@ def load_into_db(file):
 
         for idx, row in enumerate(reader, 1):
             row = [r.lower().strip().capitalize() for r in row]
-            new_entry = dict(zip(header, row))
-            is_root =
+            new_entry = _clean_entry(dict(zip(header, row)))
+            headword = new_entry.pop('item_name')
+            is_root = new_entry.pop('is_root')
             root = new_entry.pop('item_root')
 
-
-            headword, created = Headword.objects.get_or_create(headword=new_entry.pop('item_name'),
+            headword, created = Headword.objects.get_or_create(headword=headword,
                                                                is_root=is_root,
-                                                               root=root)
+                                                               root=root,
+                                                               created_date=new_entry.get('created_date'))
             if Sense.objects.filter(headword=headword, meaning=new_entry.get('meaning')).exists():
                 logger.warning(f"{new_entry['item_name']} with sense meaning {new_entry.get('meaning')}"
                                f" already exists.")
                 continue
 
-            if not new_entry['frequency']:
-                new_entry['frequency'] = 0
-
-
+            new_entry['sense_no'] =
             sentence = new_entry.pop('sentence')
             sentence_en = new_entry.pop('sentence_en')
             sentence_ch = new_entry.pop('sentence_ch')
 
-            entry = Entry.objects.create(**new_entry)
+            phrase = new_entry.pop('phrase')
+            phrase_ch = new_entry.pop('phrase_ch')
+            phrase_en = new_entry.pop('phrase_en')
+
+            sense = Sense.objects.create(**new_entry)
 
             Example.objects.create(
-                entry=entry,
+                sense=sense,
                 sentence=sentence,
                 sentence_ch=sentence_ch,
                 sentence_en=sentence_en,
             )
+
+            Phrase.objects.create(
+                sense=sense,
+                phrase=phrase,
+                phrase_ch=phrase_ch,
+                phrase_en=phrase_en,
+            )
+
             if idx % 500 == 0:
                 logger.debug(f'Processed {idx} rows...')
 

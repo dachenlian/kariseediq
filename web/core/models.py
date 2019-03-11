@@ -80,7 +80,7 @@ class Sense(models.Model):
     )
 
     headword = models.ForeignKey(Headword, related_name='senses', on_delete=models.CASCADE)
-    sense_no = models.PositiveSmallIntegerField()
+    sense_no = models.PositiveSmallIntegerField(unique=True)
     user = models.CharField(max_length=255, blank=True, default="")
     created_date = models.DateField(default=datetime.date.today)
     modified_date = models.DateTimeField(auto_now=True)
