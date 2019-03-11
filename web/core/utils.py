@@ -5,7 +5,7 @@ import logging
 
 from django.http.request import HttpRequest
 
-from .models import Entry, Example
+from .models import Headword, Sense, Phrase, Example
 
 
 logger = logging.getLogger(__name__)
@@ -25,6 +25,16 @@ def _parse_date(str_date):
         return parsed
 
 
+def _clean_entry(entry):
+
+    entry['created_date'] = _parse_date(entry['created_date'])
+    entry['refer_to'] = entry.pop('source')
+    entry['tag'] = _add_tag(entry, 'Kcjason2', '植物')
+    entry['is_root'] =_convert_to_bool(entry.pop('is_root'))
+
+    return entry
+
+
 def _add_tag(entry: dict, user: str, tag: str) -> list:
     tags = [e.strip() for e in entry.get('tag', '').split(',')]
     if entry['user'] == user and tag not in tags:
@@ -40,17 +50,21 @@ def load_into_db(file):
         for idx, row in enumerate(reader, 1):
             row = [r.lower().strip().capitalize() for r in row]
             new_entry = dict(zip(header, row))
-            if Entry.objects.filter(item_name=new_entry['item_name']).exists():
-                logger.warning(f"{new_entry['item_name']} already exists.\n{new_entry}")
+            is_root =
+            root = new_entry.pop('item_root')
+
+
+            headword, created = Headword.objects.get_or_create(headword=new_entry.pop('item_name'),
+                                                               is_root=is_root,
+                                                               root=root)
+            if Sense.objects.filter(headword=headword, meaning=new_entry.get('meaning')).exists():
+                logger.warning(f"{new_entry['item_name']} with sense meaning {new_entry.get('meaning')}"
+                               f" already exists.")
                 continue
 
             if not new_entry['frequency']:
                 new_entry['frequency'] = 0
 
-            new_entry['created_date'] = _parse_date(new_entry['created_date'])
-            new_entry['is_root'] = _convert_to_bool(new_entry['is_root'])
-            new_entry['refer_to'] = new_entry.pop('source')
-            new_entry['tag'] = _add_tag(new_entry, 'Kcjason2', '植物')
 
             sentence = new_entry.pop('sentence')
             sentence_en = new_entry.pop('sentence_en')
