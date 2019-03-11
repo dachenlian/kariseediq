@@ -4,6 +4,14 @@ from django.urls import reverse
 from multiselectfield import MultiSelectField
 
 
+class Headword(models.Model):
+    item_name = models.CharField(max_length=255)
+
+
+class Sense(models.Model):
+
+
+
 class Entry(models.Model):
     class Meta:
         verbose_name_plural = 'entries'
