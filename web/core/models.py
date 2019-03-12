@@ -61,6 +61,8 @@ class Sense(models.Model):
     AGRICULTURE = '農耕'
     RELIGION = '宗教'
     FOOD = '食物'
+    INSECT = '昆蟲'
+
     TAG_CHOICES = (
         (HAN_BORROWED, '漢語借字'),
         (JP_BORROWED, '日語借字'),
@@ -79,6 +81,7 @@ class Sense(models.Model):
         (AGRICULTURE, '農耕'),
         (RELIGION, '宗教'),
         (FOOD, '食物'),
+        (INSECT, '昆蟲'),
     )
 
     headword = models.ForeignKey(Headword, related_name='senses', on_delete=models.CASCADE)
