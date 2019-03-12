@@ -5,11 +5,14 @@ from multiselectfield import MultiSelectField
 
 
 class Headword(models.Model):
-    headword = models.CharField(max_length=255)
+    headword = models.CharField(max_length=255, unique=True)
     user = models.CharField(max_length=255, blank=True, default="")
     created_date = models.DateField(default=datetime.date.today)
     modified_date = models.DateTimeField(auto_now=True)
     variant = models.CharField(max_length=255, blank=True, default="")
+
+    def __str__(self):
+        return self.headword
 
 
 class Sense(models.Model):
@@ -79,7 +82,7 @@ class Sense(models.Model):
     )
 
     headword = models.ForeignKey(Headword, related_name='senses', on_delete=models.CASCADE)
-    headword_sense_no = models.PositiveSmallIntegerField(unique=True)
+    headword_sense_no = models.PositiveSmallIntegerField(default=1)
     is_root = models.BooleanField(blank=True, default=False)
     root = models.CharField(max_length=255, blank=True, default="")
     root_sense_no = models.PositiveSmallIntegerField(blank=True)
@@ -105,8 +108,11 @@ class Sense(models.Model):
     truku = models.CharField(max_length=255, blank=True, default="")
     truku_root = models.CharField(max_length=255, blank=True, default="")  # trukur
 
+    class Meta:
+        unique_together = ('headword', 'headword_sense_no')
+
     def __str__(self):
-        return f"{self.headword} ({self.sense_no}): {self.meaning}"
+        return f"{self.headword.headword} ({self.headword_sense_no}): {self.meaning}"
 
     def get_absolute_url(self):
         return reverse('core:update', kwargs={'pk': self.id})
