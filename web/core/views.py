@@ -23,12 +23,15 @@ print(logger)
 class IndexListView(ListView):
     model = Headword
     paginate_by = 100
-    context_object_name = 'entries'
+    context_object_name = 'headwords'
     template_name = 'core/index.html'
 
     def get_queryset(self):
-        return Headword.objects.all().order_by(Lower('item_name'))
+        return Headword.objects.all().order_by(Lower('headword'))
 
+
+class SenseUpdateView(View):
+    pass
 
 # class EntryCreateView(View):
 #     template_name = 'core/create.html'

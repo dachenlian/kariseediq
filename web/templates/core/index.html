@@ -60,21 +60,20 @@
                     </tr>
                     </thead>
                     <tbody>
-                    {% for entry in entries %}
+                    {% for headword in headwords %}
                         <tr>
                             <td class="align-middle">{{ forloop.counter0|add:page_obj.start_index }}</td>
-                            <td style="cursor: pointer" onclick="window.location='{% url 'core:update' pk=entry.id %}';"
-                                class="align-middle">{{ entry.item_name }}</td>
-                            <td class="align-middle">{{ entry.variant }}</td>
-                            <td class="align-middle">{{ entry.meaning }}</td>
-                            <td class="align-middle">{{ entry.item_root }}</td>
-                            <td class="align-middle">{{ entry.source }}</td>
-                            <td class="align-middle">{{ entry.user }}</td>
-                            <td class="align-middle">{{ entry.created_date }}</td>
+{#                            <td style="cursor: pointer" onclick="window.location='{% url 'core:update' pk=headword.id %}';"#}
+{#                                class="align-middle">{{ headword.headword }}</td>#}
+                            <td class="align-middle">{{ headword.headword }}</td>
+                            <td class="align-middle">{{ headword.variant }}</td>
+                            <td class="align-middle">{{ headword.created_date }}</td>
+                            <td class="align-middle">{{ headword.modified_date }}</td>
+                            <td class="align-middle">{{ headword.user }}</td>
                             <td class="align-middle">
                                 <button type="button" class="btn btn-primary" data-toggle="modal"
                                         data-target="#deleteModal"
-                                        data-pk="{{ entry.id }}"><i class="material-icons">delete</i>
+                                        data-pk="{{ headword.id }}"><i class="material-icons">delete</i>
                                 </button>
                             </td>
                         </tr>
@@ -140,22 +139,22 @@
     </div>
 {% endblock content %}
 {% block javascript %}
-    <script>
-        $('#deleteModal').on('show.bs.modal', function (event) {
-            let button = $(event.relatedTarget);
-            let pk = button.data('pk');
-            let url = "{% url 'core:delete' pk=1 %}".replace(1, `${pk}`);
-            let modal = $(this);
-            let entry = $(button).closest('tr').find('td:nth-child(2)').text();
-            let form = modal.find('form');
-
-            form.prop('action', url);
-            modal.find('.modal-title').text('Delete ' + entry + '?')
-        });
-    $(function() {
-        $('[data-toggle="popover"]').popover({
-            trigger: 'focus'
-        });
-    });
-    </script>
+{#    <script>#}
+{#        $('#deleteModal').on('show.bs.modal', function (event) {#}
+{#            let button = $(event.relatedTarget);#}
+{#            let pk = button.data('pk');#}
+{#            let url = "{% url 'core:delete' pk=1 %}".replace(1, `${pk}`);#}
+{#            let modal = $(this);#}
+{#            let entry = $(button).closest('tr').find('td:nth-child(2)').text();#}
+{#            let form = modal.find('form');#}
+{##}
+{#            form.prop('action', url);#}
+{#            modal.find('.modal-title').text('Delete ' + entry + '?')#}
+{#        });#}
+{#    $(function() {#}
+{#        $('[data-toggle="popover"]').popover({#}
+{#            trigger: 'focus'#}
+{#        });#}
+{#    });#}
+{#    </script>#}
 {% endblock javascript %}
