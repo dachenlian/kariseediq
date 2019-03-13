@@ -7,6 +7,8 @@ from multiselectfield import MultiSelectField
 class Headword(models.Model):
     headword = models.CharField(max_length=255, unique=True)
     user = models.CharField(max_length=255, blank=True, default="")
+    first_letter = models.CharField(max_length=255, default="")
+    is_root = models.BooleanField(blank=True, default=False)
     created_date = models.DateField(default=datetime.date.today)
     modified_date = models.DateTimeField(auto_now=True)
     variant = models.CharField(max_length=255, blank=True, default="")
@@ -86,7 +88,6 @@ class Sense(models.Model):
 
     headword = models.ForeignKey(Headword, related_name='senses', on_delete=models.CASCADE)
     headword_sense_no = models.PositiveSmallIntegerField(default=1)
-    is_root = models.BooleanField(blank=True, default=False)
     root = models.CharField(max_length=255, blank=True, default="")
     root_sense_no = models.PositiveSmallIntegerField(blank=True)
     user = models.CharField(max_length=255, blank=True, default="")

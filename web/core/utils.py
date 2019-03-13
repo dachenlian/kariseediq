@@ -1,28 +1,15 @@
 import csv
 import datetime
 import re
-from typing import List
 import logging
+import time
+from typing import List
 
 from django.http.request import HttpRequest
 
 from .models import Headword, Sense, Phrase, Example
 
 logger = logging.getLogger(__name__)
-
-
-def _convert_to_bool(cell):
-    return cell.lower() == 'yes'
-
-
-def _parse_date(str_date):
-    try:
-        parsed = datetime.datetime.strptime(str_date, '%m/%d/%Y')
-    except ValueError as e:
-        logger.exception(e)
-        return datetime.datetime.min
-    else:
-        return parsed
 
 
 def _add_tag(entry: dict, user: str, tag: str) -> list:
@@ -32,24 +19,11 @@ def _add_tag(entry: dict, user: str, tag: str) -> list:
     return tags
 
 
-def _contains_digit(s):
-    return any(c.isdigit() for c in s)
-
-
-def _split_item_name(s):
-    if _contains_digit(s):
-        m = re.match(r'([A-Za-z\-\s]+)_?(\d)?', s)
-        headword, sense = m.group(1).strip(), m.group(2).strip()
-    else:
-        headword = s.strip()
-        sense = 1
-    return headword, sense
-
-
 def _clean_entry(entry: dict) -> dict:
     headword, headword_sense_no = _split_item_name(entry.pop('item_name'))
     root, root_sense_no = _split_item_name(entry.pop('item_root'))
 
+    entry['first_letter'] = _first_letter(headword)
     entry['headword'] = headword
     entry['headword_sense_no'] = headword_sense_no
     entry['root'] = root
@@ -65,7 +39,43 @@ def _clean_entry(entry: dict) -> dict:
     return entry
 
 
+def _contains_digit(s):
+    return any(c.isdigit() for c in s)
+
+
+def _convert_to_bool(cell):
+    return cell.lower() == 'yes'
+
+
+def _first_letter(string):
+    for s in string:
+        if s.isalpha():
+            return s
+
+
+def _parse_date(str_date):
+    try:
+        parsed = datetime.datetime.strptime(str_date, '%m/%d/%Y')
+    except ValueError as e:
+        logger.exception(e)
+        return datetime.datetime.min
+    else:
+        return parsed
+
+
+def _split_item_name(s):
+    if _contains_digit(s):
+        m = re.match(r'([A-Za-z\-\s]+)_?(\d)?', s)
+        headword, sense = m.group(1).strip(), m.group(2).strip()
+    else:
+        headword = s.strip()
+        sense = 1
+    return headword, sense
+
+
 def load_into_db(file):
+    start = time.time()
+
     with open(file) as fp:
         reader = csv.reader(fp)
         header = next(reader)
@@ -75,12 +85,16 @@ def load_into_db(file):
             new_entry = _clean_entry(dict(zip(header, row)))
             headword = new_entry.pop('headword')
             variant = new_entry.pop('variant')
+            is_root = new_entry.pop('is_root')
+            first_letter = new_entry.pop('first_letter')
 
             headword, created = Headword.objects.get_or_create(
                 headword=headword,
                 defaults={
-                    'user': new_entry.get('user'),
+                    'first_letter': first_letter,
                     'variant': variant,
+                    'is_root': is_root,
+                    'user': new_entry.get('user'),
                     'created_date': new_entry.get('created_date')
                 }
             )
@@ -103,7 +117,6 @@ def load_into_db(file):
             phrase_ch = new_entry.pop('phrase_ch')
             phrase_en = new_entry.pop('phrase_en')
 
-            # headword_sense_no = Headword(headword=headword).senses.count() + 1
             sense = Sense.objects.create(headword=headword, **new_entry)
 
             Example.objects.create(
@@ -122,6 +135,9 @@ def load_into_db(file):
 
             if idx % 500 == 0:
                 logger.debug(f'Processed {idx} rows...')
+
+    end = time.time()
+    logger.debug(f'Completed in {datetime.timedelta(seconds=end - start)}.')
 
 
 def gen_query_history(request: HttpRequest):

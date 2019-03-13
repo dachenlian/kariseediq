@@ -21,10 +21,12 @@
                         <tr>
                             <th>#</th>
                             <th class="text-center">Download
-                                <a tabindex=0 data-container="body" data-toggle="popover" data-trigger="focus" title="Opening in Excel"
-                                data-content="Data tab > From Text > file.csv >1. Delimited 2. File origin: UTF-8 3. Delimiters: comma > Finish">
-                                    <i style="font-size:15px; cursor: pointer; color: darkslategrey;" class="material-icons"
-                                >help</i></a></th>
+                                <a tabindex=0 data-container="body" data-toggle="popover" data-trigger="focus"
+                                   title="Opening in Excel"
+                                   data-content="Data tab > From Text > file.csv >1. Delimited 2. File origin: UTF-8 3. Delimiters: comma > Finish">
+                                    <i style="font-size:15px; cursor: pointer; color: darkslategrey;"
+                                       class="material-icons"
+                                    >help</i></a></th>
                             <th>Query</th>
                         </tr>
                         {% for hist in view.request.session.history_list %}
@@ -51,32 +53,46 @@
                         <th>#</th>
                         <th>詞項</th>
                         <th>變體</th>
-                        <th>意義</th>
-                        <th>詞根</th>
-                        <th>參照</th>
-                        <th>輸入者</th>
-                        <th>輸入日期</th>
-                        <th>刪除</th>
+                                                <th>詞義</th>
+                        {#                        <th>輸入者</th>#}
+                        {#                        <th>輸入日期</th>#}
+                        {#                        <th>刪除</th>#}
                     </tr>
                     </thead>
                     <tbody>
-                    {% for headword in headwords %}
+                    {% for headword in headwords|slice:":5" %}
                         <tr>
                             <td class="align-middle">{{ forloop.counter0|add:page_obj.start_index }}</td>
-{#                            <td style="cursor: pointer" onclick="window.location='{% url 'core:update' pk=headword.id %}';"#}
-{#                                class="align-middle">{{ headword.headword }}</td>#}
+                            {#                            <td style="cursor: pointer" onclick="window.location='{% url 'core:update' pk=headword.id %}';"#}
+                            {#                                class="align-middle">{{ headword.headword }}</td>#}
                             <td class="align-middle">{{ headword.headword }}</td>
                             <td class="align-middle">{{ headword.variant }}</td>
-                            <td class="align-middle">{{ headword.created_date }}</td>
-                            <td class="align-middle">{{ headword.modified_date }}</td>
-                            <td class="align-middle">{{ headword.user }}</td>
-                            <td class="align-middle">
-                                <button type="button" class="btn btn-primary" data-toggle="modal"
-                                        data-target="#deleteModal"
-                                        data-pk="{{ headword.id }}"><i class="material-icons">delete</i>
-                                </button>
+                            <td>
+{#                            <table>#}
+{#                                {% for sense in headword.senses.all %}#}
+{#                                    <tr><td>{{ sense.meaning }}</td></tr>#}
+{#                                    {% endfor %}#}
+{#                            </table>#}
+{#                                {% for sense in headword.senses.all %}#}
+{#                                   <div>{{ sense.headword_sense_no }}. {{ sense.meaning }}</div>#}
+                                {% for sense in headword.senses.all %}
+                                    <div class="card">
+                                        <div class="card-body">
+                                            {{ sense.meaning }}
+                                        </div>
+                                    </div>
+                                {% endfor %}
                             </td>
                         </tr>
+                        {#                        <td class="align-middle">{{ headword.created_date }}</td>#}
+                        {#                        <td class="align-middle">{{ headword.modified_date }}</td>#}
+                        {#                        <td class="align-middle">{{ headword.user }}</td>#}
+                        {#                        <td class="align-middle">#}
+                        {#                            <button type="button" class="btn btn-primary" data-toggle="modal"#}
+                        {#                                    data-target="#deleteModal"#}
+                        {#                                    data-pk="{{ headword.id }}"><i class="material-icons">delete</i>#}
+                        {#                            </button>#}
+                        {#                        </td>#}
                     {% empty %}
                         <tr>
                             <td colspan="7">No search results match the query.</td>
@@ -139,22 +155,22 @@
     </div>
 {% endblock content %}
 {% block javascript %}
-{#    <script>#}
-{#        $('#deleteModal').on('show.bs.modal', function (event) {#}
-{#            let button = $(event.relatedTarget);#}
-{#            let pk = button.data('pk');#}
-{#            let url = "{% url 'core:delete' pk=1 %}".replace(1, `${pk}`);#}
-{#            let modal = $(this);#}
-{#            let entry = $(button).closest('tr').find('td:nth-child(2)').text();#}
-{#            let form = modal.find('form');#}
-{##}
-{#            form.prop('action', url);#}
-{#            modal.find('.modal-title').text('Delete ' + entry + '?')#}
-{#        });#}
-{#    $(function() {#}
-{#        $('[data-toggle="popover"]').popover({#}
-{#            trigger: 'focus'#}
-{#        });#}
-{#    });#}
-{#    </script>#}
+    {#    <script>#}
+    {#        $('#deleteModal').on('show.bs.modal', function (event) {#}
+    {#            let button = $(event.relatedTarget);#}
+    {#            let pk = button.data('pk');#}
+    {#            let url = "{% url 'core:delete' pk=1 %}".replace(1, `${pk}`);#}
+    {#            let modal = $(this);#}
+    {#            let entry = $(button).closest('tr').find('td:nth-child(2)').text();#}
+    {#            let form = modal.find('form');#}
+    {##}
+    {#            form.prop('action', url);#}
+    {#            modal.find('.modal-title').text('Delete ' + entry + '?')#}
+    {#        });#}
+    {#    $(function() {#}
+    {#        $('[data-toggle="popover"]').popover({#}
+    {#            trigger: 'focus'#}
+    {#        });#}
+    {#    });#}
+    {#    </script>#}
 {% endblock javascript %}

@@ -4,7 +4,8 @@ import re
 
 from django.contrib import messages
 from django.db.models import Q
-from django.db.models.functions import Lower
+from django.db.models import Case, When, F, Count
+from django.db.models.functions import Lower, Substr
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render, redirect
@@ -27,7 +28,10 @@ class IndexListView(ListView):
     template_name = 'core/index.html'
 
     def get_queryset(self):
-        return Headword.objects.all().order_by(Lower('headword'))
+        # return Headword.objects.prefetch_related('senses').filter(senses__gt=1)
+        return Headword.objects.prefetch_related('senses').annotate(senses_count=Count('senses'))\
+            .filter(senses_count__gt=1)
+        # return Headword.objects.order_by(Lower('first_letter')).prefetch_related('senses')
 
 
 class SenseUpdateView(View):
