@@ -37,7 +37,8 @@ class IndexListView(ListView):
 class SenseUpdateView(View):
 
     def get(self, request, *args, **kwargs):
-        sense = get_object_or_404(Sense, pk=kwargs.get('pk'))
+        headword = get_object_or_404(Headword, headword=kwargs.get('hw'))
+        sense = get_object_or_404(Sense, headword=headword, headword_sense_no=kwargs.get('sense'))
 
         sense_form = EntryUpdateForm(instance=sense)
         formset = ExampleFormSet(instance=sense)

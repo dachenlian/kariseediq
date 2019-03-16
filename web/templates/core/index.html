@@ -77,7 +77,7 @@
 {#                                   <div>{{ sense.headword_sense_no }}. {{ sense.meaning }}</div>#}
                                 {% for sense in headword.senses.all %}
                                     <div class="card">
-                                        <div style="cursor: pointer" onclick="window.location='{% url 'core:update' hw=sense.headword.headword pk=sense.id %}';" class="card-body">
+                                        <div style="cursor: pointer" onclick="window.location='{% url 'core:update' hw=sense.headword.headword sense=sense.headword_sense_no %}';" class="card-body">
                                             {{ sense.meaning }}
                                         </div>
                                     </div>
