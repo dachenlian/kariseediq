@@ -13,7 +13,7 @@ from django.urls import reverse_lazy
 from django.views.generic import View, DeleteView
 from django.views.generic.list import ListView
 
-from .forms import EntryForm, EntryUpdateForm, ExampleFormSet
+from .forms import EntryForm, EntryUpdateForm, ExampleFormset, PhraseFormset
 from core.models import Headword, Sense, Example, Phrase
 from core import utils
 
@@ -39,31 +39,36 @@ class SenseUpdateView(View):
     def get(self, request, *args, **kwargs):
         headword = get_object_or_404(Headword, headword=kwargs.get('hw'))
         sense = get_object_or_404(Sense, headword=headword, headword_sense_no=kwargs.get('sense'))
-
         sense_form = EntryUpdateForm(instance=sense)
-        formset = ExampleFormSet(instance=sense)
+        example_formset = ExampleFormset(instance=sense)
+        phrase_formset = PhraseFormset(instance=sense)
 
         context = {
             'form': sense_form,
-            'formset': formset
+            'example_formset': example_formset,
+            'phrase_formset': phrase_formset,
         }
         return render(self.request, template_name='core/update.html', context=context)
 
     def post(self, request, *args, **kwargs):
         logger.debug('Inside Update view.')
-        sense = get_object_or_404(Sense, pk=kwargs.get('pk'))
-        sense_form = EntryUpdateForm(request.POST, instance=sense)
-        formset = ExampleFormSet(request.POST, instance=sense)
-        if sense_form.is_valid() and formset.is_valid():
+
+        headword = get_object_or_404(Headword, headword=kwargs.get('hw'))
+        sense = get_object_or_404(Sense, headword=headword, headword_sense_no=kwargs.get('sense'))
+        sense_form = EntryUpdateForm(instance=sense, data=request.POST)
+        example_formset = ExampleFormset(instance=sense, data=request.POST)
+        phrase_formset = PhraseFormset(instance=sense, data=request.POST)
+
+        if sense_form.is_valid() and example_formset.is_valid() and phrase_formset.is_valid():
             logger.debug(sense_form.cleaned_data)
-            sense = sense_form.save(commit=False)
-            sense.is_root = sense_form.cleaned_data.get('is_root')
-            sense.save()
-            formset.save()
-            messages.success(request, "Entry updated!")
+            sense = sense_form.save()
+            example_formset.save()
+            phrase_formset.save()
+            messages.success(request, "Sense updated!")
         else:
             logger.warning(sense_form.errors)
-            logger.warning(formset.errors)
+            logger.warning(example_formset.errors)
+            logger.warning(phrase_formset.errors)
 
         return redirect(sense)
 

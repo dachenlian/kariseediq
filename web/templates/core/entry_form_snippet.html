@@ -2,7 +2,8 @@
 
 <div class="form-row">
     <div class="col">
-        {{ form.headword|as_crispy_field }} <small><span id="item_message"></span></small>
+        {{ form.headword|as_crispy_field }}
+        <small><span id="item_message"></span></small>
     </div>
     <div class="col">
         {{ form.headword_sense_no|as_crispy_field }}
@@ -64,8 +65,20 @@
         {{ form.picture|as_crispy_field }}
     </div>
 </div>
-{{ formset.management_form }}
-{% for form in formset %}
+<div class="form-row">
+    {{ phrase_formset.management_form }}
+    {% for form in phrase_formset %}
+        <div class="col">
+            <strong>Phrase #{{ forloop.counter }}</strong>
+            <div class="form-group">
+                {{ form|crispy }}
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+{{ example_formset.management_form }}
+{% for form in example_formset %}
     <strong>Example #{{ forloop.counter }}</strong>
     <div class="form-group">
         {{ form|crispy }}

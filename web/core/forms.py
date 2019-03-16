@@ -69,11 +69,27 @@ class ExampleForm(ModelForm):
         }
 
 
-ExampleFormSet = inlineformset_factory(
+class PhraseForm(ModelForm):
+    class Meta:
+        model = Phrase
+        fields = ['phrase', 'phrase_ch', 'phrase_en']
+        labels = {
+            'phrase_ch': 'Phrase (Chinese)',
+            'phrase_en': 'Phrase (English)',
+        }
+
+
+ExampleFormset = inlineformset_factory(
     parent_model=Sense,
     model=Example,
     form=ExampleForm,
     extra=2,
 )
 
+PhraseFormset = inlineformset_factory(
+    parent_model=Sense,
+    model=Phrase,
+    form=PhraseForm,
+    extra=2
+)
 
