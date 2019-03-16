@@ -13,8 +13,8 @@ from django.urls import reverse_lazy
 from django.views.generic import View, DeleteView
 from django.views.generic.list import ListView
 
-# from .forms import EntryForm, EntryUpdateForm, ExampleFormSet
-from core.models import Headword
+from .forms import EntryForm, EntryUpdateForm, ExampleFormSet
+from core.models import Headword, Sense, Example, Phrase
 from core import utils
 
 logger = logging.getLogger(__name__)
@@ -35,7 +35,37 @@ class IndexListView(ListView):
 
 
 class SenseUpdateView(View):
-    pass
+
+    def get(self, request, *args, **kwargs):
+        sense = get_object_or_404(Sense, pk=kwargs.get('pk'))
+
+        sense_form = EntryUpdateForm(instance=sense)
+        formset = ExampleFormSet(instance=sense)
+
+        context = {
+            'form': sense_form,
+            'formset': formset
+        }
+        return render(self.request, template_name='core/update.html', context=context)
+
+    def post(self, request, *args, **kwargs):
+        logger.debug('Inside Update view.')
+        sense = get_object_or_404(Sense, pk=kwargs.get('pk'))
+        sense_form = EntryUpdateForm(request.POST, instance=sense)
+        formset = ExampleFormSet(request.POST, instance=sense)
+        if sense_form.is_valid() and formset.is_valid():
+            logger.debug(sense_form.cleaned_data)
+            sense = sense_form.save(commit=False)
+            sense.is_root = sense_form.cleaned_data.get('is_root')
+            sense.save()
+            formset.save()
+            messages.success(request, "Entry updated!")
+        else:
+            logger.warning(sense_form.errors)
+            logger.warning(formset.errors)
+
+        return redirect(sense)
+
 
 # class EntryCreateView(View):
 #     template_name = 'core/create.html'

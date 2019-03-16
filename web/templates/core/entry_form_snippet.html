@@ -2,10 +2,10 @@
 
 <div class="form-row">
     <div class="col">
-        {{ form.item_name|as_crispy_field }} <small><span id="item_message"></span></small>
+        {{ form.headword|as_crispy_field }} <small><span id="item_message"></span></small>
     </div>
     <div class="col">
-        {{ form.variant|as_crispy_field }}
+        {{ form.headword_sense_no|as_crispy_field }}
     </div>
     <div class="col">
         {{ form.toda|as_crispy_field }}
@@ -16,7 +16,10 @@
 </div>
 <div class="form-row">
     <div class="col">
-        {{ form.item_root|as_crispy_field }}
+        {{ form.root|as_crispy_field }}
+    </div>
+    <div class="col">
+        {{ form.root_sense_no|as_crispy_field }}
     </div>
     <div class="col">
         {{ form.toda_root|as_crispy_field }}
@@ -34,17 +37,6 @@
     </div>
     <div class="col">
         {{ form.meaning_en|as_crispy_field }}
-    </div>
-</div>
-<div class="form-row">
-    <div class="col">
-        {{ form.phrase|as_crispy_field }}
-    </div>
-    <div class="col">
-        {{ form.phrase_en|as_crispy_field }}
-    </div>
-    <div class="col">
-        {{ form.phrase_ch|as_crispy_field }}
     </div>
 </div>
 <div class="form-row">
