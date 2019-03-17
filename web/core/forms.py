@@ -6,7 +6,7 @@ from .models import Headword, Sense, Phrase, Example
 
 
 # https://stackoverflow.com/questions/12144475/displaying-multiple-rows-and-columns-in-django-crispy-forms
-class EntryForm(ModelForm):
+class SenseForm(ModelForm):
     # tag = forms.MultipleChoiceField(choices=Entry.TAG_CHOICES)
 
     class Meta:
@@ -47,7 +47,7 @@ class EntryForm(ModelForm):
     #     return data
 
 
-class EntryUpdateForm(EntryForm):
+class SenseUpdateForm(SenseForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

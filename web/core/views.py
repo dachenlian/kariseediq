@@ -5,8 +5,8 @@ import re
 from django.contrib import messages
 from django.db.models import Q
 from django.db.models import Case, When, F, Count
-from django.db.models.functions import Lower, Substr
-from django.http import HttpResponse, FileResponse
+from django.db.models.functions import Lower
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render, redirect
 from django.views.generic import View, DeleteView
@@ -14,7 +14,7 @@ from django.views.generic.list import ListView
 from django.urls import reverse_lazy
 from django.utils.encoding import escape_uri_path
 
-from .forms import EntryForm, EntryUpdateForm, ExampleFormset, PhraseFormset
+from .forms import SenseForm, SenseUpdateForm, ExampleFormset, PhraseFormset
 from core.models import Headword, Sense, Example, Phrase
 from core import utils
 
@@ -40,7 +40,7 @@ class SenseUpdateView(View):
     def get(self, request, *args, **kwargs):
         headword = get_object_or_404(Headword, headword=kwargs.get('hw'))
         sense = get_object_or_404(Sense, headword=headword, headword_sense_no=kwargs.get('sense'))
-        sense_form = EntryUpdateForm(instance=sense)
+        sense_form = SenseUpdateForm(instance=sense)
         example_formset = ExampleFormset(instance=sense)
         phrase_formset = PhraseFormset(instance=sense)
 
@@ -56,7 +56,7 @@ class SenseUpdateView(View):
 
         headword = get_object_or_404(Headword, headword=kwargs.get('hw'))
         sense = get_object_or_404(Sense, headword=headword, headword_sense_no=kwargs.get('sense'))
-        sense_form = EntryUpdateForm(instance=sense, data=request.POST)
+        sense_form = SenseUpdateForm(instance=sense, data=request.POST)
         example_formset = ExampleFormset(instance=sense, data=request.POST)
         phrase_formset = PhraseFormset(instance=sense, data=request.POST)
 
@@ -104,29 +104,30 @@ class SenseUpdateView(View):
 #
 #
 #
-# class EntryPendingListView(ListView):
-#     model = Entry
-#     paginate_by = 1000
-#     context_object_name = 'entries'
-#     template_name = 'core/pending.html'
-#
-#     def get(self, request, *args, **kwargs):
-#         if request.is_ajax():
-#             logger.debug('Ajax request received!')
-#             queryset = self.get_queryset()
-#             return JsonResponse({'pending_count': len(queryset)})
-#         else:
-#             return super().get(request, *args, **kwargs)
-#
-#     def get_queryset(self):
-#         item_roots = Entry.objects.all().values_list('item_name', 'item_root')
-#         item_names = Entry.objects.all().values_list('item_name', flat=True)
-#         roots_without_entries = item_roots.exclude(item_root__in=item_names)
-#         roots_without_entries = sorted(filter(bool, set(roots_without_entries)))
-#         logger.debug(len(roots_without_entries))
-#         return roots_without_entries
-#
-#
+class PendingListView(ListView):
+    model = Headword
+    paginate_by = 1000
+    context_object_name = 'headwords'
+    template_name = 'core/pending.html'
+
+    def get(self, request, *args, **kwargs):
+        if request.is_ajax():
+            logger.debug('Ajax request received!')
+            queryset = self.get_queryset()
+            return JsonResponse({'pending_count': len(queryset)})
+        else:
+            return super().get(request, *args, **kwargs)
+
+    def get_queryset(self):
+        roots = Sense.objects.all().values_list('root', flat=True)
+        logger.debug(len(roots))
+        headwords = Headword.objects.exclude(headword__in=roots)
+        roots_without_entries = headwords.exclude(headword__in=roots).values_list('headword', flat=True)
+        roots_without_entries = sorted(filter(bool, set(roots_without_entries)))
+        logger.debug(len(roots_without_entries))
+        return headwords
+
+
 class SearchResultsListView(ListView):
     model = Headword
     paginate_by = 100
@@ -249,7 +250,6 @@ def export_search_to_csv(request, query_idx):
     writer.writeheader()
     for row in queryset:
         writer.writerow(row)
-    # response = FileResponse(to_csv, as_attachment=True, content_type='text/csv', filename=f'{query_str}.csv')
     return response
 #
 #

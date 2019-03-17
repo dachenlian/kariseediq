@@ -17,6 +17,7 @@ django-debug-toolbar = "*"
 whitenoise = "*"
 gunicorn = "*"
 python-dotenv = "*"
+cihai = "*"
 
 [dev-packages]
 

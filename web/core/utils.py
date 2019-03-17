@@ -8,7 +8,7 @@ from typing import List
 from django.http.request import HttpRequest
 from django.forms.models import model_to_dict
 
-from .forms import EntryForm
+from .forms import SenseForm
 from .models import Headword, Sense, Phrase, Example
 
 logger = logging.getLogger(__name__)
@@ -173,7 +173,7 @@ def get_related(qs: List[Headword]) -> List[dict]:
     :param qs:
     :return:
     """
-    fieldnames = EntryForm.Meta.fields
+    fieldnames = SenseForm.Meta.fields
     results = []
     for headword in qs:
         senses = headword.senses.all().values('id', *fieldnames)

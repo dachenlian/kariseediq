@@ -5,7 +5,7 @@
             <h1>Pending</h1>
             <div class="p-2 mb-2 bg-light text-dark col">
                 <p class="py-0 my-0 align-middle">
-                    <strong>資料筆數：</strong>{{ entries|length }}
+                    <strong>資料筆數：</strong>{{ headwords|length }}
                 </p>
             </div>
             <div class="table-responsive">
@@ -18,11 +18,11 @@
                     </tr>
                     </thead>
                     <tbody>
-                    {% for entry in entries %}
+                    {% for hw in headwords %}
                         <tr>
                             <td>{{ forloop.counter }}</td>
-                            <td>{{ entry.0 }}</td>
-                            <td>{{ entry.1 }}</td>
+                            <td>{{ hw.0 }}</td>
+                            <td>{{ hw.1 }}</td>
                         </tr>
                     {% endfor %}
                     </tbody>
