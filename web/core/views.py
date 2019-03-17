@@ -12,7 +12,7 @@ from django.shortcuts import render, redirect
 from django.views.generic import View, DeleteView
 from django.views.generic.list import ListView
 from django.urls import reverse_lazy
-from django.utils.encoding import smart_text, escape_uri_path
+from django.utils.encoding import escape_uri_path
 
 from .forms import EntryForm, EntryUpdateForm, ExampleFormset, PhraseFormset
 from core.models import Headword, Sense, Example, Phrase
@@ -167,12 +167,12 @@ class SearchResultsListView(ListView):
                            )
         elif search_filter == 'endswith':
             qs = qs.filter(Q(headword__iendswith=search_name) |
-                           Q(senses_meaning__iendswith=search_name) |
+                           Q(senses__meaning__iendswith=search_name) |
                            Q(variant__iendswith=search_name)
                            )
         else:
             qs = qs.filter(Q(headword__icontains=search_name) |
-                           Q(senses_meaning__icontains=search_name) |
+                           Q(senses__meaning__icontains=search_name) |
                            Q(variant__icontains=search_name)
                            )
 
