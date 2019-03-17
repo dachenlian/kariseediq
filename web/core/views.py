@@ -1,5 +1,4 @@
 import csv
-from io import StringIO
 import logging
 import re
 
@@ -10,9 +9,10 @@ from django.db.models.functions import Lower, Substr
 from django.http import HttpResponse, FileResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render, redirect
-from django.urls import reverse_lazy
 from django.views.generic import View, DeleteView
 from django.views.generic.list import ListView
+from django.urls import reverse_lazy
+from django.utils.encoding import smart_text, escape_uri_path
 
 from .forms import EntryForm, EntryUpdateForm, ExampleFormset, PhraseFormset
 from core.models import Headword, Sense, Example, Phrase
@@ -237,14 +237,14 @@ def export_search_to_csv(request, query_idx):
     # some chars aren't allowed in filenames
     query_str = query_str.replace(' | ', '_')
     query_str = re.sub(r'<strong>(.+?)</strong>:', r'\1=', query_str)
+    filename = escape_uri_path(f'{query_str}.csv')
     logger.debug(query_str)
 
     queryset = utils.get_related(queryset)
     fieldnames = queryset[0].keys()
     response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = f'attachment; filename="{query_str}.csv"'
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
 
-    to_csv = StringIO()
     writer = csv.DictWriter(response, fieldnames=fieldnames)
     writer.writeheader()
     for row in queryset:
