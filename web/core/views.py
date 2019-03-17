@@ -1,4 +1,5 @@
 import csv
+from io import StringIO
 import logging
 import re
 
@@ -6,7 +7,7 @@ from django.contrib import messages
 from django.db.models import Q
 from django.db.models import Case, When, F, Count
 from django.db.models.functions import Lower, Substr
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, FileResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
@@ -229,27 +230,26 @@ class SearchResultsListView(ListView):
 
 
 def export_search_to_csv(request, query_idx):
-    fieldnames = list(EntryForm.Meta.fields)
-
     query_dict = request.session.get('history_list')[query_idx]
 
-    queryset = query_dict['queryset'].values('id', *fieldnames)
+    queryset = query_dict['queryset']
     query_str = query_dict['query_str']
     # some chars aren't allowed in filenames
     query_str = query_str.replace(' | ', '_')
     query_str = re.sub(r'<strong>(.+?)</strong>:', r'\1=', query_str)
+    logger.debug(query_str)
 
     queryset = utils.get_related(queryset)
-    fieldnames.extend(['sentence', 'sentence_en', 'sentence_ch'])
-
+    fieldnames = queryset[0].keys()
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = f'attachment; filename="{query_str}.csv"'
 
+    to_csv = StringIO()
     writer = csv.DictWriter(response, fieldnames=fieldnames)
     writer.writeheader()
     for row in queryset:
-        row['tag'] = ",".join(row['tag'])
         writer.writerow(row)
+    # response = FileResponse(to_csv, as_attachment=True, content_type='text/csv', filename=f'{query_str}.csv')
     return response
 #
 #

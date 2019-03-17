@@ -6,7 +6,9 @@ import time
 from typing import List
 
 from django.http.request import HttpRequest
+from django.forms.models import model_to_dict
 
+from .forms import EntryForm
 from .models import Headword, Sense, Phrase, Example
 
 logger = logging.getLogger(__name__)
@@ -165,21 +167,40 @@ def gen_query_history(request: HttpRequest):
     return request
 
 
-def get_related(qs: List[dict]) -> list:
+def get_related(qs: List[Headword]) -> List[dict]:
     """
-    Get data from related models, such as examples.
+    Get data from related models, such as examples and phrases.
     :param qs:
     :return:
     """
-    for entry in qs:
-        _id = entry.pop('id')
-        examples = Example.objects.filter(entry=_id)
-        sentence = [f'({i}) {ex.sentence}' for i, ex in enumerate(examples, 1)]
-        sentence_en = [f'({i}) {ex.sentence_en}' for i, ex in enumerate(examples, 1)]
-        sentence_ch = [f'({i}) {ex.sentence_ch}' for i, ex in enumerate(examples, 1)]
+    fieldnames = EntryForm.Meta.fields
+    results = []
+    for headword in qs:
+        senses = headword.senses.all().values('id', *fieldnames)
+        head_dict = model_to_dict(headword, ('user', 'variant', 'is_root', 'created_date'))
+        head_dict['hw_created_date'] = head_dict.pop('created_date')
 
-        entry['sentence'] = " ".join(sentence)
-        entry['sentence_en'] = " ".join(sentence_en)
-        entry['sentence_ch'] = " ".join(sentence_ch)
+        for sense in senses:
+            sense.update(head_dict)
+            sense['tag'] = ",".join(sense['tag'])
+            sense['headword'] = headword.headword
+            _id = sense.pop('id')
 
-    return qs
+            examples = Example.objects.filter(sense=_id)
+            sentence = [f'({i}) {ex.sentence}' for i, ex in enumerate(examples, 1) if ex.sentence]
+            sentence_en = [f'({i}) {ex.sentence_en}' for i, ex in enumerate(examples, 1) if ex.sentence_en]
+            sentence_ch = [f'({i}) {ex.sentence_ch}' for i, ex in enumerate(examples, 1) if ex.sentence_ch]
+            sense['sentence'] = " ".join(sentence)
+            sense['sentence_en'] = " ".join(sentence_en)
+            sense['sentence_ch'] = " ".join(sentence_ch)
+
+            phrases = Phrase.objects.filter(sense=_id)
+            phrase = [f'({i}) {ex.phrase}' for i, ex in enumerate(phrases, 1) if ex.phrase]
+            phrase_en = [f'({i}) {ex.phrase_en}' for i, ex in enumerate(phrases, 1) if ex.phrase_en]
+            phrase_ch = [f'({i}) {ex.phrase_ch}' for i, ex in enumerate(phrases, 1) if ex.phrase_ch]
+            sense['phrase'] = " ".join(phrase)
+            sense['phrase_en'] = " ".join(phrase_en)
+            sense['phrase_ch'] = " ".join(phrase_ch)
+
+            results.append(sense)
+    return results
