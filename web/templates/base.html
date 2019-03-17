@@ -45,27 +45,27 @@
                     FreqDist</a>
             </li>
         </ul>
-{#        <form action="{% url 'core:results' %}" class="form-inline">#}
-{#            <div class="form-check form-check-inline text-white">#}
-{#                <input type="radio" name="search_root" class="form-check-input" value="only" id="rootFilter1">#}
-{#                <label style="color:white !important;" for="rootFilter1" class="form-check-label">Only roots</label>#}
-{#            </div>#}
-{#            <div class="form-check form-check-inline text-white">#}
-{#                <input type="radio" name="search_root" class="form-check-input" value="exclude" id="rootFilter2">#}
-{#                <label style="color:white !important;" for="rootFilter2" class="form-check-label">Exclude roots</label>#}
-{#            </div>#}
-{#            <div class="form-group">#}
-{#                <label for="itemFilterNav"></label>#}
-{#                <select name="search_filter" id="itemFilterNav" class="custom-select custom-select-sm mx-auto">#}
-{#                    <option value="startswith" selected>Starts with</option>#}
-{#                    <option value="endswith">Ends with</option>#}
-{#                    <option value="contains">Contains</option>#}
-{#                </select>#}
-{#            </div>#}
-{#            <input type="search" name="search_name" placeholder="Search" class="form-control mx-sm-2">#}
-{#            <input type="hidden" name="search_reset" value="True">#}
-{#            <button class="btn btn-outline-light my-2 my-sm-0" type="submit">New Search</button>#}
-{#        </form>#}
+        <form action="{% url 'core:results' %}" class="form-inline">
+            <div class="form-check form-check-inline text-white">
+                <input type="radio" name="search_root" class="form-check-input" value="only" id="rootFilter1">
+                <label style="color:white !important;" for="rootFilter1" class="form-check-label">Only roots</label>
+            </div>
+            <div class="form-check form-check-inline text-white">
+                <input type="radio" name="search_root" class="form-check-input" value="exclude" id="rootFilter2">
+                <label style="color:white !important;" for="rootFilter2" class="form-check-label">Exclude roots</label>
+            </div>
+            <div class="form-group">
+                <label for="itemFilterNav"></label>
+                <select name="search_filter" id="itemFilterNav" class="custom-select custom-select-sm mx-auto">
+                    <option value="startswith" selected>Starts with</option>
+                    <option value="endswith">Ends with</option>
+                    <option value="contains">Contains</option>
+                </select>
+            </div>
+            <input type="search" name="search_name" placeholder="Search" class="form-control mx-sm-2">
+            <input type="hidden" name="search_reset" value="True">
+            <button class="btn btn-outline-light my-2 my-sm-0" type="submit">New Search</button>
+        </form>
     </div>
 </nav>
 <div class="container">

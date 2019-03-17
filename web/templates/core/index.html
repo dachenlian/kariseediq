@@ -68,17 +68,10 @@
                             <td class="align-middle">{{ headword.headword }}</td>
                             <td class="align-middle">{{ headword.variant }}</td>
                             <td>
-                                {#                            <table>#}
-                                {#                                {% for sense in headword.senses.all %}#}
-                                {#                                    <tr><td>{{ sense.meaning }}</td></tr>#}
-                                {#                                    {% endfor %}#}
-                                {#                            </table>#}
-                                {#                                {% for sense in headword.senses.all %}#}
-                                {#                                   <div>{{ sense.headword_sense_no }}. {{ sense.meaning }}</div>#}
                                 {% for sense in headword.senses.all %}
                                     <div class="card">
                                         <div style="cursor: pointer"
-                                             onclick="window.location='{% url 'core:update' hw=sense.headword.headword sense=sense.headword_sense_no %}';"
+                                             onclick="window.location='{% url 'core:update_sense' hw=sense.headword.headword sense=sense.headword_sense_no %}';"
                                              class="card-body">
                                             {{ sense.meaning }}
                                         </div>
