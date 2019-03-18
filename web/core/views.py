@@ -9,13 +9,13 @@ from django.db.models.functions import Lower
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render, redirect
-from django.views.generic import View, DeleteView
+from django.views.generic import View, DeleteView, UpdateView
 from django.views.generic.list import ListView
 from django.urls import reverse_lazy
 from django.utils.encoding import escape_uri_path
 
-from .forms import SenseForm, SenseUpdateForm, ExampleFormset, PhraseFormset
-from core.models import Headword, Sense, Example, Phrase
+from .forms import HeadwordForm, SenseForm, SenseUpdateForm, ExampleFormset, PhraseFormset
+from core.models import Headword, Sense
 from core import utils
 
 logger = logging.getLogger(__name__)
@@ -49,7 +49,7 @@ class SenseUpdateView(View):
             'example_formset': example_formset,
             'phrase_formset': phrase_formset,
         }
-        return render(self.request, template_name='core/update.html', context=context)
+        return render(self.request, template_name='core/update_sense.html', context=context)
 
     def post(self, request, *args, **kwargs):
         logger.debug('Inside Update view.')
@@ -74,36 +74,53 @@ class SenseUpdateView(View):
         return redirect(sense)
 
 
-# class EntryCreateView(View):
-#     template_name = 'core/create.html'
-#     success_message = 'New entry saved!'
-#
-#     def get(self, request, *args, **kwargs):
-#         entry_form = EntryForm()
-#         formset = ExampleFormSet()
-#         context = {
-#             'form': entry_form,
-#             'formset': formset
-#         }
-#         return render(self.request, template_name=self.template_name, context=context)
-#
-#     def post(self, request, *args, **kwargs):
-#         entry_form = EntryForm(request.POST)
-#         formset = ExampleFormSet(request.POST)
-#         if entry_form.is_valid() and formset.is_valid():
-#             logger.debug(entry_form.cleaned_data)
-#             entry = entry_form.save(commit=False)
-#             entry.is_root = entry_form.cleaned_data.get('is_root')
-#             entry.save()
-#             formset.save()
-#             messages.success(request, self.success_message)
-#             return redirect(entry)
-#         messages.error(request, 'An error occurred. Please try again.')
-#         return redirect('core:create')
-#
-#
-#
-#
+class SenseCreateView(View):
+    template_name = 'core/create_sense.html'
+    success_message = 'New entry saved!'
+
+    def get(self, request, *args, **kwargs):
+        sense_form = SenseForm()
+        example_formset = ExampleFormset()
+        phrase_formset = PhraseFormset()
+        context = {
+            'form': sense_form,
+            'example_formset': example_formset,
+            'phrase_formset': phrase_formset
+        }
+        return render(self.request, template_name=self.template_name, context=context)
+
+    def post(self, request, *args, **kwargs):
+        sense_form = SenseForm(request.POST)
+        example_formset = ExampleFormset(request.POST)
+        phrase_formset = PhraseFormset(request.POST)
+        if sense_form.is_valid() and example_formset.is_valid() and phrase_formset.is_valid():
+            headword = sense_form.cleaned_data.get('headword')
+            headword, created = Headword.objects.get_or_create(headword=headword,
+                                                               defaults={
+                                                                   'first_letter': utils.first_letter(headword)
+                                                               })
+            sense_form.cleaned_data['headword'] = headword
+            sense_form.cleaned_data['headword_sense_no'] = headword.senses.count() + 1
+
+            sense = sense_form.save()
+
+            ex = example_formset.save(commit=False)
+            ex.sense = sense
+            ex.save()
+
+            ph = phrase_formset.save(commit=False)
+            ph.sense = sense
+            ph.save()
+
+            messages.success(request, self.success_message)
+            if created:
+                messages.info(request, 'New headword created. Please update info.')
+                return redirect(headword)
+            return redirect(sense)
+        messages.error(request, 'An error occurred. Please try again.')
+        return redirect('core:create')
+
+
 class PendingListView(ListView):
     model = Headword
     paginate_by = 1000
@@ -195,39 +212,79 @@ class SearchResultsListView(ListView):
 #         return super().delete(request, *args, **kwargs)
 #
 #
-# class EntryRootAutoComplete(View):
-#     def get(self, *args, **kwargs):
-#         logger.debug('Autocomplete Called')
-#         q = self.request.GET.get('q')
-#         logger.debug(q)
-#         if q:
-#             queryset = Entry.objects.filter(
-#                 Q(item_root__icontains=q) &
-#                 Q(is_root=True)). \
-#                 values_list('item_root', flat=True)
-#         else:
-#             queryset = None
-#
-#         logger.debug(queryset)
-#
-#         return JsonResponse(list(queryset), safe=False)
-#
-#
-# class EntryItemNameAutoComplete(View):
-#     def get(self, *args, **kwargs):
-#         logger.debug('Item name autocomplete called')
-#         q = self.request.GET.get('q')
-#         logger.debug(q)
-#         if q:
-#             queryset = Entry.objects.filter(item_name__icontains=q).values_list('item_name', flat=True)
-#         else:
-#             queryset = None
-#
-#         logger.debug(queryset)
-#
-#         return JsonResponse(list(queryset), safe=False)
-#
-#
+
+
+class RootAutoComplete(View):
+    def get(self, *args, **kwargs):
+        logger.debug('Autocomplete Called')
+        q = self.request.GET.get('q')
+        logger.debug(q)
+        if q:
+            queryset = Headword.objects.filter(
+                Q(headword__icontains=q) &
+                Q(is_root=True)). \
+                values_list('headword', flat=True)
+        else:
+            queryset = None
+
+        logger.debug(queryset)
+
+        return JsonResponse(list(queryset), safe=False)
+
+
+class RootSenseAutoComplete(View):
+    def get(self, *args, **kwargs):
+        logger.debug('Autocomplete Called')
+        q = self.request.GET.get('q')
+        logger.debug(q)
+        if q:
+            hw = Headword.objects.filter(
+                Q(headword__icontains=q) &
+                Q(is_root=True)).prefetch_related('senses').first()
+            hw = utils.build_autocomplete_response(hw)
+        else:
+            queryset = None
+
+        logger.debug(hw)
+
+        return JsonResponse(list(queryset), safe=False)
+
+
+class HeadwordAutoComplete(View):
+    def get(self, *args, **kwargs):
+        logger.debug('Item name autocomplete called')
+        q = self.request.GET.get('q')
+        logger.debug(q)
+        if q:
+            queryset = Headword.objects.filter(headword__icontains=q).values_list('headword', flat=True)
+        else:
+            queryset = None
+
+        logger.debug(queryset)
+
+        return JsonResponse(list(queryset), safe=False)
+
+
+class HeadwordUpdateView(View):
+    template_name = 'core/update_headword.html'
+    success_message = 'Headword successfully updated!'
+
+    def get(self, request, *args, **kwargs):
+        headword = Headword.objects.get(headword=kwargs.get('hw'))
+        form = HeadwordForm(instance=headword)
+        context = {'form': form}
+        return render(self.request, self.template_name, context=context)
+
+    def post(self, request, *args, **kwargs):
+        form = HeadwordForm(request.POST)
+        if form.is_valid():
+            headword = form.save()
+            messages.success(request, self.success_message)
+            return redirect(headword)
+        else:
+            messages.error(request, 'Something happened. Please try again.')
+            logger.debug(form.errors)
+            return redirect('core:update_headword', kwargs={'hw': self.kwargs.get('hw')})
 
 
 def export_search_to_csv(request, query_idx):

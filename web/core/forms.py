@@ -5,13 +5,23 @@ from django.core.exceptions import ValidationError
 from .models import Headword, Sense, Phrase, Example
 
 
+class HeadwordForm(ModelForm):
+
+    class Meta:
+        model = Headword
+        fields = ('is_root', 'variant')
+        labels = {
+            'is_root': 'Is root?',
+        }
+
+
 # https://stackoverflow.com/questions/12144475/displaying-multiple-rows-and-columns-in-django-crispy-forms
 class SenseForm(ModelForm):
     # tag = forms.MultipleChoiceField(choices=Entry.TAG_CHOICES)
 
     class Meta:
         model = Sense
-        fields = ('headword', 'headword_sense_no', 'root', 'root_sense_no',
+        fields = ('headword', 'root', 'root_sense_no',
                   'meaning', 'meaning_en', 'word_class', 'cultural_notes',
                   'focus', 'picture', 'sound', 'truku', 'grammar_notes',
                   'refer_to', 'tag', 'toda', 'toda_root', 'truku', 'truku_root',)
@@ -24,6 +34,7 @@ class SenseForm(ModelForm):
         widgets = {
             'headword': forms.widgets.TextInput(attrs={'class': 'basicAutoComplete', 'autocomplete': 'off'}),
             'root': forms.widgets.TextInput(attrs={'class': 'basicAutoComplete', 'autocomplete': 'off'}),
+            'root_sense_no': forms.widgets.TextInput(attrs={'class': 'typeahead'}),
             'tag': forms.widgets.SelectMultiple(attrs={'class': 'selectpicker', 'title': '-------'}),
             'grammar_notes': forms.widgets.Textarea(attrs={'rows': 5, 'cols': 40}),
             'cultural_notes': forms.widgets.Textarea(attrs={'rows': 5, 'cols': 40}),
@@ -40,18 +51,16 @@ class SenseForm(ModelForm):
     #         cleaned_data['is_root'] = False
     #     return cleaned_data
 
-    # def clean_item_name(self):
-    #     data = self.cleaned_data['item_name']
-    #     if any(char.isdigit() for char in data):
-    #         raise ValidationError('Item name cannot contain numbers')
-    #     return data
-
 
 class SenseUpdateForm(SenseForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['headword'].disabled = True
+        self.fields['headword_sense_no'].disabled = True
+
+    class Meta(SenseForm.Meta):
+        fields = SenseForm.Meta.fields + ('headword_sense_no',)
 
 
 class ExampleForm(ModelForm):

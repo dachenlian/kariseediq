@@ -7,6 +7,7 @@ from typing import List
 
 from django.http.request import HttpRequest
 from django.forms.models import model_to_dict
+from django.db.models.query import QuerySet
 
 from .forms import SenseForm
 from .models import Headword, Sense, Phrase, Example
@@ -25,7 +26,7 @@ def _clean_entry(entry: dict) -> dict:
     headword, headword_sense_no = _split_item_name(entry.pop('item_name'))
     root, root_sense_no = _split_item_name(entry.pop('item_root'))
 
-    entry['first_letter'] = _first_letter(headword)
+    entry['first_letter'] = first_letter(headword)
     entry['headword'] = headword
     entry['headword_sense_no'] = headword_sense_no
     entry['root'] = root
@@ -49,12 +50,6 @@ def _convert_to_bool(cell):
     return cell.lower() == 'yes'
 
 
-def _first_letter(string):
-    for s in string:
-        if s.isalpha():
-            return s
-
-
 def _parse_date(str_date):
     try:
         parsed = datetime.datetime.strptime(str_date, '%m/%d/%Y')
@@ -74,6 +69,20 @@ def _split_item_name(s):
         sense = 1
     return headword, sense
 
+
+def build_autocomplete_response(qs: List[Headword]) -> List[str]:
+    """
+    Return an enumerated list of senses for a root Headword.
+    :param hw: A Headword
+    :return:
+    """
+    return [f'{hw.headword}\n ({idx}) {s.meaning}' for hw in qs for idx, s in enumerate(hw.senses.all(), 1)]
+
+
+def first_letter(string):
+    for s in string:
+        if s.isalpha():
+            return s
 
 def load_into_db(file):
     start = time.time()

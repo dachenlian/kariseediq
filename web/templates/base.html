@@ -20,6 +20,8 @@
 
     <link rel="stylesheet" type="text/css" href="{% static 'core/web.css' %}">
 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-typeahead/2.10.6/jquery.typeahead.css">
+
     <title>KariSeediq</title>
     {% block header %}
     {% endblock header %}
@@ -33,9 +35,9 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
-{#            <li class="nav-item">#}
-{#                <a class="nav-link" href="{% url 'core:create' %}">New Entry</a>#}
-{#            </li>#}
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'core:create_sense' %}">New Entry</a>
+            </li>
             <li class="nav-item">
                 <a class="nav-link" href="{% url 'core:pending' %}">
                     Pending <span id="pendingBadge" class="badge badge-secondary align-middle"></span></a>
@@ -111,20 +113,56 @@
 </script>
 <script src="https://cdn.rawgit.com/xcash/bootstrap-autocomplete/v2.0.0/dist/latest/bootstrap-autocomplete.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.2/js/bootstrap-select.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-typeahead/2.10.6/jquery.typeahead.js"></script>
+<script>
+    $('#id_root').autoComplete({
+        resolverSettings: {
+            url: "{% url 'core:root_autocomplete' %}"
+        }
+    });
+</script>
+<script>
+    const getRootSenses = new Bloodhound({
+        datumTokenizer: Bloodhound.tokenizers.whitespace,
+        queryTokenizer: Bloodhound.tokenizers.whitespace,
+    })
+    $(".typeahead").typeahead({
+        hint: true,
+        highlight: true,
+        minLength: 1,
+        name: 'senses',
+        source: function (query, process) {
+            query = $("#id_root").val();
+            console.log(query)
+            alert(query)
+        }
+    });
+</script>
 {#<script>#}
-{#    $('#id_item_root').autoComplete({#}
-{#        resolverSettings: {#}
-{#            url: "{% url 'core:focus_autocomplete' %}"#}
+{#    $('#id_root_sense_no').autoComplete({#}
+{#        resolver: 'custom',#}
+{#        events: {#}
+{#            search: function (qry, callback) {#}
+{#                qry = $("#id_root").val();#}
+{#                $.ajax(#}
+{#                    "{% url 'core:root_sense_autocomplete' %}",#}
+{#                    {#}
+{#                        data: {'q': qry}#}
+{#                    }#}
+{#                ).done(function (res) {#}
+{#                    callback(res.results)#}
+{#                });#}
+{#            }#}
 {#        }#}
 {#    });#}
 {#</script>#}
-{#<script>#}
-{#    $('#id_item_name').autoComplete({#}
-{#        resolverSettings: {#}
-{#            url: "{% url 'core:item_name_autocomplete' %}"#}
-{#        }#}
-{#    });#}
-{#</script>#}
+<script>
+    $('#id_headword').autoComplete({
+        resolverSettings: {
+            url: "{% url 'core:headword_autocomplete' %}"
+        }
+    });
+</script>
 <script>
     $.ajax({
         url: "{% url 'core:pending' %}",

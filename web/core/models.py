@@ -16,6 +16,9 @@ class Headword(models.Model):
     def __str__(self):
         return self.headword
 
+    def get_absolute_url(self):
+        return reverse('core:update_headword', kwargs={'hw': self.headword})
+
 
 class Sense(models.Model):
 
@@ -119,7 +122,7 @@ class Sense(models.Model):
         return f"{self.headword.headword} ({self.headword_sense_no}): {self.meaning}"
 
     def get_absolute_url(self):
-        return reverse('core:update', kwargs={'hw': self.headword.headword, 'sense': self.headword_sense_no})
+        return reverse('core:update_sense', kwargs={'hw': self.headword.headword, 'sense': self.headword_sense_no})
 
 
 class Example(models.Model):
