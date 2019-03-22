@@ -18,10 +18,11 @@ class HeadwordForm(ModelForm):
 # https://stackoverflow.com/questions/12144475/displaying-multiple-rows-and-columns-in-django-crispy-forms
 class SenseForm(ModelForm):
     # tag = forms.MultipleChoiceField(choices=Entry.TAG_CHOICES)
+    headword = forms.CharField(max_length=255)
 
     class Meta:
         model = Sense
-        fields = ('headword', 'root', 'root_sense_no',
+        fields = ('root', 'root_sense_no', 'headword_sense_no',
                   'meaning', 'meaning_en', 'word_class', 'cultural_notes',
                   'focus', 'picture', 'sound', 'truku', 'grammar_notes',
                   'refer_to', 'tag', 'toda', 'toda_root', 'truku', 'truku_root',)
@@ -33,12 +34,17 @@ class SenseForm(ModelForm):
         }
         widgets = {
             'headword': forms.widgets.TextInput(attrs={'class': 'basicAutoComplete', 'autocomplete': 'off'}),
+            'headword_sense_no': forms.HiddenInput(),
             'root': forms.widgets.TextInput(attrs={'class': 'basicAutoComplete', 'autocomplete': 'off'}),
             'root_sense_no': forms.widgets.TextInput(attrs={'class': 'typeahead'}),
             'tag': forms.widgets.SelectMultiple(attrs={'class': 'selectpicker', 'title': '-------'}),
             'grammar_notes': forms.widgets.Textarea(attrs={'rows': 5, 'cols': 40}),
             'cultural_notes': forms.widgets.Textarea(attrs={'rows': 5, 'cols': 40}),
         }
+    #
+    # def __init__(self, *args, **kwargs):
+    #     super().__init__(*args, **kwargs)
+    #     self.fields['root_sense_no'].required = True
 
     # def clean(self):
     #     cleaned_data = super().clean()

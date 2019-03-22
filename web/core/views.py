@@ -90,35 +90,46 @@ class SenseCreateView(View):
         return render(self.request, template_name=self.template_name, context=context)
 
     def post(self, request, *args, **kwargs):
-        sense_form = SenseForm(request.POST)
-        example_formset = ExampleFormset(request.POST)
-        phrase_formset = PhraseFormset(request.POST)
+        updated_request = request.POST.copy()
+        sense_form = SenseForm(updated_request)
+        example_formset = ExampleFormset(updated_request)
+        phrase_formset = PhraseFormset(updated_request)
+
+        headword = sense_form.data['headword']
+        headword, created = Headword.objects.get_or_create(headword=headword,
+                                                           defaults={
+                                                               'first_letter': utils.first_letter(headword)
+                                                           })
+        sense_form.data['headword'] = headword
+        sense_form.data['headword_sense_no'] = headword.senses.count() + 1
         if sense_form.is_valid() and example_formset.is_valid() and phrase_formset.is_valid():
-            headword = sense_form.cleaned_data.get('headword')
-            headword, created = Headword.objects.get_or_create(headword=headword,
-                                                               defaults={
-                                                                   'first_letter': utils.first_letter(headword)
-                                                               })
-            sense_form.cleaned_data['headword'] = headword
-            sense_form.cleaned_data['headword_sense_no'] = headword.senses.count() + 1
 
-            sense = sense_form.save()
+            logger.debug(sense_form.cleaned_data)
+            sense = sense_form.save(commit=False)
+            sense.headword = headword
+            sense.save()
 
-            ex = example_formset.save(commit=False)
-            ex.sense = sense
-            ex.save()
+            examples = example_formset.save(commit=False)
 
-            ph = phrase_formset.save(commit=False)
-            ph.sense = sense
-            ph.save()
+            for example in examples:
+                example.sense = sense
+                example.save()
+
+            phrases = phrase_formset.save(commit=False)
+            for phrase in phrases:
+                phrase.sense = sense
+                phrase.save()
 
             messages.success(request, self.success_message)
             if created:
                 messages.info(request, 'New headword created. Please update info.')
                 return redirect(headword)
             return redirect(sense)
+        logger.error(sense_form.errors)
+        logger.error(phrase_formset.errors)
+        logger.error(example_formset.errors)
         messages.error(request, 'An error occurred. Please try again.')
-        return redirect('core:create')
+        return redirect('core:create_sense')
 
 
 class PendingListView(ListView):
