@@ -104,11 +104,10 @@
 <script>
     const wordClass = $('#id_word_class');
     const focus = $('#id_focus');
-    (wordClass.val() === 'NOUN') ? focus.prop('disabled', true) : focus.prop('disabled', false);
 
     wordClass.on('change', function () {
         const wordClassValue = this.value;
-        (wordClassValue === 'NOUN') ? focus.prop('disabled', true) : focus.prop('disabled', false);
+        (wordClassValue === '名詞') ? focus.prop('disabled', true) : focus.prop('disabled', false);
     });
 </script>
 <script src="https://cdn.rawgit.com/xcash/bootstrap-autocomplete/v2.0.0/dist/latest/bootstrap-autocomplete.min.js"></script>
