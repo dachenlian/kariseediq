@@ -104,7 +104,6 @@ class SenseCreateView(View):
         sense_form.data['headword_sense_no'] = headword.senses.count() + 1
         if sense_form.is_valid() and example_formset.is_valid() and phrase_formset.is_valid():
 
-            logger.debug(sense_form.cleaned_data)
             sense = sense_form.save(commit=False)
             sense.headword = headword
             sense.save()
@@ -211,18 +210,20 @@ class SearchResultsListView(ListView):
         utils.gen_query_history(self.request)
 
         return qs
-#
-#
-# class EntryDeleteView(DeleteView):
-#     model = Entry
-#     success_url = reverse_lazy('core:index')
-#     success_message = 'Entry successfully deleted!'
-#
-#     def delete(self, request, *args, **kwargs):
-#         messages.success(request, self.success_message)
-#         return super().delete(request, *args, **kwargs)
-#
-#
+
+
+class SenseDeleteView(DeleteView):
+    model = Sense
+    success_url = reverse_lazy('core:index')
+    success_message = 'Entry successfully deleted!'
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(request, self.success_message)
+        return super().delete(request, *args, **kwargs)
+
+    def get_object(self, queryset=None):
+        headword = get_object_or_404(Headword, headword=self.kwargs.get('hw'))
+        return get_object_or_404(self.model, headword=headword, headword_sense_no=self.kwargs.get('sense'))
 
 
 class RootAutoComplete(View):

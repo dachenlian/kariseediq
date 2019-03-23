@@ -54,6 +54,7 @@
                         <th>詞項</th>
                         <th>變體</th>
                         <th>詞義</th>
+                        <th>刪除</th>
                         {#                        <th>輸入者</th>#}
                         {#                        <th>輸入日期</th>#}
                         {#                        <th>刪除</th>#}
@@ -61,24 +62,59 @@
                     </thead>
                     <tbody>
                     {% for headword in headwords %}
-                        <tr>
-                            <td class="align-middle">{{ forloop.counter0|add:page_obj.start_index }}</td>
-                            {#                            <td style="cursor: pointer" onclick="window.location='{% url 'core:update' pk=headword.id %}';"#}
-                            {#                                class="align-middle">{{ headword.headword }}</td>#}
-                            <td class="align-middle">{{ headword.headword }}</td>
-                            <td class="align-middle">{{ headword.variant }}</td>
-                            <td>
-                                {% for sense in headword.senses.all %}
-                                    <div class="card">
-                                        <div style="cursor: pointer"
-                                             onclick="window.location='{% url 'core:update_sense' hw=sense.headword.headword sense=sense.headword_sense_no %}';"
-                                             class="card-body">
-                                            {{ sense.meaning }}
-                                        </div>
-                                    </div>
-                                {% endfor %}
-                            </td>
-                        </tr>
+
+                        {% for sense in headword.senses.all %}
+                            <tr>
+                                {% if forloop.first %}
+                                    <td rowspan="{{ headword.senses.all|length }}"
+                                        class="align-middle">{{ forloop.parentloop.counter0|add:page_obj.start_index }}</td>
+                                    <td rowspan="{{ headword.senses.all|length }}"
+                                        class="align-middle">{{ headword.headword }}</td>
+                                    <td rowspan="{{ headword.senses.all|length }}"
+                                        class="align-middle">{{ headword.variant }}</td>
+                                {% endif %}
+                                {#                            <td style="cursor: pointer" onclick="window.location='{% url 'core:update' pk=headword.id %}';"#}
+                                {#                                class="align-middle">{{ headword.headword }}</td>#}
+                                <td class="align-middle">({{ forloop.counter }}) {{ sense.meaning }}
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-primary" data-toggle="modal"
+                                            data-target="#deleteModal"
+                                            data-hw="{{ headword.headword }}"
+                                            data-sense="{{ sense.headword_sense_no }}"
+                                            data-deltext="{{ headword }}: {{ sense.meaning }}"
+                                    ><i class="material-icons">delete</i>
+                                    </button>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        {#                            {% for sense in headword.senses.all %}#}
+                        {#                                <td rowspan="4">#}
+                        {#                                    {{ sense.meaning }}#}
+
+                        {#                                {% for sense in headword.senses.all %}#}
+
+
+                        {#                                    <div class="card">#}
+                        {#                                        <div style="cursor: pointer"#}
+                        {#                                             onclick="window.location='{% url 'core:update_sense' hw=sense.headword.headword sense=sense.headword_sense_no %}';"#}
+                        {#                                             class="card-body">#}
+                        {#                                            {{ sense.meaning }}#}
+                        {#                                            <button type="button" class="btn btn-primary" data-toggle="modal"#}
+                        {#                                                    data-target="#deleteModal"#}
+                        {#                                                    data-pk="{{ sense.id }}"><i class="material-icons">delete</i>#}
+                        {#                                            </button>#}
+                        {#                                        </div>#}
+                        {#                                    </div>#}
+                        {#                                {% endfor %}#}
+                        {#                                </td>#}
+                        {#                            {% endfor %}#}
+                        {#                        </tr>#}
+                        {#                        {% for sense in headword.senses.all %}#}
+                        {#                            <tr>#}
+                        {#                                <td colspan="{{ headword.senses.all|length }}">{{ sense.meaning }}</td>#}
+                        {#                            </tr>#}
+                        {#                        {% endfor %}#}
                         {#                        <td class="align-middle">{{ headword.created_date }}</td>#}
                         {#                        <td class="align-middle">{{ headword.modified_date }}</td>#}
                         {#                        <td class="align-middle">{{ headword.user }}</td>#}
@@ -150,22 +186,24 @@
     </div>
 {% endblock content %}
 {% block javascript %}
-    {#    <script>#}
-    {#        $('#deleteModal').on('show.bs.modal', function (event) {#}
-    {#            let button = $(event.relatedTarget);#}
-    {#            let pk = button.data('pk');#}
-    {#            let url = "{% url 'core:delete' pk=1 %}".replace(1, `${pk}`);#}
-    {#            let modal = $(this);#}
-    {#            let entry = $(button).closest('tr').find('td:nth-child(2)').text();#}
-    {#            let form = modal.find('form');#}
-    {##}
-    {#            form.prop('action', url);#}
-    {#            modal.find('.modal-title').text('Delete ' + entry + '?')#}
-    {#        });#}
-    {#    $(function() {#}
-    {#        $('[data-toggle="popover"]').popover({#}
-    {#            trigger: 'focus'#}
-    {#        });#}
-    {#    });#}
-    {#    </script>#}
+    <script>
+        $('#deleteModal').on('show.bs.modal', function (event) {
+            let button = $(event.relatedTarget);
+            let hw = button.data('hw');
+            let sense = button.data('sense');
+            let url = "{% url 'core:delete' hw=1 sense=2 %}".replace(1, `${hw}`).replace(2, `${sense}`);
+            let modal = $(this);
+            let delText = button.data('deltext');
+            {#let entry = $(button).closest('tr').find('td:nth-child(2)').text();#}
+            let form = modal.find('form');
+
+            form.prop('action', url);
+            modal.find('.modal-title').text('Delete ' + delText + '?')
+        });
+        $(function () {
+            $('[data-toggle="popover"]').popover({
+                trigger: 'focus'
+            });
+        });
+    </script>
 {% endblock javascript %}
