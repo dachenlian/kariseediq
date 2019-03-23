@@ -1,10 +1,12 @@
 {% load crispy_forms_tags %}
 
 <div class="form-row">
-    <div class="col">
-        {{ form.headword|as_crispy_field }}
-        <small><span id="item_message"></span></small>
-    </div>
+    {% if form.headword %}
+        <div class="col">
+            {{ form.headword|as_crispy_field }}
+            <small><span id="item_message"></span></small>
+        </div>
+    {% endif %}
     <div class="col">
         {{ form.toda|as_crispy_field }}
     </div>

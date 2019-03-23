@@ -7,7 +7,6 @@ from typing import List
 
 from django.http.request import HttpRequest
 from django.forms.models import model_to_dict
-from django.db.models.query import QuerySet
 
 from .forms import SenseForm
 from .models import Headword, Sense, Phrase, Example
@@ -73,7 +72,7 @@ def _split_item_name(s):
 def build_autocomplete_response(qs: List[Headword]) -> List[str]:
     """
     Return an enumerated list of senses for a root Headword.
-    :param hw: A Headword
+    :param qs: A Headword
     :return:
     """
     return [f'{hw.headword}\n ({idx}) {s.meaning}' for hw in qs for idx, s in enumerate(hw.senses.all(), 1)]
@@ -83,6 +82,7 @@ def first_letter(string):
     for s in string:
         if s.isalpha():
             return s
+
 
 def load_into_db(file):
     start = time.time()
@@ -179,7 +179,7 @@ def gen_query_history(request: HttpRequest):
 def get_related(qs: List[Headword]) -> List[dict]:
     """
     Get data from related models, such as examples and phrases.
-    :param qs:
+    :param qs: A list of Headword objects.
     :return:
     """
     fieldnames = SenseForm.Meta.fields
@@ -191,8 +191,8 @@ def get_related(qs: List[Headword]) -> List[dict]:
 
         for sense in senses:
             sense.update(head_dict)
-            sense['tag'] = ",".join(sense['tag'])
             sense['headword'] = headword.headword
+            sense['tag'] = ",".join(sense['tag'])
             _id = sense.pop('id')
 
             examples = Example.objects.filter(sense=_id)

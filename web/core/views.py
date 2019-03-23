@@ -207,7 +207,7 @@ class SenseUpdateView(View):
             logger.warning(sense_form.errors)
             logger.warning(example_formset.errors)
             logger.warning(phrase_formset.errors)
-
+            messages.error(request, 'An error occurred. Please try again.')
         return redirect(sense)
 
 
@@ -298,8 +298,6 @@ class HeadwordAutoComplete(View):
         logger.debug(queryset)
 
         return JsonResponse(list(queryset), safe=False)
-
-
 
 
 def export_search_to_csv(request, query_idx):

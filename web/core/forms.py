@@ -17,7 +17,6 @@ class HeadwordForm(ModelForm):
 
 # https://stackoverflow.com/questions/12144475/displaying-multiple-rows-and-columns-in-django-crispy-forms
 class SenseForm(ModelForm):
-    # tag = forms.MultipleChoiceField(choices=Entry.TAG_CHOICES)
     headword = forms.CharField(max_length=255)
 
     class Meta:
@@ -62,11 +61,13 @@ class SenseUpdateForm(SenseForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['headword'].disabled = True
+        self.fields.pop('headword')
+        # self.fields['headword'].disabled = True
         self.fields['headword_sense_no'].disabled = True
 
     class Meta(SenseForm.Meta):
-        fields = SenseForm.Meta.fields + ('headword_sense_no',)
+        fields = SenseForm.Meta.fields + ('headword_sense_no', )
+        # exclude = ('headword', )
 
 
 class ExampleForm(ModelForm):
