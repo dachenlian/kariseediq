@@ -30,9 +30,9 @@ class IndexListView(ListView):
 
     def get_queryset(self):
         # return Headword.objects.prefetch_related('senses').filter(senses__gt=1)
-        return Headword.objects.prefetch_related('senses').annotate(senses_count=Count('senses'))\
-            .filter(senses_count__gt=1)
-        # return Headword.objects.order_by(Lower('first_letter')).prefetch_related('senses')
+        # return Headword.objects.prefetch_related('senses').annotate(senses_count=Count('senses'))\
+        #     .filter(senses_count__gt=1)
+        return Headword.objects.order_by(Lower('first_letter')).prefetch_related('senses')
 
 
 class SearchResultsListView(ListView):
