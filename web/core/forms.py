@@ -6,10 +6,9 @@ from .models import Headword, Sense, Phrase, Example
 
 
 class HeadwordForm(ModelForm):
-
     class Meta:
         model = Headword
-        fields = ('headword', 'variant', 'is_root', )
+        fields = ('headword', 'variant', 'is_root',)
         labels = {
             'is_root': 'Is root?',
         }
@@ -66,7 +65,7 @@ class SenseUpdateForm(SenseForm):
         self.fields['headword_sense_no'].disabled = True
 
     class Meta(SenseForm.Meta):
-        fields = SenseForm.Meta.fields + ('headword_sense_no', )
+        fields = SenseForm.Meta.fields + ('headword_sense_no',)
         # exclude = ('headword', )
 
 
@@ -108,4 +107,3 @@ PhraseFormset = inlineformset_factory(
     form=PhraseForm,
     extra=2
 )
-
