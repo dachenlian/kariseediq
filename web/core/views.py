@@ -35,43 +35,84 @@ class IndexListView(ListView):
         # return Headword.objects.order_by(Lower('first_letter')).prefetch_related('senses')
 
 
-class SenseUpdateView(View):
+class SearchResultsListView(ListView):
+    model = Headword
+    paginate_by = 100
+    context_object_name = 'headwords'
+    template_name = 'core/index.html'
+
+    def get_queryset(self):
+        logger.debug(self.request.GET)
+        reset = self.request.GET.get('search_reset')
+        if reset:
+            logger.debug('Resetting queryset!')
+            self.request.session.pop('search_root', False)
+            self.request.session.pop('history_list', False)
+            qs = Headword.objects.all().prefetch_related('senses')
+        else:
+            qs = self.request.session.get('queryset')
+
+        search_root = self.request.GET.get('search_root', "")
+        if search_root:
+            if search_root == 'exclude':
+                logger.debug('Filtering roots.')
+                qs = qs.filter(is_root=False)
+            elif search_root == 'only':
+                logger.debug('Only including roots.')
+                qs = qs.filter(is_root=True)
+
+            self.request.session['search_root'] = search_root
+        search_filter = self.request.GET.get('search_filter', "")
+        search_name = self.request.GET.get('search_name', "")
+
+        self.request.session['search_filter'] = search_filter
+        self.request.session['search_name'] = search_name
+
+        if search_filter == 'startswith':
+            qs = qs.filter(Q(headword__istartswith=search_name) |
+                           Q(senses__meaning__istartswith=search_name) |
+                           Q(variant__istartswith=search_name)
+                           )
+        elif search_filter == 'endswith':
+            qs = qs.filter(Q(headword__iendswith=search_name) |
+                           Q(senses__meaning__iendswith=search_name) |
+                           Q(variant__iendswith=search_name)
+                           )
+        else:
+            qs = qs.filter(Q(headword__icontains=search_name) |
+                           Q(senses__meaning__icontains=search_name) |
+                           Q(variant__icontains=search_name)
+                           )
+
+        qs = qs.order_by(Lower('first_letter'))
+
+        self.request.session['queryset'] = qs
+        utils.gen_query_history(self.request)
+
+        return qs
+
+
+class HeadwordUpdateView(View):
+    template_name = 'core/update_headword.html'
+    success_message = 'Headword successfully updated!'
 
     def get(self, request, *args, **kwargs):
-        headword = get_object_or_404(Headword, headword=kwargs.get('hw'))
-        sense = get_object_or_404(Sense, headword=headword, headword_sense_no=kwargs.get('sense'))
-        sense_form = SenseUpdateForm(instance=sense)
-        example_formset = ExampleFormset(instance=sense)
-        phrase_formset = PhraseFormset(instance=sense)
-
-        context = {
-            'form': sense_form,
-            'example_formset': example_formset,
-            'phrase_formset': phrase_formset,
-        }
-        return render(self.request, template_name='core/update_sense.html', context=context)
+        headword = Headword.objects.get(headword=kwargs.get('hw'))
+        form = HeadwordForm(instance=headword)
+        context = {'form': form}
+        return render(self.request, self.template_name, context=context)
 
     def post(self, request, *args, **kwargs):
-        logger.debug('Inside Update view.')
-
         headword = get_object_or_404(Headword, headword=kwargs.get('hw'))
-        sense = get_object_or_404(Sense, headword=headword, headword_sense_no=kwargs.get('sense'))
-        sense_form = SenseUpdateForm(instance=sense, data=request.POST)
-        example_formset = ExampleFormset(instance=sense, data=request.POST)
-        phrase_formset = PhraseFormset(instance=sense, data=request.POST)
-
-        if sense_form.is_valid() and example_formset.is_valid() and phrase_formset.is_valid():
-            logger.debug(sense_form.cleaned_data)
-            sense = sense_form.save()
-            example_formset.save()
-            phrase_formset.save()
-            messages.success(request, "Sense updated!")
+        form = HeadwordForm(instance=headword, data=request.POST)
+        if form.is_valid():
+            headword = form.save()
+            messages.success(request, self.success_message)
+            return redirect(headword)
         else:
-            logger.warning(sense_form.errors)
-            logger.warning(example_formset.errors)
-            logger.warning(phrase_formset.errors)
-
-        return redirect(sense)
+            messages.error(request, 'Something happened. Please try again.')
+            logger.debug(form.errors)
+            return redirect(headword)
 
 
 class SenseCreateView(View):
@@ -131,6 +172,59 @@ class SenseCreateView(View):
         return redirect('core:create_sense')
 
 
+class SenseUpdateView(View):
+
+    def get(self, request, *args, **kwargs):
+        headword = get_object_or_404(Headword, headword=kwargs.get('hw'))
+        sense = get_object_or_404(Sense, headword=headword, headword_sense_no=kwargs.get('sense'))
+        sense_form = SenseUpdateForm(instance=sense)
+        example_formset = ExampleFormset(instance=sense)
+        phrase_formset = PhraseFormset(instance=sense)
+
+        context = {
+            'form': sense_form,
+            'example_formset': example_formset,
+            'phrase_formset': phrase_formset,
+        }
+        return render(self.request, template_name='core/update_sense.html', context=context)
+
+    def post(self, request, *args, **kwargs):
+        logger.debug('Inside Update view.')
+
+        headword = get_object_or_404(Headword, headword=kwargs.get('hw'))
+        sense = get_object_or_404(Sense, headword=headword, headword_sense_no=kwargs.get('sense'))
+        sense_form = SenseUpdateForm(instance=sense, data=request.POST)
+        example_formset = ExampleFormset(instance=sense, data=request.POST)
+        phrase_formset = PhraseFormset(instance=sense, data=request.POST)
+
+        if sense_form.is_valid() and example_formset.is_valid() and phrase_formset.is_valid():
+            logger.debug(sense_form.cleaned_data)
+            sense = sense_form.save()
+            example_formset.save()
+            phrase_formset.save()
+            messages.success(request, "Sense updated!")
+        else:
+            logger.warning(sense_form.errors)
+            logger.warning(example_formset.errors)
+            logger.warning(phrase_formset.errors)
+
+        return redirect(sense)
+
+
+class SenseDeleteView(DeleteView):
+    model = Sense
+    success_url = reverse_lazy('core:index')
+    success_message = 'Entry successfully deleted!'
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(request, self.success_message)
+        return super().delete(request, *args, **kwargs)
+
+    def get_object(self, queryset=None):
+        headword = get_object_or_404(Headword, headword=self.kwargs.get('hw'))
+        return get_object_or_404(self.model, headword=headword, headword_sense_no=self.kwargs.get('sense'))
+
+
 class PendingListView(ListView):
     model = Headword
     paginate_by = 1000
@@ -153,77 +247,6 @@ class PendingListView(ListView):
         roots_without_entries = sorted(filter(bool, set(roots_without_entries)))
         logger.debug(len(roots_without_entries))
         return headwords
-
-
-class SearchResultsListView(ListView):
-    model = Headword
-    paginate_by = 100
-    context_object_name = 'headwords'
-    template_name = 'core/index.html'
-
-    def get_queryset(self):
-        logger.debug(self.request.GET)
-        reset = self.request.GET.get('search_reset')
-        if reset:
-            logger.debug('Resetting queryset!')
-            self.request.session.pop('search_root', False)
-            self.request.session.pop('history_list', False)
-            qs = Headword.objects.all().prefetch_related('senses')
-        else:
-            qs = self.request.session.get('queryset')
-
-        search_root = self.request.GET.get('search_root', "")
-        if search_root:
-            if search_root == 'exclude':
-                logger.debug('Filtering roots.')
-                qs = qs.filter(is_root=False)
-            elif search_root == 'only':
-                logger.debug('Only including roots.')
-                qs = qs.filter(is_root=True)
-
-            self.request.session['search_root'] = search_root
-        search_filter = self.request.GET.get('search_filter', "")
-        search_name = self.request.GET.get('search_name', "")
-
-        self.request.session['search_filter'] = search_filter
-        self.request.session['search_name'] = search_name
-
-        if search_filter == 'startswith':
-            qs = qs.filter(Q(headword__istartswith=search_name) |
-                           Q(senses__meaning__istartswith=search_name) |
-                           Q(variant__istartswith=search_name)
-                           )
-        elif search_filter == 'endswith':
-            qs = qs.filter(Q(headword__iendswith=search_name) |
-                           Q(senses__meaning__iendswith=search_name) |
-                           Q(variant__iendswith=search_name)
-                           )
-        else:
-            qs = qs.filter(Q(headword__icontains=search_name) |
-                           Q(senses__meaning__icontains=search_name) |
-                           Q(variant__icontains=search_name)
-                           )
-
-        qs = qs.order_by(Lower('first_letter'))
-
-        self.request.session['queryset'] = qs
-        utils.gen_query_history(self.request)
-
-        return qs
-
-
-class SenseDeleteView(DeleteView):
-    model = Sense
-    success_url = reverse_lazy('core:index')
-    success_message = 'Entry successfully deleted!'
-
-    def delete(self, request, *args, **kwargs):
-        messages.success(request, self.success_message)
-        return super().delete(request, *args, **kwargs)
-
-    def get_object(self, queryset=None):
-        headword = get_object_or_404(Headword, headword=self.kwargs.get('hw'))
-        return get_object_or_404(self.model, headword=headword, headword_sense_no=self.kwargs.get('sense'))
 
 
 class RootAutoComplete(View):
@@ -277,26 +300,6 @@ class HeadwordAutoComplete(View):
         return JsonResponse(list(queryset), safe=False)
 
 
-class HeadwordUpdateView(View):
-    template_name = 'core/update_headword.html'
-    success_message = 'Headword successfully updated!'
-
-    def get(self, request, *args, **kwargs):
-        headword = Headword.objects.get(headword=kwargs.get('hw'))
-        form = HeadwordForm(instance=headword)
-        context = {'form': form}
-        return render(self.request, self.template_name, context=context)
-
-    def post(self, request, *args, **kwargs):
-        form = HeadwordForm(request.POST)
-        if form.is_valid():
-            headword = form.save()
-            messages.success(request, self.success_message)
-            return redirect(headword)
-        else:
-            messages.error(request, 'Something happened. Please try again.')
-            logger.debug(form.errors)
-            return redirect('core:update_headword', kwargs={'hw': self.kwargs.get('hw')})
 
 
 def export_search_to_csv(request, query_idx):

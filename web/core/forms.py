@@ -9,7 +9,7 @@ class HeadwordForm(ModelForm):
 
     class Meta:
         model = Headword
-        fields = ('is_root', 'variant')
+        fields = ('headword', 'variant', 'is_root', )
         labels = {
             'is_root': 'Is root?',
         }
