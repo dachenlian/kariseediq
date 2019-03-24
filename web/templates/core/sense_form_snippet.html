@@ -4,7 +4,6 @@
     {% if form.headword %}
         <div class="col">
             {{ form.headword|as_crispy_field }}
-            <small><span id="item_message"></span></small>
         </div>
     {% endif %}
     <div class="col">
@@ -20,6 +19,7 @@
     </div>
     <div class="col">
         {{ form.root_sense_no|as_crispy_field }}
+        <small><span id="rootSensesMessage"></span></small>
     </div>
     <div class="col">
         {{ form.toda_root|as_crispy_field }}

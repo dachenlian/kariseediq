@@ -4,7 +4,6 @@ import re
 
 from django.contrib import messages
 from django.db.models import Q
-from django.db.models import Case, When, F, Count
 from django.db.models.functions import Lower
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
@@ -319,13 +318,22 @@ def export_search_to_csv(request, query_idx):
     for row in queryset:
         writer.writerow(row)
     return response
-#
-#
-# def validate_item_name(request):
-#     item_name = request.GET.get('item_name', None)
-#     data = {
-#         'is_taken': Entry.objects.filter(item_name__iexact=item_name).exists()
-#     }
-#     if data['is_taken']:
-#         data['error_message'] = 'This item already exists.'
-#     return JsonResponse(data)
+
+
+def get_root_senses(request):
+    root = request.GET.get('root', None)
+    try:
+        headword = Headword.objects.get(headword=root)
+    except Headword.DoesNotExist:
+        data = {
+            'success': False,
+            'senses': []
+        }
+        return JsonResponse(data)
+    else:
+        senses = [f'({idx}) {s.meaning}' for idx, s in enumerate(headword.senses.all(), 1)]
+        data = {
+            'success': True,
+            'senses': senses
+        }
+        return JsonResponse(data)

@@ -121,41 +121,6 @@
     });
 </script>
 <script>
-    const getRootSenses = new Bloodhound({
-        datumTokenizer: Bloodhound.tokenizers.whitespace,
-        queryTokenizer: Bloodhound.tokenizers.whitespace,
-    })
-    $(".typeahead").typeahead({
-        hint: true,
-        highlight: true,
-        minLength: 1,
-        name: 'senses',
-        source: function (query, process) {
-            query = $("#id_root").val();
-            console.log(query)
-            alert(query)
-        }
-    });
-</script>
-{#<script>#}
-{#    $('#id_root_sense_no').autoComplete({#}
-{#        resolver: 'custom',#}
-{#        events: {#}
-{#            search: function (qry, callback) {#}
-{#                qry = $("#id_root").val();#}
-{#                $.ajax(#}
-{#                    "{% url 'core:root_sense_autocomplete' %}",#}
-{#                    {#}
-{#                        data: {'q': qry}#}
-{#                    }#}
-{#                ).done(function (res) {#}
-{#                    callback(res.results)#}
-{#                });#}
-{#            }#}
-{#        }#}
-{#    });#}
-{#</script>#}
-<script>
     $('#id_headword').autoComplete({
         resolverSettings: {
             url: "{% url 'core:headword_autocomplete' %}"

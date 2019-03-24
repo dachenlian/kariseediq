@@ -9,32 +9,37 @@
     </form>
 {% endblock content %}
 {% block javascript %}
-{#    <script>#}
-{#        let timer, delay = 250;#}
-{#        $('#id_item_name').on('input', function (e) {#}
-{#            const itemName = $(this).val();#}
-{#            let itemNameMessage = $('#item_message');#}
-{#            clearTimeout(timer);#}
-{#            timer = setTimeout(function () {#}
-{#                $.ajax({#}
-{#                    url: "{% url 'core:validate_item_name' %}",#}
-{#                    data: {#}
-{#                        'item_name': itemName#}
-{#                    },#}
-{#                    dataType: 'json',#}
-{#                    success: function (data) {#}
-{#                        if (data.is_taken) {#}
-{#                            itemNameMessage.text('This item already exists.');#}
-{#                            itemNameMessage.className = '';#}
-{#                            itemNameMessage.addClass('text-warning');#}
-{#                        } else {#}
-{#                            itemNameMessage.text('');#}
-{#                        }#}
-{#                    }#}
-{#                });#}
-{#            }, delay);#}
-{#        });#}
-{#    </script>#}
+    <script>
+        let timer, delay = 250;
+        $('#id_root').on('input', function (e) {
+            const root = $(this).val();
+            let rootSensesMessage = $('#rootSensesMessage');
+            $('p.text-success').remove();
+
+            clearTimeout(timer);
+            timer = setTimeout(function () {
+                $.ajax({
+                    url: "{% url 'core:get_senses' %}",
+                    data: {
+                        'root': root
+                    },
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data.success) {
+                            rootSensesMessage.children('span').remove();
+                            const senses = data.senses;
+                            senses.forEach(function (s) {
+                                rootSensesMessage.before(
+                                    $("<p></p>").text(s).addClass('text-success')
+                                )
+                            });
+                        } else {
+                        }
+                    }
+                });
+            }, delay);
+        });
+    </script>
     {{ form.media }}
     <script>
         $(window).bind('load', function () {
