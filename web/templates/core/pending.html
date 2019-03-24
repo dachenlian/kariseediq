@@ -14,15 +14,15 @@
                     <tr>
                         <th>#</th>
                         <th>詞項</th>
-                        <th>詞根</th>
+{#                        <th>詞根</th>#}
                     </tr>
                     </thead>
                     <tbody>
                     {% for hw in headwords %}
                         <tr>
                             <td>{{ forloop.counter }}</td>
-                            <td>{{ hw.0 }}</td>
-                            <td>{{ hw.1 }}</td>
+                            <td>{{ hw }}</td>
+{#                            <td>{{ hw.1 }}</td>#}
                         </tr>
                     {% endfor %}
                     </tbody>

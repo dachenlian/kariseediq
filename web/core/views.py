@@ -240,13 +240,11 @@ class PendingListView(ListView):
             return super().get(request, *args, **kwargs)
 
     def get_queryset(self):
-        roots = Sense.objects.all().values_list('root', flat=True)
-        logger.debug(len(roots))
-        headwords = Headword.objects.exclude(headword__in=roots)
-        roots_without_entries = headwords.exclude(headword__in=roots).values_list('headword', flat=True)
-        roots_without_entries = sorted(filter(bool, set(roots_without_entries)))
-        logger.debug(len(roots_without_entries))
-        return headwords
+        roots = Sense.objects.all().distinct().values('root')
+        headwords = Headword.objects.filter(is_root=True).values_list('headword', flat=True).distinct()
+        roots_without_entries = roots.difference(headwords).values_list('headword', flat=True)
+        roots_without_entries = sorted(filter(bool, roots_without_entries))
+        return roots_without_entries
 
 
 class RootAutoComplete(View):
