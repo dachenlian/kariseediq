@@ -447,3 +447,5 @@ static/*
 # End of https://www.gitignore.io/api/git,node,python,django,sublimetext,pycharm+all,intellij+all
 
 web/static
+*migrations*
+*.csv
