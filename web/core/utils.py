@@ -84,7 +84,7 @@ def first_letter(string):
             return s
 
 
-def load_into_db(file):
+def load_into_db(file="seediq_items_updated.csv"):
     start = time.time()
 
     with open(file) as fp:
@@ -97,12 +97,12 @@ def load_into_db(file):
             headword = new_entry.pop('headword')
             variant = new_entry.pop('variant')
             is_root = new_entry.pop('is_root')
-            first_letter = new_entry.pop('first_letter')
+            first_lttr = new_entry.pop('first_letter')
 
             headword, created = Headword.objects.get_or_create(
                 headword=headword,
                 defaults={
-                    'first_letter': first_letter,
+                    'first_letter': first_lttr,
                     'variant': variant,
                     'is_root': is_root,
                     'user': new_entry.get('user'),
@@ -149,6 +149,16 @@ def load_into_db(file):
 
     end = time.time()
     logger.debug(f'Completed in {datetime.timedelta(seconds=end - start)}.')
+
+
+def load_extra_meaning(file='seediq_extra_meaning_updated.csv'):
+    with open(file) as fp:
+        reader = csv.reader(fp)
+        header = next(reader)
+
+        for idx, row in enumerate(reader, 1):
+            row = [r.strip() for r in row]
+            
 
 
 def gen_query_history(request: HttpRequest):
