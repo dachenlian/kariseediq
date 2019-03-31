@@ -158,7 +158,36 @@ def load_extra_meaning(file='seediq_extra_meaning_updated.csv'):
 
         for idx, row in enumerate(reader, 1):
             row = [r.strip() for r in row]
-            
+            new_entry = dict(zip(header, row))
+            headword = new_entry.pop('item_name')
+            meaning = new_entry.pop('meaning')
+            meaning_en = new_entry.pop('meaning_en')
+            main_meaning_word_class = new_entry.pop('word_class')
+
+            if not meaning and not new_entry['sentence']:
+                logger.debug(f'{headword}: Empty row.')
+                continue
+            try:
+                headword = Headword.objects.get(headword=headword)
+            except Headword.DoesNotExist:
+                logger.debug(headword)
+                break
+            if meaning:
+                sense, created = Sense.objects.get_or_create(
+                    headword=headword,
+                    meaning=meaning,
+                    defaults={
+                        'headword_sense_no': headword.senses.count() + 1,
+                        'main_meaning_word_class': main_meaning_word_class,
+                        'meaning_en': meaning_en,
+                    }
+                )
+            else:
+                sense = headword.senses.first()
+            if new_entry['sentence']:
+                Example.objects.create(sense=sense, **new_entry)
+            if idx % 100 == 0:
+                logger.debug(f'Processed {idx}...')
 
 
 def gen_query_history(request: HttpRequest):
