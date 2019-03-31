@@ -185,6 +185,9 @@ def load_extra_meaning(file='seediq_extra_meaning_updated.csv'):
             else:
                 sense = headword.senses.first()
             if new_entry['sentence']:
+                if sense.examples.filter(sentence=new_entry['sentence']).exists():
+                    logger.debug(f"{headword.headword} ({sense.headword_sense_no}) -- {new_entry['sentence']} already exists.")
+                    continue
                 Example.objects.create(sense=sense, **new_entry)
             if idx % 100 == 0:
                 logger.debug(f'Processed {idx}...')

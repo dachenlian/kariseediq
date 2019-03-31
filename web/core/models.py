@@ -131,6 +131,7 @@ class Example(models.Model):
     sentence = models.TextField(blank=True, default="")
     sentence_en = models.TextField(blank=True, default="")
     sentence_ch = models.TextField(blank=True, default="")
+    modified_date = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f'{self.sentence} / {self.sentence_ch}'
@@ -142,6 +143,7 @@ class Phrase(models.Model):
     phrase = models.CharField(max_length=255, blank=True, default="")  # 詞組
     phrase_ch = models.CharField(max_length=255, blank=True, default="")
     phrase_en = models.CharField(max_length=255, blank=True, default="")
+    modified_date = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f'{self.phrase} / {self.phrase_ch}'
