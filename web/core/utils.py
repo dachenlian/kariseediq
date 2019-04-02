@@ -51,7 +51,7 @@ def _convert_to_bool(cell):
 
 def _parse_date(str_date):
     try:
-        parsed = datetime.datetime.strptime(str_date, '%Y-%d-%m')
+        parsed = datetime.datetime.strptime(str_date, '%Y-%m-%d')
     except ValueError as e:
         logger.exception(e)
         return datetime.datetime.min
