@@ -83,7 +83,7 @@ class SearchResultsListView(ListView):
                            Q(variant__icontains=search_name)
                            )
 
-        qs = qs.order_by(Lower('first_letter'))
+        qs = qs.order_by(Lower('first_letter')).distinct()
 
         self.request.session['queryset'] = qs
         utils.gen_query_history(self.request)

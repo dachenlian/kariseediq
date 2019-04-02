@@ -159,7 +159,7 @@ def load_extra_meaning(file='seediq_extra_meaning_updated.csv'):
         for idx, row in enumerate(reader, 1):
             row = [r.strip() for r in row]
             new_entry = dict(zip(header, row))
-            headword = new_entry.pop('item_name')
+            headword, _ = _split_item_name(new_entry.pop('item_name'))
             meaning = new_entry.pop('meaning')
             meaning_en = new_entry.pop('meaning_en')
             main_meaning_word_class = new_entry.pop('word_class')
@@ -167,11 +167,15 @@ def load_extra_meaning(file='seediq_extra_meaning_updated.csv'):
             if not meaning and not new_entry['sentence']:
                 logger.debug(f'{headword}: Empty row.')
                 continue
-            try:
-                headword = Headword.objects.get(headword=headword)
-            except Headword.DoesNotExist:
-                logger.debug(headword)
-                break
+
+            headword, created = Headword.objects.get_or_create(
+                headword=headword,
+                defaults={
+                    'first_letter': first_letter(headword)
+                }
+            )
+            if created:
+                logger.debug(f'Created headword: {headword}')
             if meaning:
                 sense, created = Sense.objects.get_or_create(
                     headword=headword,
@@ -183,6 +187,7 @@ def load_extra_meaning(file='seediq_extra_meaning_updated.csv'):
                     }
                 )
             else:
+                # Only contains extra examples
                 sense = headword.senses.first()
             if new_entry['sentence']:
                 if sense.examples.filter(sentence=new_entry['sentence']).exists():
@@ -191,6 +196,24 @@ def load_extra_meaning(file='seediq_extra_meaning_updated.csv'):
                 Example.objects.create(sense=sense, **new_entry)
             if idx % 100 == 0:
                 logger.debug(f'Processed {idx}...')
+
+
+def load_extra_phrases(file='seediq_extra_phrases_updated.csv'):
+    with open(file) as fp:
+        reader = csv.reader(fp)
+        header = next(reader)
+
+        for idx, row in enumerate(reader, 1):
+            row = [r.strip() for r in row]
+            new_entry = dict(zip(header, row))
+            headword, _ = _split_item_name(new_entry.pop('item_name'))
+
+            if not new_entry['phrase']:
+                logger.debug(f'{headword}: empty row.')
+                continue
+            headword = Headword.objects.get(headword=headword)
+            sense = headword.senses.first()
+            Phrase.objects.create(sense=sense, **new_entry)
 
 
 def gen_query_history(request: HttpRequest):
