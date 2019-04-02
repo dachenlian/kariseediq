@@ -84,7 +84,7 @@ def first_letter(string):
             return s
 
 
-def load_into_db(file="seediq_items_updated.csv"):
+def load_into_db(file="../seediq_items_updated.csv"):
     start = time.time()
 
     with open(file) as fp:
@@ -151,7 +151,7 @@ def load_into_db(file="seediq_items_updated.csv"):
     logger.debug(f'Completed in {datetime.timedelta(seconds=end - start)}.')
 
 
-def load_extra_meaning(file='seediq_extra_meaning_updated.csv'):
+def load_extra_meaning(file='../seediq_extra_meaning_updated.csv'):
     with open(file) as fp:
         reader = csv.reader(fp)
         header = next(reader)
@@ -198,7 +198,7 @@ def load_extra_meaning(file='seediq_extra_meaning_updated.csv'):
                 logger.debug(f'Processed {idx}...')
 
 
-def load_extra_phrases(file='seediq_extra_phrases_updated.csv'):
+def load_extra_phrases(file='../seediq_extra_phrases_updated.csv'):
     with open(file) as fp:
         reader = csv.reader(fp)
         header = next(reader)
