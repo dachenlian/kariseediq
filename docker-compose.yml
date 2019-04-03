@@ -4,7 +4,7 @@ services:
   web:
     build: .
     volumes:
-      - ./db:/app/web/db.dqlite3
+      - ./db_backup:/app/web/db.sqlite3
     restart: always
     ports:
-      - "8000:8000"
+      - "8002:8000"
