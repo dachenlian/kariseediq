@@ -7,6 +7,7 @@ from typing import List
 
 from django.http.request import HttpRequest
 from django.forms.models import model_to_dict
+from django.db import IntegrityError
 
 from .forms import SenseForm
 from .models import Headword, Sense, Phrase, Example
@@ -128,21 +129,29 @@ def load_into_db(file="../seediq_items_updated.csv"):
             phrase_ch = new_entry.pop('phrase_ch')
             phrase_en = new_entry.pop('phrase_en')
 
-            sense = Sense.objects.create(headword=headword, **new_entry)
+            try:
+                sense = Sense.objects.create(headword=headword, **new_entry)
+            except IntegrityError as e:
+                # Possibly caused by an extra space in item name that was eventually stripped during pre-processing.
+                logger.error(e, headword.headword, new_entry)
+                new_entry['headword_sense_no'] = headword.senses.count() + 1
+                sense = Sense.objects.create(headword=headword, **new_entry)
 
-            Example.objects.create(
-                sense=sense,
-                sentence=sentence,
-                sentence_ch=sentence_ch,
-                sentence_en=sentence_en,
-            )
+            if sentence:
+                Example.objects.create(
+                    sense=sense,
+                    sentence=sentence,
+                    sentence_ch=sentence_ch,
+                    sentence_en=sentence_en,
+                )
 
-            Phrase.objects.create(
-                sense=sense,
-                phrase=phrase,
-                phrase_ch=phrase_ch,
-                phrase_en=phrase_en,
-            )
+            if phrase:
+                Phrase.objects.create(
+                    sense=sense,
+                    phrase=phrase,
+                    phrase_ch=phrase_ch,
+                    phrase_en=phrase_en,
+                )
 
             if idx % 500 == 0:
                 logger.debug(f'Processed {idx} rows...')
@@ -214,6 +223,15 @@ def load_extra_phrases(file='../seediq_extra_phrases_updated.csv'):
             headword = Headword.objects.get(headword=headword)
             sense = headword.senses.first()
             Phrase.objects.create(sense=sense, **new_entry)
+
+
+def load():
+    logger.debug('Starting load_into_db()')
+    load_into_db()
+    logger.debug('Starting load_extra_meaning()')
+    load_extra_meaning()
+    logger.debug('Starting load_extra_phrases()')
+    load_extra_phrases()
 
 
 def gen_query_history(request: HttpRequest):
