@@ -171,7 +171,7 @@ def load_extra_meaning(file='../seediq_extra_meaning_updated.csv'):
             headword, _ = _split_item_name(new_entry.pop('item_name'))
             meaning = new_entry.pop('meaning')
             meaning_en = new_entry.pop('meaning_en')
-            main_meaning_word_class = new_entry.pop('word_class')
+            word_class = new_entry.pop('word_class')
 
             if not meaning and not new_entry['sentence']:
                 logger.debug(f'{headword}: Empty row.')
@@ -191,7 +191,7 @@ def load_extra_meaning(file='../seediq_extra_meaning_updated.csv'):
                     meaning=meaning,
                     defaults={
                         'headword_sense_no': headword.senses.count() + 1,
-                        'main_meaning_word_class': main_meaning_word_class,
+                        'word_class': word_class,
                         'meaning_en': meaning_en,
                     }
                 )
