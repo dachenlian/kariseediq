@@ -25,3 +25,9 @@ textarea:focus, input:focus {
     color: black;
 }
 
+#search_name_id {
+    background: white;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+

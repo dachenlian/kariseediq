@@ -59,12 +59,12 @@
             <div class="form-group">
                 <label for="itemFilterNav"></label>
                 <select name="search_filter" id="itemFilterNav" class="custom-select custom-select-sm mx-auto">
-                    <option value="startswith" selected>Starts with</option>
+                    <option value="startswith">Starts with</option>
                     <option value="endswith">Ends with</option>
-                    <option value="contains">Contains</option>
+                    <option value="contains" selected>Contains</option>
                 </select>
             </div>
-            <input type="search" name="search_name" placeholder="Search" class="form-control mx-sm-2">
+            <input type="search" id="search_name_id" name="search_name" placeholder="Search" class="form-control mx-sm-2">
             <input type="hidden" name="search_reset" value="True">
             <button class="btn btn-outline-light my-2 my-sm-0" type="submit">New Search</button>
         </form>

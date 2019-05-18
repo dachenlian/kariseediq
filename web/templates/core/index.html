@@ -54,10 +54,9 @@
                         <th>詞項</th>
                         <th>變體</th>
                         <th>詞義</th>
+                        <th>詞根</th>
+                        <th>輸入者</th>
                         <th>刪除</th>
-                        {#                        <th>輸入者</th>#}
-                        {#                        <th>輸入日期</th>#}
-                        {#                        <th>刪除</th>#}
                     </tr>
                     </thead>
                     <tbody>
@@ -68,21 +67,25 @@
                                 {% if forloop.first %}
                                     <td rowspan="{{ headword.senses.all|length }}"
                                         class="align-middle">{{ forloop.parentloop.counter0|add:page_obj.start_index }}</td>
-                                    <td style="cursor: pointer;" onclick="window.location='{% url 'core:update_headword' hw=headword.headword %}';"
-                                            rowspan="{{ headword.senses.all|length }}"
+                                    <td style="cursor: pointer;"
+                                        onclick="window.location='{% url 'core:update_headword' hw=headword.headword %}';"
+                                        rowspan="{{ headword.senses.all|length }}"
                                         class="align-middle">{{ headword.headword }}</td>
                                     <td class="align-middle" rowspan="{{ headword.senses.all|length }}"
-                                        >{{ headword.variant }}</td>
+                                    >{{ headword.variant }}</td>
                                 {% endif %}
                                 {#                            <td style="cursor: pointer" onclick="window.location='{% url 'core:update' pk=headword.id %}';"#}
                                 {#                                class="align-middle">{{ headword.headword }}</td>#}
                                 <td style="cursor: pointer;"
                                     onclick="window.location=
                                             '{% url 'core:update_sense' hw=headword.headword sense=sense.headword_sense_no %}';"
-                                        class="align-middle">({{ forloop.counter }}) {{ sense.meaning }}
+                                    class="align-middle">({{ forloop.counter }}) {{ sense.meaning }}
                                 </td>
+                                <td class="align-middle">{{ sense.root }}</td>
+                                <td class="align-middle">{{ sense.user }}</td>
                                 <td>
-                                    <button style="padding: 0;" type="button" class="btn btn-primary" data-toggle="modal"
+                                    <button style="padding: 0;" type="button" class="btn btn-primary"
+                                            data-toggle="modal"
                                             data-target="#deleteModal"
                                             data-hw="{{ headword.headword }}"
                                             data-sense="{{ sense.headword_sense_no }}"
