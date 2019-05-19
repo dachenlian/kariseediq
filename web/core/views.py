@@ -31,7 +31,7 @@ class IndexListView(ListView):
         # return Headword.objects.prefetch_related('senses').filter(senses__gt=1)
         # return Headword.objects.prefetch_related('senses').annotate(senses_count=Count('senses'))\
         #     .filter(senses_count__gt=1)
-        return Headword.objects.order_by(Lower('first_letter')).prefetch_related('senses')
+        return Headword.objects.order_by('only_letters').prefetch_related('senses')
 
 
 class SearchResultsListView(ListView):
@@ -83,7 +83,7 @@ class SearchResultsListView(ListView):
                            Q(variant__icontains=search_name)
                            )
 
-        qs = qs.order_by(Lower('first_letter')).distinct()
+        qs = qs.order_by('only_letters').distinct()
 
         self.request.session['queryset'] = qs
         utils.gen_query_history(self.request)
@@ -138,7 +138,7 @@ class SenseCreateView(View):
         headword = sense_form.data['headword']
         headword, created = Headword.objects.get_or_create(headword=headword,
                                                            defaults={
-                                                               'first_letter': utils.first_letter(headword)
+                                                               'first_letter': utils.only_letters(headword)
                                                            })
         sense_form.data['headword'] = headword
         sense_form.data['headword_sense_no'] = headword.senses.count() + 1
@@ -227,7 +227,7 @@ class SenseDeleteView(DeleteView):
 class PendingListView(ListView):
     model = Headword
     paginate_by = 1000
-    context_object_name = 'headwords'
+    context_object_name = 'senses'
     template_name = 'core/pending.html'
 
     def get(self, request, *args, **kwargs):
@@ -243,6 +243,7 @@ class PendingListView(ListView):
         headwords = Headword.objects.filter(is_root=True).values_list('headword', flat=True).distinct()
         roots_without_entries = roots.difference(headwords).values_list('headword', flat=True)
         roots_without_entries = sorted(filter(bool, roots_without_entries))
+        roots_without_entries = Sense.objects.filter(root__in=roots_without_entries).order_by('root')
         return roots_without_entries
 
 

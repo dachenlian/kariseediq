@@ -7,7 +7,7 @@ from multiselectfield import MultiSelectField
 class Headword(models.Model):
     headword = models.CharField(max_length=255, unique=True)
     user = models.CharField(max_length=255, blank=True, default="")
-    first_letter = models.CharField(max_length=255, default="")
+    only_letters = models.CharField(max_length=255, default="")  # used for sorting by letters only
     is_root = models.BooleanField(blank=True, default=False)
     created_date = models.DateField(default=datetime.date.today)
     modified_date = models.DateTimeField(auto_now=True)

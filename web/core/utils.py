@@ -26,7 +26,7 @@ def _clean_entry(entry: dict) -> dict:
     headword, headword_sense_no = _split_item_name(entry.pop('item_name'))
     root, root_sense_no = _split_item_name(entry.pop('item_root'))
 
-    entry['first_letter'] = first_letter(headword)
+    entry['only_letters'] = only_letters(headword)
     entry['headword'] = headword
     entry['headword_sense_no'] = headword_sense_no
     entry['root'] = root
@@ -79,10 +79,8 @@ def build_autocomplete_response(qs: List[Headword]) -> List[str]:
     return [f'{hw.headword}\n ({idx}) {s.meaning}' for hw in qs for idx, s in enumerate(hw.senses.all(), 1)]
 
 
-def first_letter(string):
-    for s in string:
-        if s.isalpha():
-            return s
+def only_letters(string):
+    return "".join(char for char in string if char.isalpha() or char == ' ')
 
 
 def load_into_db(file="../seediq_items_updated.csv"):
@@ -98,12 +96,12 @@ def load_into_db(file="../seediq_items_updated.csv"):
             headword = new_entry.pop('headword')
             variant = new_entry.pop('variant')
             is_root = new_entry.pop('is_root')
-            first_lttr = new_entry.pop('first_letter')
+            only_lttrs = new_entry.pop('only_letters')
 
             headword, created = Headword.objects.get_or_create(
                 headword=headword,
                 defaults={
-                    'first_letter': first_lttr,
+                    'only_letters': only_lttrs,
                     'variant': variant,
                     'is_root': is_root,
                     'user': new_entry.get('user'),
@@ -180,7 +178,7 @@ def load_extra_meaning(file='../seediq_extra_meaning_updated.csv'):
             headword, created = Headword.objects.get_or_create(
                 headword=headword,
                 defaults={
-                    'first_letter': first_letter(headword)
+                    'only_letters': only_letters(headword)
                 }
             )
             if created:
