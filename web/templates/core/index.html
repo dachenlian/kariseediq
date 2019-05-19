@@ -79,18 +79,18 @@
                                 <td style="cursor: pointer;"
                                     onclick="window.location=
                                             '{% url 'core:update_sense' hw=headword.headword sense=sense.headword_sense_no %}';"
-                                    class="align-middle">({{ forloop.counter }}) {{ sense.meaning }}
+                                    class="align-middle">{% if headword.senses.all|length_is:"1" %}{{ sense.meaning }}{% else %}({{ forloop.counter }}) {{ sense.meaning }}{% endif %}
                                 </td>
                                 <td class="align-middle">{{ sense.root }}</td>
                                 <td class="align-middle">{{ sense.user }}</td>
-                                <td>
-                                    <button style="padding: 0;" type="button" class="btn btn-primary"
+                                <td class="align-middle">
+                                    <button style="padding: 0;" type="button" class="btn btn-primary align-middle"
                                             data-toggle="modal"
                                             data-target="#deleteModal"
                                             data-hw="{{ headword.headword }}"
                                             data-sense="{{ sense.headword_sense_no }}"
                                             data-deltext="{{ headword }}: {{ sense.meaning }}"
-                                    ><i class="material-icons">delete</i>
+                                    ><i class="material-icons align-middle">delete</i>
                                     </button>
                                 </td>
                             </tr>
