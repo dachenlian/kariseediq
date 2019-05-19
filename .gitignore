@@ -449,3 +449,4 @@ static/*
 web/static
 *migrations*
 *.csv
+.~lock*
