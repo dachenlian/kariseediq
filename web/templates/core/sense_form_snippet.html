@@ -47,7 +47,7 @@
         {{ form.cultural_notes|as_crispy_field }}
     </div>
 </div>
-<div class="form-row">
+<div class="form-row align-items-center">
     <div class="col">
         {{ form.word_class|as_crispy_field }}
     </div>
@@ -63,17 +63,12 @@
     <div class="col-lg-2">
         {{ form.picture|as_crispy_field }}
     </div>
-</div>
-<div class="form-row">
-    {{ phrase_formset.management_form }}
-    {% for form in phrase_formset %}
-        <div class="col">
-            <strong>Phrase #{{ forloop.counter }}</strong>
-            <div class="form-group">
-                {{ form|crispy }}
-            </div>
-        </div>
-    {% endfor %}
+    <div class="col">
+        <!-- Button trigger modal -->
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#phrase-modal">
+            Phrases
+        </button>
+    </div>
 </div>
 
 {{ example_formset.management_form }}
@@ -87,4 +82,29 @@
     <button class="btn btn-primary btn-lg active w-50" type="submit">Submit</button>
 </div>
 
+
+<!-- Modal -->
+<div class="modal fade" id="phrase-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Phrases</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                {{ phrase_formset.management_form }}
+                {% for form in phrase_formset %}
+                    <strong>Phrase #{{ forloop.counter }}</strong>
+                    {{ form|crispy }}
+                {% endfor %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 

@@ -138,7 +138,7 @@ class SenseCreateView(View):
         headword = sense_form.data['headword']
         headword, created = Headword.objects.get_or_create(headword=headword,
                                                            defaults={
-                                                               'first_letter': utils.only_letters(headword)
+                                                               'only_letters': utils.only_letters(headword)
                                                            })
         sense_form.data['headword'] = headword
         sense_form.data['headword_sense_no'] = headword.senses.count() + 1
