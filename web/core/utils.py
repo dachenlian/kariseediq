@@ -83,7 +83,7 @@ def only_letters(string):
     return "".join(char for char in string if char.isalpha() or char == ' ')
 
 
-def load_into_db(file="../seediq_items_updated.csv"):
+def load_items(file="../seediq_items_updated.csv"):
     start = time.time()
 
     with open(file) as fp:
@@ -166,7 +166,8 @@ def load_extra_meaning(file='../seediq_extra_meaning_updated.csv'):
         for idx, row in enumerate(reader, 1):
             row = [r.strip() for r in row]
             new_entry = dict(zip(header, row))
-            headword, _ = _split_item_name(new_entry.pop('item_name'))
+            headword, headword_sense_no = _split_item_name(new_entry.pop('item_name'))
+            meaning_no = new_entry.pop('meaning_no')
             meaning = new_entry.pop('meaning')
             meaning_en = new_entry.pop('meaning_en')
             word_class = new_entry.pop('word_class')
@@ -183,7 +184,8 @@ def load_extra_meaning(file='../seediq_extra_meaning_updated.csv'):
             )
             if created:
                 logger.debug(f'Created headword: {headword}')
-            if meaning:
+
+            if meaning_no != 0:
                 sense, created = Sense.objects.get_or_create(
                     headword=headword,
                     meaning=meaning,
@@ -195,7 +197,7 @@ def load_extra_meaning(file='../seediq_extra_meaning_updated.csv'):
                 )
             else:
                 # Only contains extra examples
-                sense = headword.senses.first()
+                sense = headword.senses.get(headword_sense_no=headword_sense_no)
             if new_entry['sentence']:
                 if sense.examples.filter(sentence=new_entry['sentence']).exists():
                     logger.debug(f"{headword.headword} ({sense.headword_sense_no}) -- {new_entry['sentence']} already exists.")
@@ -206,6 +208,7 @@ def load_extra_meaning(file='../seediq_extra_meaning_updated.csv'):
 
 
 def load_extra_phrases(file='../seediq_extra_phrases_updated.csv'):
+    """Assuming all phrases relate to the first large items.csv"""
     with open(file) as fp:
         reader = csv.reader(fp)
         header = next(reader)
@@ -225,7 +228,7 @@ def load_extra_phrases(file='../seediq_extra_phrases_updated.csv'):
 
 def load():
     logger.debug('Starting load_into_db()')
-    load_into_db()
+    load_items()
     logger.debug('Starting load_extra_meaning()')
     load_extra_meaning()
     logger.debug('Starting load_extra_phrases()')

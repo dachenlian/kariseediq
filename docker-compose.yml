@@ -8,3 +8,5 @@ services:
     restart: always
     ports:
       - "8002:8000"
+    tty: true
+    stdin_open: true
