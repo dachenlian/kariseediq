@@ -181,6 +181,8 @@ class SenseUpdateView(View):
         phrase_formset = PhraseFormset(instance=sense)
 
         context = {
+            'headword': headword,
+            'headword_sense_no': sense.headword_sense_no,
             'form': sense_form,
             'example_formset': example_formset,
             'phrase_formset': phrase_formset,

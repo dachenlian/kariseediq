@@ -3,7 +3,12 @@
 {% block content %}
     <div class="row">
         <div class="col">
-            <h1>Update entry</h1>
+            <h1>Update {{ headword.headword }} sense {{ headword_sense_no }}</h1>
+            <p>
+                <strong>Headword: </strong>{{ headword.headword }} |
+                <strong>Variant: </strong>{{ headword.variant }} |
+                <strong>Is root? </strong>{{ headword.is_root }}
+            </p>
             <form action="" method="post">
                 {% csrf_token %}
                 {% include 'core/sense_form_snippet.html' %}
