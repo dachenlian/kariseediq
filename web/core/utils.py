@@ -168,7 +168,7 @@ def load_extra_meaning(file='../seediq_extra_meaning_updated.csv'):
             new_entry = dict(zip(header, row))
             headword, headword_sense_no = _split_item_name(new_entry.pop('item_name'))
             sentence_no = new_entry.pop('sentence_no')
-            meaning_no = new_entry.pop('meaning_no')
+            meaning_no = int(new_entry.pop('meaning_no'))
             meaning = new_entry.pop('meaning')
             meaning_en = new_entry.pop('meaning_en')
             word_class = new_entry.pop('word_class')
@@ -186,19 +186,26 @@ def load_extra_meaning(file='../seediq_extra_meaning_updated.csv'):
             if created:
                 logger.debug(f'Created headword: {headword}')
 
-            if meaning_no != 0 and sentence_no == 0:  # New sense
-                sense, created = Sense.objects.get_or_create(
+            if meaning_no != 0:  # New sense
+                try:
+                    sense, created = Sense.objects.get_or_create(
+                        headword=headword,
+                        meaning=meaning,
+                        defaults={
+                            'headword_sense_no': meaning_no + 1,
+                            'word_class': word_class,
+                            'meaning_en': meaning_en,
+                        }
+                    )
+                except IntegrityError as e:
+                    print(e, row)
+                    break
+            else:
+                sense = Sense.objects.get(
                     headword=headword,
-                    meaning=meaning,
-                    defaults={
-                        'headword_sense_no': headword.senses.count() + 1,
-                        'word_class': word_class,
-                        'meaning_en': meaning_en,
-                    }
+                    headword_sense_no=headword_sense_no
                 )
-            elif meaning_no == 0 and sentence_no != 0:
-                # Only contains extra examples
-                sense = headword.senses.get(headword_sense_no=headword_sense_no)
+
             if new_entry['sentence']:
                 if sense.examples.filter(sentence=new_entry['sentence']).exists():
                     logger.debug(f"{headword.headword} ({sense.headword_sense_no}) -- {new_entry['sentence']} already exists.")
@@ -223,13 +230,13 @@ def load_extra_phrases(file='../seediq_extra_phrases_updated.csv'):
                 logger.debug(f'{headword}: empty row.')
                 continue
             headword = Headword.objects.get(headword=headword)
-            sense = headword.senses.first()
+            sense = headword.senses.get(headword_sense_no=1)
             Phrase.objects.create(sense=sense, **new_entry)
 
 
 def load():
-    logger.debug('Starting load_into_db()')
-    load_items()
+    # logger.debug('Starting load_into_db()')
+    # load_items()
     logger.debug('Starting load_extra_meaning()')
     load_extra_meaning()
     logger.debug('Starting load_extra_phrases()')
