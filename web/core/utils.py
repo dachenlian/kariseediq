@@ -167,6 +167,7 @@ def load_extra_meaning(file='../seediq_extra_meaning_updated.csv'):
             row = [r.strip() for r in row]
             new_entry = dict(zip(header, row))
             headword, headword_sense_no = _split_item_name(new_entry.pop('item_name'))
+            sentence_no = new_entry.pop('sentence_no')
             meaning_no = new_entry.pop('meaning_no')
             meaning = new_entry.pop('meaning')
             meaning_en = new_entry.pop('meaning_en')
@@ -185,7 +186,7 @@ def load_extra_meaning(file='../seediq_extra_meaning_updated.csv'):
             if created:
                 logger.debug(f'Created headword: {headword}')
 
-            if meaning_no != 0:
+            if meaning_no != 0 and sentence_no == 0:  # New sense
                 sense, created = Sense.objects.get_or_create(
                     headword=headword,
                     meaning=meaning,
@@ -195,7 +196,7 @@ def load_extra_meaning(file='../seediq_extra_meaning_updated.csv'):
                         'meaning_en': meaning_en,
                     }
                 )
-            else:
+            elif meaning_no == 0 and sentence_no != 0:
                 # Only contains extra examples
                 sense = headword.senses.get(headword_sense_no=headword_sense_no)
             if new_entry['sentence']:
