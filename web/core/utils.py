@@ -186,13 +186,13 @@ def load_extra_meaning(file='../seediq_extra_meaning_updated.csv'):
             if created:
                 logger.debug(f'Created headword: {headword}')
 
-            if meaning_no != 0:  # New sense
+            if meaning_no != 0 and sentence_no == 0:  # New sense
                 try:
                     sense, created = Sense.objects.get_or_create(
                         headword=headword,
                         meaning=meaning,
                         defaults={
-                            'headword_sense_no': meaning_no + 1,
+                            'headword_sense_no': headword.senses.count() + meaning_no,
                             'word_class': word_class,
                             'meaning_en': meaning_en,
                         }
@@ -201,10 +201,14 @@ def load_extra_meaning(file='../seediq_extra_meaning_updated.csv'):
                     print(e, row)
                     break
             else:
-                sense = Sense.objects.get(
-                    headword=headword,
-                    headword_sense_no=headword_sense_no
-                )
+                try:
+                    sense = Sense.objects.get(
+                        headword=headword,
+                        meaning=meaning,
+                    )
+                except Sense.DoesNotExist as e:
+                    print(e, row)
+                    break
 
             if new_entry['sentence']:
                 if sense.examples.filter(sentence=new_entry['sentence']).exists():
@@ -235,7 +239,7 @@ def load_extra_phrases(file='../seediq_extra_phrases_updated.csv'):
 
 
 def load():
-    # logger.debug('Starting load_into_db()')
+    # logger.debug('Starting load_items()')
     # load_items()
     logger.debug('Starting load_extra_meaning()')
     load_extra_meaning()
