@@ -83,7 +83,7 @@ def only_letters(string):
     return "".join(char for char in string if char.isalpha() or char == ' ')
 
 
-def load_items(file="../seediq_items_updated.csv"):
+def load_items(file="../seediq_items_updated-20190613-sung.csv"):
     start = time.time()
 
     with open(file) as fp:
@@ -112,7 +112,6 @@ def load_items(file="../seediq_items_updated.csv"):
                 logger.debug(f'{headword.headword} already exists. Retrieving from DB.')
 
             if Sense.objects.filter(headword=headword,
-                                    headword_sense_no=new_entry.get('headword_sense_no'),
                                     meaning=new_entry.get('meaning')
                                     ).exists():
                 logger.warning(f"{headword} with sense meaning {new_entry.get('meaning')}"
@@ -158,7 +157,7 @@ def load_items(file="../seediq_items_updated.csv"):
     logger.debug(f'Completed in {datetime.timedelta(seconds=end - start)}.')
 
 
-def load_extra_meaning(file='../seediq_extra_meaning_updated.csv'):
+def load_extra_meaning(file='../seediq_extra_meaning_updated-20190613-sung.csv'):
     with open(file) as fp:
         reader = csv.reader(fp)
         header = next(reader)
@@ -167,8 +166,6 @@ def load_extra_meaning(file='../seediq_extra_meaning_updated.csv'):
             row = [r.strip() for r in row]
             new_entry = dict(zip(header, row))
             headword, headword_sense_no = _split_item_name(new_entry.pop('item_name'))
-            sentence_no = new_entry.pop('sentence_no')
-            meaning_no = int(new_entry.pop('meaning_no'))
             meaning = new_entry.pop('meaning')
             meaning_en = new_entry.pop('meaning_en')
             word_class = new_entry.pop('word_class')
@@ -186,29 +183,15 @@ def load_extra_meaning(file='../seediq_extra_meaning_updated.csv'):
             if created:
                 logger.debug(f'Created headword: {headword}')
 
-            if meaning_no != 0 and sentence_no == 0:  # New sense
-                try:
-                    sense, created = Sense.objects.get_or_create(
-                        headword=headword,
-                        meaning=meaning,
-                        defaults={
-                            'headword_sense_no': headword.senses.count() + meaning_no,
-                            'word_class': word_class,
-                            'meaning_en': meaning_en,
-                        }
-                    )
-                except IntegrityError as e:
-                    print(e, row)
-                    break
-            else:
-                try:
-                    sense = Sense.objects.get(
-                        headword=headword,
-                        meaning=meaning,
-                    )
-                except Sense.DoesNotExist as e:
-                    print(e, row)
-                    break
+            sense, created = Sense.objects.get_or_create(
+                headword=headword,
+                meaning=meaning,
+                defaults={
+                    'headword_sense_no': headword.senses.count() + 1,
+                    'word_class': word_class,
+                    'meaning_en': meaning_en,
+                }
+            )
 
             if new_entry['sentence']:
                 if sense.examples.filter(sentence=new_entry['sentence']).exists():
@@ -219,7 +202,7 @@ def load_extra_meaning(file='../seediq_extra_meaning_updated.csv'):
                 logger.debug(f'Processed {idx}...')
 
 
-def load_extra_phrases(file='../seediq_extra_phrases_updated.csv'):
+def load_extra_phrases(file='../seediq_extra_phrases_updated-20190606-sung.csv'):
     """Assuming all phrases relate to the first large items.csv"""
     with open(file) as fp:
         reader = csv.reader(fp)
@@ -229,18 +212,27 @@ def load_extra_phrases(file='../seediq_extra_phrases_updated.csv'):
             row = [r.strip() for r in row]
             new_entry = dict(zip(header, row))
             headword, _ = _split_item_name(new_entry.pop('item_name'))
+            meaning = new_entry.pop('meaning')
 
             if not new_entry['phrase']:
                 logger.debug(f'{headword}: empty row.')
                 continue
             headword = Headword.objects.get(headword=headword)
-            sense = headword.senses.get(headword_sense_no=1)
+            if not Sense.objects.filter(headword=headword, meaning=meaning).exists():
+                logger.debug("Sense does not exist:", headword, meaning)
+                continue
+            sense = headword.senses.get(meaning=meaning)
+            # try:
+            #     sense = headword.senses.get(meaning=meaning)
+            # except Sense.DoesNotExist as e:
+            #     logger.debug("DoesNotExist:", headword, meaning)
+            #     continue
             Phrase.objects.create(sense=sense, **new_entry)
 
 
 def load():
-    # logger.debug('Starting load_items()')
-    # load_items()
+    logger.debug('Starting load_items()')
+    load_items()
     logger.debug('Starting load_extra_meaning()')
     load_extra_meaning()
     logger.debug('Starting load_extra_phrases()')
