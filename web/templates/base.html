@@ -65,7 +65,8 @@
                 </select>
             </div>
             <label>
-                <input type="search" id="search_name_id" name="search_name" placeholder="Search" class="form-control mx-sm-2">
+                <input type="search" id="search_name_id" name="search_name" placeholder="Search"
+                       class="form-control mx-sm-2">
             </label>
             <input type="hidden" name="search_reset" value="True">
             <button class="btn btn-outline-light my-2 my-sm-0" type="submit">New Search</button>
@@ -140,6 +141,43 @@
     });
 </script>
 {% block javascript %}
+    <script>
+        let timer, delay = 250;
+        $('#id_root').on('input', function (e) {
+            const root = $(this).val();
+            let rootSensesMessage = $('#rootSensesMessage');
+            $('p.text-success').remove();
+
+            clearTimeout(timer);
+            timer = setTimeout(function () {
+                $.ajax({
+                    url: "{% url 'core:get_senses' %}",
+                    data: {
+                        'root': root
+                    },
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data.success) {
+                            rootSensesMessage.children('span').remove();
+                            const senses = data.senses;
+                            senses.forEach(function (s) {
+                                rootSensesMessage.before(
+                                    $("<p></p>").text(s).addClass('text-success')
+                                )
+                            });
+                        } else {
+                        }
+                    }
+                });
+            }, delay);
+        });
+    </script>
+    {{ form.media }}
+    <script>
+        $(window).bind('load', function () {
+            document.querySelector('#div_id_tag > div > div > button > div').classList.add("text-dark");
+        });
+    </script>
 {% endblock javascript %}
 </body>
 </html>

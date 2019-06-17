@@ -31,3 +31,7 @@ textarea:focus, input:focus {
     margin-bottom: 0;
 }
 
+th a {
+    color: white;
+}
+

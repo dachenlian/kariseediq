@@ -49,21 +49,24 @@
             <div class="table-responsive">
                 <table class="table table-bordered">
                     <thead class="thead-dark">
-                    <tr>
-                        <th>#</th>
-                        <th>詞項</th>
-                        <th>變體</th>
-                        <th>詞義</th>
-                        <th>詞根</th>
-                        <th>輸入者</th>
-                        <th>刪除</th>
+                    <tr class="align-middle text-center">
+                        <th class="align-middle">#</th>
+                        <th class="align-middle">詞項</th>
+                        <th class="align-middle">變體</th>
+                        <th class="align-middle">詞義</th>
+                        <th class="align-middle">
+                            <a href="?order_by=root"><i class="tiny material-icons">arrow_drop_down</i></a>
+                            <a href=""><i class="tiny material-icons">arrow_drop_up</i></a><br>詞根</th>
+                        <th class="align-middle"><a href="?order_by=uploader">輸入者</a></th>
+                        <th class="align-middle"><a href="?order_by=date">更新時間</a></th>
+                        <th class="align-middle">刪除</th>
                     </tr>
                     </thead>
                     <tbody>
                     {% for headword in headwords %}
 
                         {% for sense in headword.senses.all %}
-                            <tr>
+                            <tr class="text-center">
                                 {% if forloop.first %}
                                     <td rowspan="{{ headword.senses.all|length }}"
                                         class="align-middle">{{ forloop.parentloop.counter0|add:page_obj.start_index }}</td>
@@ -79,10 +82,13 @@
                                 <td style="cursor: pointer;"
                                     onclick="window.location=
                                             '{% url 'core:update_sense' hw=headword.headword sense=sense.headword_sense_no %}';"
-                                    class="align-middle">{% if headword.senses.all|length_is:"1" %}{{ sense.meaning }}{% else %}({{ forloop.counter }}) {{ sense.meaning }}{% endif %}
+                                    class="align-middle">
+                                    {% if headword.senses.all|length_is:"1" %}{{ sense.meaning }}{% else %}(
+                                        {{ forloop.counter }}) {{ sense.meaning }}{% endif %}
                                 </td>
                                 <td class="align-middle">{{ sense.root }}</td>
                                 <td class="align-middle">{{ sense.user }}</td>
+                                <td class="align-middle">{{ sense.modified_date|date:"N d, Y P" }}</td>
                                 <td style="text-align: center;" class="align-middle">
                                     <button style="padding: 0;" type="button" class="btn btn-primary align-middle"
                                             data-toggle="modal"
