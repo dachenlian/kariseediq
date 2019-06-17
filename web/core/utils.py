@@ -202,7 +202,7 @@ def load_extra_meaning(file='../seediq_extra_meaning_updated-20190613-sung.csv')
                 logger.debug(f'Processed {idx}...')
 
 
-def load_extra_phrases(file='../seediq_extra_phrases_updated-20190606-sung.csv'):
+def load_extra_phrases(file='../seediq_extra_phrases_updated-20190617-sung.csv'):
     """Assuming all phrases relate to the first large items.csv"""
     with open(file) as fp:
         reader = csv.reader(fp)
