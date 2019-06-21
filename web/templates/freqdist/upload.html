@@ -2,24 +2,27 @@
 {% load static %}
 
 {% block content %}
-    <div id="modal-progress" class="modal fade" data-backdrop="static" data-keyboard="false">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title">Uploading...</h4>
-                </div>
-                <div class="modal-body">
-                    <div class="progress">
-                        <div class="progress-bar" role="progressbar" style="width: 0%;">0%</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+{#    <div id="modal-progress" class="modal fade" data-backdrop="static" data-keyboard="false">#}
+{#        <div class="modal-dialog">#}
+{#            <div class="modal-content">#}
+{#                <div class="modal-header">#}
+{#                    <h4 class="modal-title">Uploading...</h4>#}
+{#                </div>#}
+{#                <div class="modal-body">#}
+{#                    <div class="progress">#}
+{#                        <div class="progress-bar" role="progressbar" style="width: 0%;">0%</div>#}
+{#                    </div>#}
+{#                </div>#}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
     {# 1. BUTTON TO TRIGGER THE ACTION #}
     <button type="button" class="btn btn-primary js-upload-text">
         <span class="glyphicon glyphicon-cloud-upload"></span> Upload text
     </button>
+    {% if text_list %}
+        <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#deleteAllModal">Delete All</button>
+    {% endif %}
 
     {# 2. FILE INPUT TO BE USED BY THE PLUG-IN #}
     <input id="fileupload" type="file" name="file" multiple
@@ -44,7 +47,7 @@
                 <td style="text-align: center;" class="align-middle">
                     <button style="padding: 0;" type="button" class="btn btn-primary align-middle"
                             data-toggle="modal"
-                            data-target="#deleteModal"
+                            data-target="#deleteSingleModal"
                             data-pk="{{ text.pk }}"
                             data-deltext="{{ text.file.name }}"
                     ><i class="material-icons align-middle">delete</i>
@@ -54,12 +57,35 @@
         {% endfor %}
         </tbody>
     </table>
-    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel"
+    <div class="modal fade" id="deleteSingleModal" tabindex="-1" role="dialog" aria-labelledby="deleteSingleModalLabel"
          aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="deleteModalLabel">Delete entry?</h5>
+                    <h5 class="modal-title" id="deleteSingleModalLabel">Delete?</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Delete</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="deleteAllModal" tabindex="-1" role="dialog" aria-labelledby="deleteAllModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteAllModalLabel">Delete all texts?</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -86,7 +112,25 @@
     <script src="{% static 'freqdist/js/upload.js' %}"></script>
     {# Delete script #}
     <script>
-        $('#deleteModal').on('show.bs.modal', function (event) {
+        $('#deleteSingleModal').on('show.bs.modal', function (event) {
+            let button = $(event.relatedTarget);
+            let pk = button.data('pk');
+            let url = "{% url 'freq:single_delete' pk=1 %}".replace(1, `${pk}`);
+            let modal = $(this);
+            let delText = button.data('deltext');
+            let form = modal.find('form');
+
+            form.prop('action', url);
+            modal.find('.modal-title').text('Delete ' + delText + '?')
+        });
+        $(function () {
+            $('[data-toggle="popover"]').popover({
+                trigger: 'focus'
+            });
+        });
+    </script>
+    <script>
+        $('#deleteAllModal').on('show.bs.modal', function (event) {
             let button = $(event.relatedTarget);
             let pk = button.data('pk');
             let url = "{% url 'freq:single_delete' pk=1 %}".replace(1, `${pk}`);
