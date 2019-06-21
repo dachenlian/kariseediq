@@ -1,6 +1,11 @@
+from pathlib import Path
+
+from django.contrib import messages
 from django.views import View
+from django.views.generic import DeleteView
 from django.shortcuts import render
 from django.http import JsonResponse
+from django.urls import reverse_lazy
 
 from .models import TextFile
 from .forms import TextFileUploadForm
@@ -22,3 +27,19 @@ class TextFileUploadView(View):
         else:
             data = {'is_valid': False}
         return JsonResponse(data)
+
+
+class TextSingleDeleteView(DeleteView):
+    model = TextFile
+    success_url = reverse_lazy('freq:upload')
+    success_message = "Text successfully deleted!"
+
+    def delete(self, request, *args, **kwargs):
+        obj = self.get_object()
+        path = Path(obj.file.path)
+        if path.exists():
+            path.unlink()
+        messages.success(request, self.success_message)
+        return super().delete(request, *args, **kwargs)
+
+

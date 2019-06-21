@@ -48,17 +48,26 @@ def build_item_root_freq():
                                         Q(variant__contains=word)
                                         )
         if query.exists():
-            root = query[0].senses.all()[0].root
+            sense = query[0].senses.all()[0]
+            root = sense.root
+            focus = sense.focus
+            word_class = sense.word_class
+            variant = query[0].variant
             if root:
                 root_freq[root] += freq
 
-            # word_details.append({
-            #     'item_name': word,
-            #     'item_freq': freq,
-            #     'root': root,
-            #     'root_freq':
-            # })
+            word_details.append({
+                'item_name': word,
+                'item_freq': freq,
+                'root': root,
+                'root_freq': None,
+                'focus': focus,
+                'word_class': word_class,
+                'variant': variant,
+            })
+    for word in word_details:
+        word['root_freq'] = root_freq.get(word['root'])
 
-    print("Number of words:", word_num)
-    print("Number of sentences:", sent_num)
+    return word_details, word_num, sent_num
+
 

@@ -31,17 +31,51 @@
     <table id="gallery" class="table table-bordered">
         <thead>
         <tr>
+            <th>#</th>
             <th>Texts</th>
+            <th>Delete</th>
         </tr>
         </thead>
         <tbody>
         {% for text in text_list %}
             <tr>
+                <td>{{ forloop.counter }}</td>
                 <td><a href="{{ text.file.url }}">{{ text.file.name }}</a></td>
+                <td style="text-align: center;" class="align-middle">
+                    <button style="padding: 0;" type="button" class="btn btn-primary align-middle"
+                            data-toggle="modal"
+                            data-target="#deleteModal"
+                            data-pk="{{ text.pk }}"
+                            data-deltext="{{ text.file.name }}"
+                    ><i class="material-icons align-middle">delete</i>
+                    </button>
+                </td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
+    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Delete entry?</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Delete</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock content %}
 {% block javascript %}
     <script src="{% static 'freqdist/js/jquery-file-upload/js/vendor/jquery.ui.widget.js' %}"></script>
@@ -50,4 +84,23 @@
 
     {# PHOTOS PAGE SCRIPTS #}
     <script src="{% static 'freqdist/js/upload.js' %}"></script>
+    {# Delete script #}
+    <script>
+        $('#deleteModal').on('show.bs.modal', function (event) {
+            let button = $(event.relatedTarget);
+            let pk = button.data('pk');
+            let url = "{% url 'freq:single_delete' pk=1 %}".replace(1, `${pk}`);
+            let modal = $(this);
+            let delText = button.data('deltext');
+            let form = modal.find('form');
+
+            form.prop('action', url);
+            modal.find('.modal-title').text('Delete ' + delText + '?')
+        });
+        $(function () {
+            $('[data-toggle="popover"]').popover({
+                trigger: 'focus'
+            });
+        });
+    </script>
 {% endblock javascript %}
