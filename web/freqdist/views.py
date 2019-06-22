@@ -57,3 +57,7 @@ class TextAllDeleteView(View):
         return redirect(self.success_url)
 
 
+class FreqResultsView(View):
+    def get(self, request, *args, **kwargs):
+        return render(request, 'freqdist/results.html')
+
