@@ -1,9 +1,10 @@
 from pathlib import Path
 
+from django.conf import settings
 from django.contrib import messages
 from django.views import View
 from django.views.generic import DeleteView
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.urls import reverse_lazy
 
@@ -41,5 +42,18 @@ class TextSingleDeleteView(DeleteView):
             path.unlink()
         messages.success(request, self.success_message)
         return super().delete(request, *args, **kwargs)
+
+
+class TextAllDeleteView(View):
+    success_url = reverse_lazy('freq:upload')
+    success_message = "All texts successfully deleted!"
+
+    def post(self, request, *args, **kwargs):
+        TextFile.objects.all().delete()
+        texts_path = Path(settings.MEDIA_ROOT) / 'freq'
+        for text in texts_path.iterdir():
+            text.unlink()
+        messages.success(request, self.success_message)
+        return redirect(self.success_url)
 
 

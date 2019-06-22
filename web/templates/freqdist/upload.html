@@ -91,7 +91,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form method="post">
+                    <form method="post" action="{% url 'freq:delete_all' %}">
                         {% csrf_token %}
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -115,25 +115,7 @@
         $('#deleteSingleModal').on('show.bs.modal', function (event) {
             let button = $(event.relatedTarget);
             let pk = button.data('pk');
-            let url = "{% url 'freq:single_delete' pk=1 %}".replace(1, `${pk}`);
-            let modal = $(this);
-            let delText = button.data('deltext');
-            let form = modal.find('form');
-
-            form.prop('action', url);
-            modal.find('.modal-title').text('Delete ' + delText + '?')
-        });
-        $(function () {
-            $('[data-toggle="popover"]').popover({
-                trigger: 'focus'
-            });
-        });
-    </script>
-    <script>
-        $('#deleteAllModal').on('show.bs.modal', function (event) {
-            let button = $(event.relatedTarget);
-            let pk = button.data('pk');
-            let url = "{% url 'freq:single_delete' pk=1 %}".replace(1, `${pk}`);
+            let url = "{% url 'freq:delete_single' pk=1 %}".replace(1, `${pk}`);
             let modal = $(this);
             let delText = button.data('deltext');
             let form = modal.find('form');
