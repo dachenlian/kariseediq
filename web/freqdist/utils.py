@@ -42,11 +42,15 @@ def build_item_root_freq():
 
         text = PUNCTUATION_RE.sub('', text).lower().split()
         word_freq.update(text)
+    print("Completed word_freq...")
+    print(len(word_freq))
 
-    for word, freq in word_freq.items():
+    # queries = Headword.objects.filter(Q(headword__in=word_freq.keys()) |
+    #                                   Q(variant__in=word_freq.keys()))
+    for idx, (word, freq) in enumerate(word_freq.items(), 1):
         query = Headword.objects.filter(Q(headword=word) |
                                         Q(variant__contains=word)
-                                        )
+                                        ).prefetch_related('senses')
         if query.exists():
             sense = query[0].senses.all()[0]
             root = sense.root
@@ -65,6 +69,8 @@ def build_item_root_freq():
                 'word_class': word_class,
                 'variant': variant,
             })
+        if idx % 500 == 0:
+            print(f"Completed {idx} of {len(word_freq)}")
     for word in word_details:
         word['root_freq'] = root_freq.get(word['root'])
 

@@ -8,8 +8,9 @@ from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.urls import reverse_lazy
 
-from .models import TextFile
 from .forms import TextFileUploadForm
+from .models import TextFile
+from . import utils
 
 
 class TextFileUploadView(View):
@@ -59,5 +60,11 @@ class TextAllDeleteView(View):
 
 class FreqResultsView(View):
     def get(self, request, *args, **kwargs):
-        return render(request, 'freqdist/results.html')
+        word_details, word_num, sent_num = utils.build_item_root_freq()
+        context = {
+            'word_details': word_details,
+            'word_num': word_num,
+            'sent_num': sent_num
+        }
+        return render(request, 'freqdist/results.html', context=context)
 

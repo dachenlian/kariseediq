@@ -1,7 +1,40 @@
 {% extends 'base.html' %}
 {% block content %}
-
-<div class="row">
-    <h1>Results</h1>
-</div>
+    <div class="row">
+        <h1>Results</h1>
+    </div>
+    <div class="row">
+        <p><strong>Number of sentences: </strong>{{ sent_num }}</p><br>
+        <p><strong>Number of words: </strong>{{ word_num }}</p>
+    </div>
+    <div class="row">
+        <table class="table">
+            <thead>
+            <tr class="align-middle text-center">
+                <th class="align-middle">#</th>
+                <th class="align-middle">Item</th>
+                <th class="align-middle">Item Freq</th>
+                <th class="align-middle">Root</th>
+                <th class="align-middle">Root Freq</th>
+                <th class="align-middle">Focus</th>
+                <th class="align-middle">Word Class</th>
+                <th class="align-middle">Variant</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for row in word_details %}
+                <tr>
+                    <td class="align-middle">{{ forloop.counter }}</td>
+                    <td class="align-middle">{{ row.item_name }}</td>
+                    <td class="align-middle">{{ row.item_freq }}</td>
+                    <td class="align-middle">{{ row.root }}</td>
+                    <td class="align-middle">{{ row.root_freq }}</td>
+                    <td class="align-middle">{{ row.focus }}</td>
+                    <td class="align-middle">{{ row.word_class }}</td>
+                    <td class="align-middle">{{ row.variant }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
 {% endblock content %}
