@@ -45,34 +45,68 @@ def build_item_root_freq() -> dict:
     print("Completed word_freq...")
     print(len(word_freq))
 
-    # queries = Headword.objects.filter(Q(headword__in=word_freq.keys()) |
-    #                                   Q(variant__in=word_freq.keys()))
-    for idx, (word, freq) in enumerate(word_freq.items(), 1):
+    for idx, (word, freq) in enumerate(word_freq.items()):
         query = Headword.objects.filter(Q(headword=word) |
-                                        Q(variant__contains=word)
-                                        ).prefetch_related('senses')
-        if query.exists():
-            sense = query[0].senses.all()[0]
-            root = sense.root
-            focus = sense.focus
-            word_class = sense.word_class
-            variant = query[0].variant
-            if root:
-                root_freq[root] += freq
+                                        Q(variant=word)).prefetch_related('senses')
+        if not query:
+            queries = Headword.objects.filter(variant__contains=';').prefetch_related('senses')
+            for q in queries:
+                variants = q.variant.split(';')
+                if word in variants:
+                    query = q
+                    break
+            else:
+                continue
+        else:
+            query = query[0]
+        sense = query.senses.all()[0]
+        root = sense.root
+        focus = sense.focus
+        word_class = sense.word_class
+        variant = query.variant
+        if root:
+            root_freq[root] += freq
 
-            word_details.append({
-                'item_name': word,
-                'item_freq': freq,
-                'root': root,
-                'root_freq': None,
-                'focus': focus,
-                'word_class': word_class,
-                'variant': variant,
-            })
+        word_details.append({
+            'item_name': word,
+            'item_freq': freq,
+            'root': root,
+            'root_freq': None,
+            'focus': focus,
+            'word_class': word_class,
+            'variant': variant,
+        })
         if idx % 500 == 0:
             print(f"Completed {idx} of {len(word_freq)}")
     for word in word_details:
         word['root_freq'] = root_freq.get(word['root'])
+
+    # for idx, (word, freq) in enumerate(word_freq.items(), 1):
+    #     query = Headword.objects.filter(Q(headword=word) |
+    #                                     Q(variant__contains=word)
+    #                                     ).prefetch_related('senses')
+    #     if query.exists():
+    #         sense = query[0].senses.all()[0]
+    #         root = sense.root
+    #         focus = sense.focus
+    #         word_class = sense.word_class
+    #         variant = query[0].variant
+    #         if root:
+    #             root_freq[root] += freq
+    #
+    #         word_details.append({
+    #             'item_name': word,
+    #             'item_freq': freq,
+    #             'root': root,
+    #             'root_freq': None,
+    #             'focus': focus,
+    #             'word_class': word_class,
+    #             'variant': variant,
+    #         })
+    #     if idx % 500 == 0:
+    #         print(f"Completed {idx} of {len(word_freq)}")
+    # for word in word_details:
+    #     word['root_freq'] = root_freq.get(word['root'])
 
     results = {
         'word_details': word_details,
@@ -80,5 +114,3 @@ def build_item_root_freq() -> dict:
         'sent_num': sent_num
     }
     return results
-
-
