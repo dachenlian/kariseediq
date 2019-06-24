@@ -1,3 +1,7 @@
+import csv
+import pickle
+import datetime
+
 from pathlib import Path
 
 from django.conf import settings
@@ -5,12 +9,19 @@ from django.contrib import messages
 from django.views import View
 from django.views.generic import DeleteView
 from django.shortcuts import render, redirect
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.urls import reverse_lazy
 
 from .forms import TextFileUploadForm
 from .models import TextFile
 from . import utils
+
+
+RESULTS_DIR = Path(settings.BASE_DIR) / 'freqdist' / 'static' / 'freqdist' / 'results'
+if not RESULTS_DIR.exists():
+    RESULTS_DIR.mkdir(parents=True)
+FILE_NAME = 'freq_results.pkl'
+FILE_PATH = RESULTS_DIR.joinpath(FILE_NAME)
 
 
 class TextFileUploadView(View):
@@ -59,12 +70,34 @@ class TextAllDeleteView(View):
 
 
 class FreqResultsView(View):
-    def get(self, request, *args, **kwargs):
-        word_details, word_num, sent_num = utils.build_item_root_freq()
-        context = {
-            'word_details': word_details,
-            'word_num': word_num,
-            'sent_num': sent_num
-        }
-        return render(request, 'freqdist/results.html', context=context)
 
+    def get(self, request, *args, **kwargs):
+        recalculate = request.GET.get('recalculate')
+        if recalculate or not FILE_PATH.exists():
+            results = utils.build_item_root_freq()
+            now = datetime.datetime.now()
+            results['date'] = now
+            with FILE_PATH.open('wb') as f:
+                pickle.dump(results, f)
+        else:
+            with FILE_PATH.open('rb') as f:
+                results = pickle.load(f)
+
+        return render(request, 'freqdist/results.html', context=results)
+
+
+def export_results_to_csv(request):
+    with FILE_PATH.open('rb') as f:
+        results = pickle.load(f)
+    word_details = results.get('word_details')
+    date = results.get('date')
+    filename = f'freq_results.csv'
+
+    fieldnames = word_details[0].keys()
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+
+    writer = csv.DictWriter(response, fieldnames=fieldnames)
+    writer.writeheader()
+    writer.writerows(word_details)
+    return response

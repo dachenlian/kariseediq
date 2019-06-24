@@ -24,7 +24,7 @@ def _split_by_sent_boundary(text):
     return text.split('.')
 
 
-def build_item_root_freq():
+def build_item_root_freq() -> dict:
     word_freq = Counter()
     root_freq = Counter()
 
@@ -74,6 +74,11 @@ def build_item_root_freq():
     for word in word_details:
         word['root_freq'] = root_freq.get(word['root'])
 
-    return word_details, word_num, sent_num
+    results = {
+        'word_details': word_details,
+        'word_num': word_num,
+        'sent_num': sent_num
+    }
+    return results
 
 

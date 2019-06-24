@@ -7,6 +7,12 @@
         <p><strong>Number of sentences: </strong>{{ sent_num }} | <strong>Number of words: </strong>{{ word_num }}</p>
     </div>
     <div class="row">
+        <p><strong>Last recalculated: </strong>{{ date }}
+            <a class="btn btn-info" href="?recalculate=true">Recalculate Now</a>
+            <a class="btn btn-success" href="{% url 'freq:export' %}">Export to CSV</a>
+        </p>
+    </div>
+    <div class="row">
         <table class="table table-bordered">
             <thead class="thead-dark">
             <tr class="align-middle text-center">
@@ -22,7 +28,7 @@
             </thead>
             <tbody>
             {% for row in word_details %}
-                <tr>
+                <tr class="text-center">
                     <td class="align-middle">{{ forloop.counter }}</td>
                     <td class="align-middle">{{ row.item_name }}</td>
                     <td class="align-middle">{{ row.item_freq }}</td>
