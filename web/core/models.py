@@ -110,12 +110,14 @@ class Sense(models.Model):
     meaning_en = models.CharField(max_length=255, blank=True, default="")
     main_meaning_word_class = models.CharField(max_length=255, blank=True, default="")
     word_class = ArrayField(models.CharField(max_length=255),
-                            choices=[(w, w.value) for w in WordClassChoices],
-                            default=list)
+                            choices=[(w.value, w.value) for w in WordClassChoices],
+                            default=list,
+                            blank=True)
     cultural_notes = models.CharField(max_length=255, blank=True, default="")
     focus = ArrayField(models.CharField(max_length=255),
-                       choices=[(f, f.value) for f in FocusChoices],
-                       default=list)
+                       choices=[(f.value, f.value) for f in FocusChoices],
+                       default=list,
+                       blank=True)
     char_strokes_first = models.CharField(max_length=255, blank=True, default="")  # no. of strokes for char of meaning
     char_strokes_all = models.CharField(max_length=255, blank=True, default="")  # no. of strokes for all chars
     frequency = models.IntegerField(blank=True, default=0)
@@ -124,8 +126,9 @@ class Sense(models.Model):
     grammar_notes = models.CharField(max_length=255, blank=True, default="")  # 語法註記
     refer_to = models.CharField(max_length=255, blank=True, default="")  # 參照
     tag = ArrayField(models.CharField(max_length=255),
-                     choices=[(t, t.value) for t in TagChoices],
-                     default=list)  # 標籤
+                     choices=[(t.value, t.value) for t in TagChoices],
+                     default=list,
+                     blank=True)  # 標籤
     toda = models.CharField(max_length=255, blank=True, default="")
     toda_root = models.CharField(max_length=255, blank=True, default="")  # todar
     truku = models.CharField(max_length=255, blank=True, default="")

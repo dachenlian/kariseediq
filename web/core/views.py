@@ -191,7 +191,11 @@ class SenseUpdateView(View):
 
     def post(self, request, *args, **kwargs):
         logger.debug('Inside Update view.')
-
+        print(request.POST.getlist('tag'))
+        print(request.POST.getlist('focus'))
+        print(request.POST.getlist('word_class'))
+        print('='*40)
+        print(request.POST)
         headword = get_object_or_404(Headword, headword=kwargs.get('hw'))
         sense = get_object_or_404(Sense, headword=headword, headword_sense_no=kwargs.get('sense'))
         sense_form = SenseUpdateForm(instance=sense, data=request.POST)

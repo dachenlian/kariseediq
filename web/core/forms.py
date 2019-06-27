@@ -1,8 +1,15 @@
+import logging
+
 from django import forms
 from django.forms import ModelForm, inlineformset_factory
+from django.utils.datastructures import MultiValueDict
+from django.forms.widgets import SelectMultiple
 from django.core.exceptions import ValidationError
 
 from .models import Headword, Sense, Phrase, Example
+
+
+logger = logging.getLogger(__name__)
 
 
 class HeadwordForm(ModelForm):
@@ -35,10 +42,47 @@ class SenseForm(ModelForm):
             'headword_sense_no': forms.HiddenInput(),
             'root': forms.widgets.TextInput(attrs={'class': 'basicAutoComplete', 'autocomplete': 'off'}),
             'root_sense_no': forms.widgets.TextInput(attrs={'class': 'typeahead'}),
-            'tag': forms.widgets.SelectMultiple(attrs={'class': 'selectpicker', 'title': '-------'}),
+            'word_class': SelectMultiple(attrs={'class': 'selectpicker', 'title': '-------'}),
+            'focus': SelectMultiple(attrs={'class': 'selectpicker', 'title': '-------'}),
+            'tag': SelectMultiple(attrs={'class': 'selectpicker', 'title': '-------'}),
             'grammar_notes': forms.widgets.Textarea(attrs={'rows': 5, 'cols': 40}),
             'cultural_notes': forms.widgets.Textarea(attrs={'rows': 5, 'cols': 40}),
         }
+
+    def clean_word_class(self):
+        print('='*40)
+        print("Inside clean word class!")
+        data = self.cleaned_data['word_class']
+        print(data)
+        return data
+    # def clean_word_class(self):
+    #     data = self.cleaned_data['word_class']
+    #     print('='*40)
+    #     print(data)
+    #
+    # def clean(self):
+    #     cleaned_data = super().clean()
+    #     print("="*40)
+    #     return cleaned_data
+    #
+    def clean_tag(self):
+        print("Inside cleaning tag!!!")
+        data = self.cleaned_data['tag']
+        print(data)
+        return data
+    #
+    # def clean_focus(self):
+    #     print("Inside clean focus!!!")
+    #     data = self.cleaned_data['focus']
+    #     print(data)
+    #     return data
+    #
+    # def clean_word_class(self):
+    #     print("Inside clean word class!!!")
+    #     data = self.cleaned_data['word_class']
+    #     print('='*40)
+    #     print(data)
+
     #
     # def __init__(self, *args, **kwargs):
     #     super().__init__(*args, **kwargs)
@@ -67,6 +111,7 @@ class SenseUpdateForm(SenseForm):
     class Meta(SenseForm.Meta):
         fields = SenseForm.Meta.fields + ('headword_sense_no',)
         # exclude = ('headword', )
+
 
 
 class ExampleForm(ModelForm):
