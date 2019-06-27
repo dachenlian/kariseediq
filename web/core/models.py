@@ -34,7 +34,7 @@ class FocusChoices(Enum):
     AGENT = '主事焦點'
     PATIENT = '受事焦點'
     PATIENT_IMPERATIVE = '受事焦點（祈使）'
-    N_PERFECT = '&lt;n&gt;完成貌'
+    N_PERFECT = '<n>完成貌'
     LOCATIVE = '處所焦點'
     REF_BENE = '參考焦點（受惠）'
     REF_INSTRUMENTAL = '參考焦點（工具）'
