@@ -13,7 +13,7 @@ class Headword(models.Model):
     is_root = models.BooleanField(blank=True, default=False)
     created_date = models.DateField(default=datetime.date.today)
     modified_date = models.DateTimeField(auto_now=True)
-    variant = models.CharField(max_length=255, blank=True, default="")
+    variant = ArrayField(models.CharField(max_length=255), default=list)
 
     def __str__(self):
         return self.headword

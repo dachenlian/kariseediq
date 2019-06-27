@@ -54,9 +54,7 @@
                         <th class="align-middle">詞項</th>
                         <th class="align-middle">變體</th>
                         <th class="align-middle">詞義</th>
-                        <th class="align-middle">
-                            <a href="?order_by=root"><i class="tiny material-icons">arrow_drop_down</i></a>
-                            <a href=""><i class="tiny material-icons">arrow_drop_up</i></a><br>詞根</th>
+                        <th class="align-middle">詞根</th>
                         <th class="align-middle"><a href="?order_by=uploader">輸入者</a></th>
                         <th class="align-middle"><a href="?order_by=date">更新時間</a></th>
                         <th class="align-middle">刪除</th>
@@ -74,8 +72,11 @@
                                         onclick="window.location='{% url 'core:update_headword' hw=headword.headword %}';"
                                         rowspan="{{ headword.senses.all|length }}"
                                         class="align-middle">{{ headword.headword }}</td>
-                                    <td class="align-middle" rowspan="{{ headword.senses.all|length }}"
-                                    >{{ headword.variant }}</td>
+                                    <td class="align-middle" rowspan="{{ headword.senses.all|length }}">
+                                    {% for v in headword.variant %}
+                                    {{ v }}<br>
+                                    {% endfor %}
+                                    </td>
                                 {% endif %}
                                 {#                            <td style="cursor: pointer" onclick="window.location='{% url 'core:update' pk=headword.id %}';"#}
                                 {#                                class="align-middle">{{ headword.headword }}</td>#}
