@@ -30,10 +30,12 @@ def _clean_entry(entry: dict) -> dict:
     entry['headword'] = headword
     entry['headword_sense_no'] = headword_sense_no
     entry['root'] = root
+    entry['word_class']: list = entry.pop('word_class').split()
+    entry['focus']: list = entry.pop('focus').split()
     entry['root_sense_no'] = root_sense_no
     entry['created_date'] = _parse_date(entry['created_date'])
     entry['refer_to'] = entry.pop('source')
-    entry['tag'] = _add_tag(entry, 'Kcjason2', '植物')
+    entry['tag']: list = _add_tag(entry, 'Kcjason2', '植物')
     entry['is_root'] = _convert_to_bool(entry.pop('is_root'))
 
     if not entry['frequency']:
@@ -168,7 +170,7 @@ def load_extra_meaning(file='../seediq_extra_meaning_updated-20190613-sung.csv')
             headword, headword_sense_no = _split_item_name(new_entry.pop('item_name'))
             meaning = new_entry.pop('meaning')
             meaning_en = new_entry.pop('meaning_en')
-            word_class = new_entry.pop('word_class')
+            word_class = new_entry.pop('word_class').split()
 
             if not meaning and not new_entry['sentence']:
                 logger.debug(f'{headword}: Empty row.')
