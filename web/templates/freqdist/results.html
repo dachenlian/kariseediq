@@ -1,16 +1,37 @@
 {% extends 'base.html' %}
 {% block content %}
     <div class="row">
+    <div class="col">
         <h1>Results</h1>
     </div>
-    <div class="row">
-        <p><strong>Number of sentences: </strong>{{ sent_num }} | <strong>Number of words: </strong>{{ word_num }}</p>
     </div>
     <div class="row">
-        <p><strong>Last recalculated: </strong>{{ date }}
+    <div class="col">
+        <p><strong>Number of sentences: </strong>{{ sent_num }} | <strong>Number of words: </strong>{{ word_num }} | <strong>Include examples: </strong> {{ include_examples }}</p>
+    </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <p><strong>Last calculated: </strong>{{ date }}</p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <form action="{% url %}"></form>
+            <div class="form-check form-check-inline">
+                <input id="id_includeExamples" type="checkbox" class="form-check-input" value="True"
+                       name="includeExamples">
+                <label class="form-check-label" for="id_includeExamples">
+                    Include Examples
+                </label>
+            </div>
             <a class="btn btn-info" href="?recalculate=true">Recalculate Now</a>
-            <a class="btn btn-success" href="{% url 'freq:export' %}">Export to CSV</a>
-        </p>
+        </div>
+        <div class="col-lg-6 col-sm-12">
+            <p class="text-right">
+                <a class="btn btn-success" href="{% url 'freq:export' %}">Export to CSV</a>
+            </p>
+        </div>
     </div>
     <div class="row">
         <table class="table table-bordered">

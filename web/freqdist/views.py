@@ -73,8 +73,9 @@ class FreqResultsView(View):
 
     def get(self, request, *args, **kwargs):
         recalculate = request.GET.get('recalculate')
+        include_examples = request.GET.get('includeExamples') == 'True'
         if recalculate or not FILE_PATH.exists():
-            results = utils.build_item_root_freq()
+            results = utils.build_item_root_freq(include_examples)
             now = datetime.datetime.now()
             results['date'] = now
             with FILE_PATH.open('wb') as f:
