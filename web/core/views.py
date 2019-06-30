@@ -191,14 +191,15 @@ class SenseUpdateView(View):
 
     def post(self, request, *args, **kwargs):
         logger.debug('Inside Update view.')
-        print(request.POST.getlist('tag'))
-        print(request.POST.getlist('focus'))
-        print(request.POST.getlist('word_class'))
-        print('='*40)
-        print(request.POST)
         headword = get_object_or_404(Headword, headword=kwargs.get('hw'))
         sense = get_object_or_404(Sense, headword=headword, headword_sense_no=kwargs.get('sense'))
         sense_form = SenseUpdateForm(instance=sense, data=request.POST)
+        print('Changed?', sense_form.has_changed())
+        print(sense_form.changed_data)
+        sense_form.is_valid()
+        print(sense_form['tag'].data)
+        print(sense_form['word_class'].data)
+        print(sense_form['focus'].data)
         example_formset = ExampleFormset(instance=sense, data=request.POST)
         phrase_formset = PhraseFormset(instance=sense, data=request.POST)
 
@@ -210,8 +211,8 @@ class SenseUpdateView(View):
             messages.success(request, "Sense updated!")
         else:
             logger.warning(sense_form.errors)
-            logger.warning(example_formset.errors)
-            logger.warning(phrase_formset.errors)
+            # logger.warning(example_formset.errors)
+            # logger.warning(phrase_formset.errors)
             messages.error(request, 'An error occurred. Please try again.')
         return redirect(sense)
 

@@ -19,9 +19,4 @@
 {% endblock content %}
 {% block javascript %}
     {{ block.super }}
-    <script>
-        $(window).bind('load', function () {
-            document.querySelector('.filter-option-inner-inner').classList.add("text-dark");
-        });
-    </script>
 {% endblock javascript %}
