@@ -34,9 +34,21 @@
                     <td class="align-middle">{{ row.item_freq }}</td>
                     <td class="align-middle">{{ row.root }}</td>
                     <td class="align-middle">{{ row.root_freq }}</td>
-                    <td class="align-middle">{{ row.focus }}</td>
-                    <td class="align-middle">{{ row.word_class }}</td>
-                    <td class="align-middle">{{ row.variant }}</td>
+                    <td class="align-middle">
+                        {% for f in row.focus %}
+                            {{ f }}<br>
+                        {% endfor %}
+                    </td>
+                    <td class="align-middle">
+                        {% for w in row.word_class %}
+                            {{ w }}<br>
+                        {% endfor %}
+                    </td>
+                    <td class="align-middle">
+                        {% for v in row.variant %}
+                            {{ v }}<br>
+                        {% endfor %}
+                    </td>
                 </tr>
             {% endfor %}
             </tbody>

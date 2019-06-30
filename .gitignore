@@ -450,3 +450,4 @@ web/static
 *migrations*
 *.csv
 .~lock*
+web/freqdist/static/freqdist/results

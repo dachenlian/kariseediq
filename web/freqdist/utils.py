@@ -47,16 +47,9 @@ def build_item_root_freq() -> dict:
 
     for idx, (word, freq) in enumerate(word_freq.items()):
         query = Headword.objects.filter(Q(headword=word) |
-                                        Q(variant=word)).prefetch_related('senses')
+                                        Q(variant__contains=[word])).prefetch_related('senses')
         if not query:
-            queries = Headword.objects.filter(variant__contains=';').prefetch_related('senses')
-            for q in queries:
-                variants = q.variant.split(';')
-                if word in variants:
-                    query = q
-                    break
-            else:
-                continue
+            continue
         else:
             query = query[0]
         sense = query.senses.all()[0]
