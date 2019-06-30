@@ -35,3 +35,6 @@ th a {
     color: white;
 }
 
+.bootstrap-select .filter-option, .filter-option-inner, .filter-option-inner-inner {
+    color: black;
+}

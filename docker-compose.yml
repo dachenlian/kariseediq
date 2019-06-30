@@ -1,6 +1,10 @@
 version: '3'
 
 services:
+  db:
+    image: postgres
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
   web:
     build: .
     volumes:
@@ -10,3 +14,5 @@ services:
       - "8002:8000"
     tty: true
     stdin_open: true
+    depends_on:
+      - db

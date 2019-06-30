@@ -18,6 +18,7 @@ whitenoise = "*"
 gunicorn = "*"
 python-dotenv = "*"
 cihai = "*"
+psycopg2 = "*"
 
 [dev-packages]
 
