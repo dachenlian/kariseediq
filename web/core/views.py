@@ -194,12 +194,6 @@ class SenseUpdateView(View):
         headword = get_object_or_404(Headword, headword=kwargs.get('hw'))
         sense = get_object_or_404(Sense, headword=headword, headword_sense_no=kwargs.get('sense'))
         sense_form = SenseUpdateForm(instance=sense, data=request.POST)
-        print('Changed?', sense_form.has_changed())
-        print(sense_form.changed_data)
-        sense_form.is_valid()
-        print(sense_form['tag'].data)
-        print(sense_form['word_class'].data)
-        print(sense_form['focus'].data)
         example_formset = ExampleFormset(instance=sense, data=request.POST)
         phrase_formset = PhraseFormset(instance=sense, data=request.POST)
 
