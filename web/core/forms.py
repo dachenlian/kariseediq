@@ -49,7 +49,7 @@ class SenseForm(ModelForm):
         fields = ('root', 'root_sense_no', 'headword_sense_no',
                   'meaning', 'meaning_en', 'word_class', 'cultural_notes',
                   'focus', 'picture', 'sound', 'truku', 'grammar_notes',
-                  'refer_to', 'tag', 'toda', 'toda_root', 'truku', 'truku_root',)
+                  'refer_to', 'tag', 'toda',)
         labels = {
             'word_class': 'Word class',
             'meaning': 'Meaning (Chinese)',

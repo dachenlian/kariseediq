@@ -6,12 +6,6 @@
             {{ form.headword|as_crispy_field }}
         </div>
     {% endif %}
-    <div class="col">
-        {{ form.toda|as_crispy_field }}
-    </div>
-    <div class="col">
-        {{ form.truku|as_crispy_field }}
-    </div>
 </div>
 <div class="form-row">
     <div class="col">
@@ -22,13 +16,13 @@
         <small><span id="rootSensesMessage"></span></small>
     </div>
     <div class="col">
-        {{ form.toda_root|as_crispy_field }}
-    </div>
-    <div class="col">
-        {{ form.truku_root|as_crispy_field }}
-    </div>
-    <div class="col">
         {{ form.refer_to|as_crispy_field }}
+    </div>
+    <div class="col">
+        {{ form.toda|as_crispy_field }}
+    </div>
+    <div class="col">
+        {{ form.truku|as_crispy_field }}
     </div>
 </div>
 <div class="form-row">

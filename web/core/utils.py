@@ -38,6 +38,8 @@ def _clean_entry(entry: dict) -> dict:
     entry['tag']: list = _add_tag(entry, 'Kcjason2', '植物')
     entry['is_root'] = _convert_to_bool(entry.pop('is_root'))
     entry['variant'] = [e.strip() for e in entry.pop('variant').split(';')]
+    del entry['toda_root']
+    del entry['truku_root']
 
     if not entry['frequency']:
         entry['frequency'] = 0
