@@ -4,7 +4,6 @@ from django import forms
 from django.utils.encoding import force_text
 from django.forms import ModelForm, inlineformset_factory
 from django.forms.widgets import SelectMultiple
-from django.core.exceptions import ValidationError
 
 from .models import Headword, Sense, Phrase, Example
 
@@ -12,6 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 class ArraySelectMultiple(SelectMultiple):
+    # https://stackoverflow.com/questions/52830191/django-arrayfield-rendered-using-selectmultiple-not-showing-the-selected-optons
     def format_value(self, value):
         if value is None and self.allow_multiple_selected:
             return []
