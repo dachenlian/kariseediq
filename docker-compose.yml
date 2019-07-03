@@ -10,6 +10,8 @@ services:
     volumes:
       - ./:/app/
     restart: always
+    environment:
+      - DOCKER=1
     ports:
       - "8002:8000"
     tty: true

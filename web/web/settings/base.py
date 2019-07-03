@@ -123,7 +123,7 @@ WSGI_APPLICATION = 'web.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
-DOCKER = True
+DOCKER = os.environ.get('DOCKER', False)
 
 if DOCKER:
     DATABASES = {
