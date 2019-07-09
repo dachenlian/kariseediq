@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="row">
+    <h1>Concordance</h1>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <form action="{% url 'kwic:index' %}">
+                <div class="form-row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="query">Query</label>
+                            <input type="text" name="q" id="query">
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="left-context">Left context</label>
+                            <select class="form-control" name="left-context" id="left-context"></select>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="right-context">Right context</label>
+                            <select class="form-control" name="right-context" id="right-context"></select>
+                        </div>
+                    </div>
+                    <div class="col align-self-center">
+                        <div class="form-group">
+                            <button class="btn btn-primary" type="submit">Search</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+{% endblock content %}
+{% block javascript %}
+    {{ block.super }}
+    <script>
+        const addSelectNums = function (widgetId) {
+            const select = document.querySelector(widgetId);
+            for (let i = 1; i < 10; i++) {
+                let option = document.createElement("OPTION");
+                select.options.add(option);
+                option.text = i;
+                option.value = i;
+                if (i === 5) {
+                    option.setAttribute("selected", "");
+                }
+            }
+        };
+        $("document").ready(function () {
+            addSelectNums('#left-context');
+            addSelectNums('#right-context');
+        });
+    </script>
+{% endblock javascript %}
