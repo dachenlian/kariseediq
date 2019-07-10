@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
     <div class="row">
-    <h1>Concordance</h1>
+        <h1>Concordance</h1>
     </div>
     <div class="row justify-content-center">
         <div class="col-lg-6">
@@ -10,30 +10,48 @@
                     <div class="col">
                         <div class="form-group">
                             <label for="query">Query</label>
-                            <input type="text" name="q" id="query">
+                            <input type="text" name="query" id="query">
                         </div>
                     </div>
                     <div class="col">
                         <div class="form-group">
-                            <label for="left-context">Left context</label>
-                            <select class="form-control" name="left-context" id="left-context"></select>
+                            <label for="width">Width</label>
+                            <select class="form-control" name="width" id="width"></select>
                         </div>
                     </div>
-                    <div class="col">
-                        <div class="form-group">
-                            <label for="right-context">Right context</label>
-                            <select class="form-control" name="right-context" id="right-context"></select>
-                        </div>
-                    </div>
-                    <div class="col align-self-center">
-                        <div class="form-group">
-                            <button class="btn btn-primary" type="submit">Search</button>
-                        </div>
+                </div>
+                <div class="form-row justify-content-center">
+                    <div class="form-group">
+                        <button class="btn btn-primary" type="submit">Search</button>
                     </div>
                 </div>
             </form>
         </div>
     </div>
+    {% if conc_list %}
+        <div class="row">
+            <table>
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Left</th>
+                    <th>Center</th>
+                    <th>Right</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for c in conc_list %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ c.left_print }}</td>
+                        <td>{{ c.query }}</td>
+                        <td>{{ c.right_print }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
 
 {% endblock content %}
 {% block javascript %}
@@ -41,19 +59,18 @@
     <script>
         const addSelectNums = function (widgetId) {
             const select = document.querySelector(widgetId);
-            for (let i = 1; i < 10; i++) {
+            for (let i = 1; i < 150; i ++) {
                 let option = document.createElement("OPTION");
                 select.options.add(option);
                 option.text = i;
                 option.value = i;
-                if (i === 5) {
+                if (i === 80) {
                     option.setAttribute("selected", "");
                 }
             }
         };
         $("document").ready(function () {
-            addSelectNums('#left-context');
-            addSelectNums('#right-context');
+            addSelectNums('#width');
         });
     </script>
 {% endblock javascript %}

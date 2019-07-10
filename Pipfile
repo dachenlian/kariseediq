@@ -19,6 +19,7 @@ gunicorn = "*"
 python-dotenv = "*"
 cihai = "*"
 psycopg2 = "*"
+nltk = "*"
 
 [dev-packages]
 

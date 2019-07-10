@@ -1,8 +1,14 @@
-from core.models import Headword
+import re
+import string
+from types import GeneratorType
+
+from nltk.text import Text
+
+from core.models import Headword, Example
 from freqdist.models import TextFile
 
 
-def _add_variant(words):
+def _add_variant(words: GeneratorType) -> list:
     new_words = []
     variant_dict = {}
     for h in Headword.objects.all():
@@ -18,3 +24,16 @@ def _add_variant(words):
         else:
             new_words.append(word)
     return new_words
+
+
+def build_kwic(include_examples=False):
+    pat = r"(\w+)([{}])".format(string.punctuation)
+
+    files = TextFile.objects.all()
+    texts = " ".join(text.read_and_decode() for text in files)
+    texts = re.sub('\n', ' ', texts).strip()
+    texts = re.sub(pat, r'\1 \2', texts)
+    word_gen = (word for word in texts.split())
+    words = _add_variant(word_gen)
+    return Text(words)
+
