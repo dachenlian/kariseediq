@@ -13,7 +13,6 @@ class KwicView(View):
             width = int(request.GET.get('width'))
             text = build_kwic()
             conc_list = text.concordance_list(query, width=width)
-            print(conc_list[0])
             context = {
                 'conc_list': conc_list,
             }
