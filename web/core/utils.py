@@ -88,7 +88,7 @@ def only_letters(string):
     return "".join(char for char in string if char.isalpha() or char == ' ')
 
 
-def load_items(file="../seediq_items_updated-20190613-sung.csv"):
+def load_items(file="../seediq_items_updated-20190707-sung.csv"):
     start = time.time()
 
     with open(file) as fp:
@@ -105,10 +105,10 @@ def load_items(file="../seediq_items_updated-20190613-sung.csv"):
 
             headword, created = Headword.objects.get_or_create(
                 headword=headword,
+                is_root=is_root,
                 defaults={
                     'only_letters': only_lttrs,
                     'variant': variant,
-                    'is_root': is_root,
                     'user': new_entry.get('user'),
                     'created_date': new_entry.get('created_date')
                 }
@@ -162,7 +162,7 @@ def load_items(file="../seediq_items_updated-20190613-sung.csv"):
     logger.debug(f'Completed in {datetime.timedelta(seconds=end - start)}.')
 
 
-def load_extra_meaning(file='../seediq_extra_meaning_updated-20190613-sung.csv'):
+def load_extra_meaning(file='../seediq_extra_meaning_updated-20190707-sung.csv'):
     with open(file) as fp:
         reader = csv.reader(fp)
         header = next(reader)
@@ -173,6 +173,8 @@ def load_extra_meaning(file='../seediq_extra_meaning_updated-20190613-sung.csv')
             headword, headword_sense_no = _split_item_name(new_entry.pop('item_name'))
             meaning = new_entry.pop('meaning')
             meaning_en = new_entry.pop('meaning_en')
+            is_root = new_entry.pop(is_root) == 'yes'
+            item_root = new_entry.pop('item_root')
             word_class = new_entry.pop('word_class').split()
 
             if not meaning and not new_entry['sentence']:
@@ -181,6 +183,7 @@ def load_extra_meaning(file='../seediq_extra_meaning_updated-20190613-sung.csv')
 
             headword, created = Headword.objects.get_or_create(
                 headword=headword,
+                is_root=is_root,
                 defaults={
                     'only_letters': only_letters(headword)
                 }
@@ -195,6 +198,7 @@ def load_extra_meaning(file='../seediq_extra_meaning_updated-20190613-sung.csv')
                     'headword_sense_no': headword.senses.count() + 1,
                     'word_class': word_class,
                     'meaning_en': meaning_en,
+                    'item_root': item_root,
                 }
             )
 
