@@ -16,7 +16,7 @@
                     <div class="col">
                         <div class="form-group">
                             <label for="width">Width</label>
-                            <select class="form-control" name="width" id="width"></select>
+                            <input class="form-control" name="width" id="width" value="100">
                         </div>
                     </div>
                 </div>
@@ -30,8 +30,8 @@
     </div>
     {% if conc_list %}
         <div class="row">
-            <table>
-                <thead>
+            <table class="table table-striped">
+                <thead class="thead-dark">
                 <tr>
                     <th>#</th>
                     <th>Left</th>
@@ -54,23 +54,23 @@
     {% endif %}
 
 {% endblock content %}
-{% block javascript %}
-    {{ block.super }}
-    <script>
-        const addSelectNums = function (widgetId) {
-            const select = document.querySelector(widgetId);
-            for (let i = 1; i < 150; i ++) {
-                let option = document.createElement("OPTION");
-                select.options.add(option);
-                option.text = i;
-                option.value = i;
-                if (i === 80) {
-                    option.setAttribute("selected", "");
-                }
-            }
-        };
-        $("document").ready(function () {
-            addSelectNums('#width');
-        });
-    </script>
-{% endblock javascript %}
+{#{% block javascript %}#}
+{#    {{ block.super }}#}
+{#    <script>#}
+{#        const addSelectNums = function (widgetId) {#}
+{#            const select = document.querySelector(widgetId);#}
+{#            for (let i = 1; i < 150; i ++) {#}
+{#                let option = document.createElement("OPTION");#}
+{#                select.options.add(option);#}
+{#                option.text = i;#}
+{#                option.value = i;#}
+{#                if (i === 80) {#}
+{#                    option.setAttribute("selected", "");#}
+{#                }#}
+{#            }#}
+{#        };#}
+{#        $("document").ready(function () {#}
+{#            addSelectNums('#width');#}
+{#        });#}
+{#    </script>#}
+{#{% endblock javascript %}#}
