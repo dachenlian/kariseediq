@@ -7,7 +7,7 @@ from django.contrib.postgres.fields import ArrayField
 
 
 class Headword(models.Model):
-    headword = models.CharField(max_length=255, unique=True)
+    headword = models.CharField(max_length=255)
     user = models.CharField(max_length=255, blank=True, default="")
     only_letters = models.CharField(max_length=255, default="")  # used for sorting by letters only
     is_root = models.BooleanField(blank=True, default=False)
@@ -20,6 +20,9 @@ class Headword(models.Model):
 
     def get_absolute_url(self):
         return reverse('core:update_headword', kwargs={'hw': self.headword})
+
+    class Meta:
+        unique_together = ('headword', 'is_root')
 
 
 class Sense(models.Model):

@@ -96,13 +96,13 @@ class HeadwordUpdateView(View):
     success_message = 'Headword successfully updated!'
 
     def get(self, request, *args, **kwargs):
-        headword = Headword.objects.get(headword=kwargs.get('hw'))
+        headword = Headword.objects.get(id=kwargs.get('pk'))
         form = HeadwordForm(instance=headword)
         context = {'form': form}
         return render(self.request, self.template_name, context=context)
 
     def post(self, request, *args, **kwargs):
-        headword = get_object_or_404(Headword, headword=kwargs.get('hw'))
+        headword = get_object_or_404(Headword, id=kwargs.get('pk'))
         form = HeadwordForm(instance=headword, data=request.POST)
         if form.is_valid():
             headword = form.save()
@@ -174,7 +174,7 @@ class SenseCreateView(View):
 class SenseUpdateView(View):
 
     def get(self, request, *args, **kwargs):
-        headword = get_object_or_404(Headword, headword=kwargs.get('hw'))
+        headword = get_object_or_404(Headword, pk=kwargs.get('pk'))
         sense = get_object_or_404(Sense, headword=headword, headword_sense_no=kwargs.get('sense'))
         sense_form = SenseUpdateForm(instance=sense)
         example_formset = ExampleFormset(instance=sense)
@@ -191,7 +191,7 @@ class SenseUpdateView(View):
 
     def post(self, request, *args, **kwargs):
         logger.debug('Inside Update view.')
-        headword = get_object_or_404(Headword, headword=kwargs.get('hw'))
+        headword = get_object_or_404(Headword, headword=kwargs.get('pk'))
         sense = get_object_or_404(Sense, headword=headword, headword_sense_no=kwargs.get('sense'))
         sense_form = SenseUpdateForm(instance=sense, data=request.POST)
         example_formset = ExampleFormset(instance=sense, data=request.POST)
@@ -221,7 +221,7 @@ class SenseDeleteView(DeleteView):
         return super().delete(request, *args, **kwargs)
 
     def get_object(self, queryset=None):
-        headword = get_object_or_404(Headword, headword=self.kwargs.get('hw'))
+        headword = get_object_or_404(Headword, headword=self.kwargs.get('pk'))
         return get_object_or_404(self.model, headword=headword, headword_sense_no=self.kwargs.get('sense'))
 
 

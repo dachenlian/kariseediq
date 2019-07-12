@@ -173,7 +173,7 @@ def load_extra_meaning(file='../seediq_extra_meaning_updated-20190707-sung.csv')
             headword, headword_sense_no = _split_item_name(new_entry.pop('item_name'))
             meaning = new_entry.pop('meaning')
             meaning_en = new_entry.pop('meaning_en')
-            is_root = new_entry.pop(is_root) == 'yes'
+            is_root = new_entry.pop('is_root') == 'yes'
             item_root = new_entry.pop('item_root')
             word_class = new_entry.pop('word_class').split()
 
@@ -198,7 +198,7 @@ def load_extra_meaning(file='../seediq_extra_meaning_updated-20190707-sung.csv')
                     'headword_sense_no': headword.senses.count() + 1,
                     'word_class': word_class,
                     'meaning_en': meaning_en,
-                    'item_root': item_root,
+                    'root': item_root,
                 }
             )
 

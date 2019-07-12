@@ -69,7 +69,7 @@
                                     <td rowspan="{{ headword.senses.all|length }}"
                                         class="align-middle">{{ forloop.parentloop.counter0|add:page_obj.start_index }}</td>
                                     <td style="cursor: pointer;"
-                                        onclick="window.location='{% url 'core:update_headword' hw=headword.headword %}';"
+                                        onclick="window.location='{% url 'core:update_headword' pk=headword.id %}';"
                                         rowspan="{{ headword.senses.all|length }}"
                                         class="align-middle">{{ headword.headword }}</td>
                                     <td class="align-middle" rowspan="{{ headword.senses.all|length }}">
@@ -82,7 +82,7 @@
                                 {#                                class="align-middle">{{ headword.headword }}</td>#}
                                 <td style="cursor: pointer;"
                                     onclick="window.location=
-                                            '{% url 'core:update_sense' hw=headword.headword sense=sense.headword_sense_no %}';"
+                                            '{% url 'core:update_sense' pk=headword.headword sense=sense.headword_sense_no %}';"
                                     class="align-middle">
                                     {% if headword.senses.all|length_is:"1" %}{{ sense.meaning }}{% else %}(
                                         {{ forloop.counter }}) {{ sense.meaning }}{% endif %}
@@ -94,7 +94,7 @@
                                     <button style="padding: 0;" type="button" class="btn btn-primary align-middle"
                                             data-toggle="modal"
                                             data-target="#deleteModal"
-                                            data-hw="{{ headword.headword }}"
+                                            data-pk="{{ headword.id }}"
                                             data-sense="{{ sense.headword_sense_no }}"
                                             data-deltext="{{ headword }}: {{ sense.meaning }}"
                                     ><i class="material-icons align-middle">delete</i>
@@ -167,9 +167,9 @@
     <script>
         $('#deleteModal').on('show.bs.modal', function (event) {
             let button = $(event.relatedTarget);
-            let hw = button.data('hw');
+            let hw = button.data('pk');
             let sense = button.data('sense');
-            let url = "{% url 'core:delete' hw=1 sense=2 %}".replace(1, `${hw}`).replace(2, `${sense}`);
+            let url = "{% url 'core:delete' pk=1 sense=2 %}".replace(1, `${hw}`).replace(2, `${sense}`);
             let modal = $(this);
             let delText = button.data('deltext');
             let form = modal.find('form');
