@@ -106,6 +106,7 @@ class HeadwordUpdateView(View):
         form = HeadwordForm(instance=headword, data=request.POST)
         if form.is_valid():
             headword = form.save()
+            print(type(headword), headword)
             messages.success(request, self.success_message)
             return redirect(headword)
         else:
@@ -191,7 +192,7 @@ class SenseUpdateView(View):
 
     def post(self, request, *args, **kwargs):
         logger.debug('Inside Update view.')
-        headword = get_object_or_404(Headword, headword=kwargs.get('pk'))
+        headword = get_object_or_404(Headword, id=kwargs.get('pk'))
         sense = get_object_or_404(Sense, headword=headword, headword_sense_no=kwargs.get('sense'))
         sense_form = SenseUpdateForm(instance=sense, data=request.POST)
         example_formset = ExampleFormset(instance=sense, data=request.POST)

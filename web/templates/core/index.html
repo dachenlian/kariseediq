@@ -82,7 +82,7 @@
                                 {#                                class="align-middle">{{ headword.headword }}</td>#}
                                 <td style="cursor: pointer;"
                                     onclick="window.location=
-                                            '{% url 'core:update_sense' pk=headword.headword sense=sense.headword_sense_no %}';"
+                                            '{% url 'core:update_sense' pk=headword.id sense=sense.headword_sense_no %}';"
                                     class="align-middle">
                                     {% if headword.senses.all|length_is:"1" %}{{ sense.meaning }}{% else %}(
                                         {{ forloop.counter }}) {{ sense.meaning }}{% endif %}

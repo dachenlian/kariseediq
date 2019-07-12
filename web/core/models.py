@@ -19,7 +19,7 @@ class Headword(models.Model):
         return self.headword
 
     def get_absolute_url(self):
-        return reverse('core:update_headword', kwargs={'hw': self.headword})
+        return reverse('core:update_headword', kwargs={'pk': self.id})
 
     class Meta:
         unique_together = ('headword', 'is_root')
@@ -140,7 +140,7 @@ class Sense(models.Model):
         return f"{self.headword.headword} ({self.headword_sense_no}): {self.meaning}"
 
     def get_absolute_url(self):
-        return reverse('core:update_sense', kwargs={'hw': self.headword.headword, 'sense': self.headword_sense_no})
+        return reverse('core:update_sense', kwargs={'pk': self.headword.id, 'sense': self.headword_sense_no})
 
 
 class Example(models.Model):
