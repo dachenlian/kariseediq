@@ -23,10 +23,11 @@ def _add_variant(words: GeneratorType) -> list:
     variant_dict = _build_variant_dict()
 
     for word in words:
-        v = variant_dict.get(word)
-        if v:
-            vs = f"({', '.join(v)})"
-            new_words.append(f"{word} {vs}")
+        vs = variant_dict.get(word)
+        if vs:
+            new_words.append(word)
+            for v in vs:
+                new_words.extend(['(', v, ')'])
         else:
             new_words.append(word)
     return new_words
