@@ -12,7 +12,8 @@ class KwicView(View):
         if query:
             width = int(request.GET.get('width'))
             text = build_kwic()
-            conc_list = text.concordance_list(query, width=width)
+            conc_list = text.concordance_list(query, width=width, lines=999999)  # show all lines
+            print(len(conc_list))
             context = {
                 'conc_list': conc_list,
             }
