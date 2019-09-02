@@ -55,6 +55,8 @@ class SenseForm(ModelForm):
             'meaning': 'Meaning (Chinese)',
             'meaning_en': 'Meaning (English)',
             'word_root': 'Word root',
+            'truku': 'Truku headword',
+            'toda': 'Toda headword'
         }
         widgets = {
             'headword': forms.widgets.TextInput(attrs={'class': 'basicAutoComplete', 'autocomplete': 'off'}),
