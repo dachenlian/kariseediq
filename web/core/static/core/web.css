@@ -38,3 +38,8 @@ th a {
 .bootstrap-select .filter-option, .filter-option-inner, .filter-option-inner-inner {
     color: black;
 }
+
+.headword {
+    color: #603F83FF;
+    font-weight: bold;
+}
