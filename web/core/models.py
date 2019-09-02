@@ -135,6 +135,7 @@ class Sense(models.Model):
 
     class Meta:
         unique_together = ('headword', 'headword_sense_no')
+        ordering = ['headword_sense_no']
 
     def __str__(self):
         return f"{self.headword.headword} ({self.headword_sense_no}): {self.meaning}"
