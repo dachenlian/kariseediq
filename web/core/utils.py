@@ -88,7 +88,7 @@ def only_letters(string):
     return "".join(char for char in string if char.isalpha() or char == ' ')
 
 
-def load_items(file="../seediq_items_updated-20190707-sung.csv"):
+def load_items(file="../seediq_items_updated-20190726-sung.csv"):
     start = time.time()
 
     with open(file) as fp:
@@ -163,7 +163,7 @@ def load_items(file="../seediq_items_updated-20190707-sung.csv"):
     logger.debug(f'Completed in {datetime.timedelta(seconds=end - start)}.')
 
 
-def load_extra_meaning(file='../seediq_extra_meaning_updated-20190707-sung.csv'):
+def load_extra_meaning(file='../seediq_extra_meaning_updated-20190726-sung.csv'):
     with open(file) as fp:
         reader = csv.reader(fp)
         header = next(reader)
