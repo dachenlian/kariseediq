@@ -1,3 +1,5 @@
+from pathlib import Path
+import pickle
 import re
 import string
 from types import GeneratorType
@@ -7,6 +9,8 @@ from nltk.text import Text
 
 from core.models import Headword, Example
 from freqdist.models import TextFile
+
+KWIC_PATH = Path(__file__).parent / 'static/kwic/kwic.pkl'
 
 
 def _build_variant_dict() -> dict:
@@ -33,7 +37,7 @@ def _add_variant(words: GeneratorType) -> list:
     return new_words
 
 
-def build_kwic(include_examples=False):
+def build_kwic(query, width, include_examples=False):
     pat_one = r"(\w+)([{}])".format(string.punctuation)  # add space between char and punctuation
     pat_two = r"([{}])(\w+)".format(string.punctuation)  # add space between punctuation and char
 
@@ -44,5 +48,12 @@ def build_kwic(include_examples=False):
     texts = re.sub(pat_two, r'\1 \2', texts)
     word_gen = (word for word in texts.split())
     words = _add_variant(word_gen)
-    return Text(words)
-
+    text = Text(words)
+    conc_list = text.concordance_list(query, width=width, lines=9999999)  # show all lines
+    with KWIC_PATH.open('wb') as f:
+        d = {
+            'query': query,
+            'conc_list': conc_list
+        }
+        pickle.dump(d, f)
+    return conc_list

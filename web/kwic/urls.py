@@ -6,4 +6,5 @@ app_name = 'kwic'
 
 urlpatterns = [
     path('', views.KwicView.as_view(), name='index'),
+    path('export/', views.export_results_to_csv, name='export'),
 ]
