@@ -23,6 +23,10 @@ class Headword(models.Model):
 
     class Meta:
         unique_together = ('headword', 'is_root')
+        indexes = [
+            models.Index(fields=['headword']),
+            models.Index(fields=['variant'])
+        ]
 
 
 class Sense(models.Model):
