@@ -30,7 +30,7 @@ def _add_tag(entry: dict, user: str, tag: str) -> list:
 def _clean_entry(entry: dict) -> dict:
     headword, headword_sense_no = _split_item_name(entry.pop('item_name'))
     root, root_sense_no = _split_item_name(entry.pop('item_root'))
-    char_strokes_first, char_strokes_all = _get_char_strokes(entry['meaning'])
+    char_strokes_first, char_strokes_all = get_char_strokes(entry['meaning'])
 
     entry['char_strokes_first'] = char_strokes_first
     entry['char_strokes_all'] = char_strokes_all
@@ -83,7 +83,7 @@ def _split_item_name(s):
     return headword, sense
 
 
-def _get_char_strokes(s) -> Tuple[str, str]:
+def get_char_strokes(s: str) -> Tuple[str, str]:
     all_char_strokes = []
     for char in s:
         query = C.unihan.lookup_char(char)
@@ -196,7 +196,7 @@ def load_extra_meaning(file='../seediq_extra_meaning_updated-20190726-sung.csv')
             new_entry = dict(zip(header, row))
             headword, headword_sense_no = _split_item_name(new_entry.pop('item_name'))
             meaning = new_entry.pop('meaning')
-            char_strokes_first, char_strokes_all = _get_char_strokes(meaning)
+            char_strokes_first, char_strokes_all = get_char_strokes(meaning)
             meaning_en = new_entry.pop('meaning_en')
             is_root = new_entry.pop('is_root') == 'yes'
             item_root = new_entry.pop('item_root')

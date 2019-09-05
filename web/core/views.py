@@ -200,7 +200,12 @@ class SenseUpdateView(View):
 
         if sense_form.is_valid() and example_formset.is_valid() and phrase_formset.is_valid():
             logger.debug(sense_form.cleaned_data)
-            sense = sense_form.save()
+            sense = sense_form.save(commit=False)
+            meaning = sense_form.cleaned_data.get('meaning')
+            char_strokes_first, char_strokes_all = utils.get_char_strokes(meaning)
+            sense.char_strokes_all = char_strokes_all
+            sense.char_strokes_first = char_strokes_first
+            sense.save()
             example_formset.save()
             phrase_formset.save()
             messages.success(request, "Sense updated!")
