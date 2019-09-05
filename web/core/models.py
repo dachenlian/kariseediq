@@ -121,8 +121,13 @@ class Sense(models.Model):
     focus = ArrayField(models.CharField(max_length=255, blank=True, choices=[(f.value, f.value) for f in FocusChoices]),
                        default=list,
                        blank=True)
-    char_strokes_first = models.CharField(max_length=255, blank=True, default="")  # no. of strokes for char of meaning
-    char_strokes_all = models.CharField(max_length=255, blank=True, default="")  # no. of strokes for all chars
+    char_strokes_first = ArrayField(models.CharField(max_length=255, blank=True),
+                                    default=list,
+                                    blank=True)
+    char_strokes_all = ArrayField(ArrayField(models.CharField(max_length=255, blank=True)),
+                                  blank=True,
+                                  default=list)
+    # char_strokes_all = models.CharField(max_length=255, blank=True, default="")  # no. of strokes for all chars
     frequency = models.IntegerField(blank=True, default=0)
     picture = models.ImageField(upload_to='pictures/', blank=True)
     sound = models.FileField(upload_to='sound/', blank=True)

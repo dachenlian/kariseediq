@@ -20,6 +20,7 @@ python-dotenv = "*"
 cihai = "*"
 psycopg2 = "*"
 nltk = "*"
+"psycopg2-binary" = "*"
 
 [dev-packages]
 

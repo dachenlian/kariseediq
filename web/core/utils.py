@@ -5,6 +5,7 @@ import logging
 import time
 from typing import List
 
+from cihai.core import Cihai
 from django.http.request import HttpRequest
 from django.forms.models import model_to_dict
 from django.db import IntegrityError
@@ -13,6 +14,10 @@ from .forms import SenseForm
 from .models import Headword, Sense, Phrase, Example
 
 logger = logging.getLogger(__name__)
+
+C = Cihai()
+if not C.unihan.is_bootstrapped:
+    C.unihan.bootstrap()
 
 
 def _add_tag(entry: dict, user: str, tag: str) -> list:
@@ -73,6 +78,18 @@ def _split_item_name(s):
         headword = s.strip()
         sense = 1
     return headword, sense
+
+
+def _get_char_strokes(s):
+    all_char_strokes = []
+    for char in s:
+        query = C.unihan.lookup_char(char)
+        if query:
+            glyph = query.first()
+            strokes = glyph.kTotalStrokes
+            all_char_strokes.append([char, strokes])
+    first_char_stroke = all_char_strokes[0]
+    return first_char_stroke, all_char_strokes
 
 
 def build_autocomplete_response(qs: List[Headword]) -> List[str]:
