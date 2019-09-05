@@ -1,4 +1,5 @@
 import logging
+import re
 
 from django import forms
 from django.utils.encoding import force_text
@@ -31,7 +32,12 @@ class HeadwordForm(ModelForm):
 
     def clean_variant(self):
         data = self.cleaned_data['variant']
-        print("Inside clean variant!")
+        if not data:
+            return list()
+        if ',' in str(data):
+            return data
+        data = re.split(r'[,;]', "".join(data))
+        data = [s.strip() for s in data]
         return data
 
 
