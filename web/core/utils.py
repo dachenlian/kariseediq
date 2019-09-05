@@ -3,7 +3,7 @@ import datetime
 import re
 import logging
 import time
-from typing import List
+from typing import List, Tuple
 
 from cihai.core import Cihai
 from django.http.request import HttpRequest
@@ -30,7 +30,10 @@ def _add_tag(entry: dict, user: str, tag: str) -> list:
 def _clean_entry(entry: dict) -> dict:
     headword, headword_sense_no = _split_item_name(entry.pop('item_name'))
     root, root_sense_no = _split_item_name(entry.pop('item_root'))
+    char_strokes_first, char_strokes_all = _get_char_strokes(entry['meaning'])
 
+    entry['char_strokes_first'] = char_strokes_first
+    entry['char_strokes_all'] = char_strokes_all
     entry['only_letters'] = only_letters(headword)
     entry['headword'] = headword
     entry['headword_sense_no'] = headword_sense_no
@@ -80,15 +83,18 @@ def _split_item_name(s):
     return headword, sense
 
 
-def _get_char_strokes(s):
+def _get_char_strokes(s) -> Tuple[str, str]:
     all_char_strokes = []
     for char in s:
         query = C.unihan.lookup_char(char)
-        if query:
-            glyph = query.first()
+        glyph = query.first()
+        if glyph:
             strokes = glyph.kTotalStrokes
-            all_char_strokes.append([char, strokes])
+            all_char_strokes.append(f"{char}/{strokes}")
+    if not all_char_strokes:
+        return "", ""
     first_char_stroke = all_char_strokes[0]
+    all_char_strokes = ",".join(all_char_strokes)
     return first_char_stroke, all_char_strokes
 
 
@@ -190,6 +196,7 @@ def load_extra_meaning(file='../seediq_extra_meaning_updated-20190726-sung.csv')
             new_entry = dict(zip(header, row))
             headword, headword_sense_no = _split_item_name(new_entry.pop('item_name'))
             meaning = new_entry.pop('meaning')
+            char_strokes_first, char_strokes_all = _get_char_strokes(meaning)
             meaning_en = new_entry.pop('meaning_en')
             is_root = new_entry.pop('is_root') == 'yes'
             item_root = new_entry.pop('item_root')
@@ -214,6 +221,8 @@ def load_extra_meaning(file='../seediq_extra_meaning_updated-20190726-sung.csv')
                 meaning=meaning,
                 defaults={
                     'headword_sense_no': headword.senses.count() + 1,
+                    'char_strokes_first': char_strokes_first,
+                    'char_strokes_all': char_strokes_all,
                     'word_class': word_class,
                     'meaning_en': meaning_en,
                     'root': item_root,
