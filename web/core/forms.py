@@ -7,6 +7,7 @@ from django.forms import ModelForm, inlineformset_factory
 from django.forms.widgets import SelectMultiple
 
 from .models import Headword, Sense, Phrase, Example
+from core.utils import _get_char_strokes
 
 logger = logging.getLogger(__name__)
 
@@ -95,24 +96,13 @@ class SenseUpdateForm(SenseForm):
         fields = SenseForm.Meta.fields + ('headword_sense_no',)
         # exclude = ('headword', )
 
-    # def clean_word_class(self):
-    #     print('=' * 40)
-    #     print("Inside clean word class!")
-    #     data = self.cleaned_data['word_class']
-    #     print(data)
-    #     return data
-    #
-    # def clean_focus(self):
-    #     print("Inside clean focus!!!")
-    #     data = self.cleaned_data['focus']
-    #     print(data)
-    #     return data
-    #
-    # def clean_tag(self):
-    #     print("Inside clean tag!!!")
-    #     data = self.cleaned_data['tag']
-    #     print(data)
-    #     return data
+    def clean(self):
+        cleaned_data = super().clean()
+        meaning = cleaned_data.get('meaning')
+        char_strokes_first, char_strokes_all = _get_char_strokes(meaning)
+        cleaned_data['char_strokes_first'] = char_strokes_first
+        cleaned_data['char_strokes_all'] = char_strokes_all
+        return cleaned_data
 
 
 class ExampleForm(ModelForm):
