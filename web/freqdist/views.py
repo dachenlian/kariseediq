@@ -70,7 +70,6 @@ class TextAllDeleteView(View):
 
 
 class FreqResultsView(View):
-
     def get(self, request, *args, **kwargs):
         recalculate = request.GET.get('recalculate')
         include_examples = request.GET.get('includeExamples') == 'True'
