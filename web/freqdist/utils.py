@@ -27,6 +27,7 @@ def _split_by_sent_boundary(text):
 
 
 def build_item_root_freq(include_examples: bool) -> dict:
+
     word_freq = Counter()
     root_freq = Counter()
 
@@ -36,6 +37,7 @@ def build_item_root_freq(include_examples: bool) -> dict:
 
     files = TextFile.objects.all()
 
+    # Get text from uploaded files
     for file in files:
         text = file.read_and_decode()
 
@@ -54,35 +56,38 @@ def build_item_root_freq(include_examples: bool) -> dict:
             text = PUNCTUATION_RE.sub('', text).lower().split()
             word_freq.update(text)
 
-    print("Completed word_freq...")
-    print(len(word_freq))
+    senses = Sense.objects.all().select_related('headword').values(
+        'root',
+        'focus',
+        'word_class',
+        'headword__headword',
+        'headword__variant',
+    )
 
     for idx, (word, freq) in enumerate(word_freq.items()):
-        query = Headword.objects.filter(Q(headword=word) |
-                                        Q(variant__contains=[word])).prefetch_related('senses')
-        if not query:
-            continue
-        else:
-            query = query[0]
-        sense = query.senses.all()[0]
-        root = sense.root
-        focus = sense.focus
-        word_class = sense.word_class
-        variant = query.variant
-        if root:
-            root_freq[root] += freq
+        for sense in senses:
+            hw = sense.get('headword__headword')
+            variant = sense.get('headword__variant')
+            if word == hw or word in variant:
+                query = sense
+                root = query.get('root')
+                focus = query.get('focus')
+                word_class = query.get('word_class')
+                if root:
+                    root_freq[root] += freq
 
-        word_details.append({
-            'item_name': word,
-            'item_freq': freq,
-            'root': root,
-            'root_freq': None,
-            'focus': focus,
-            'word_class': word_class,
-            'variant': variant,
-        })
+                word_details.append({
+                    'item_name': word,
+                    'item_freq': freq,
+                    'root': root,
+                    'root_freq': None,
+                    'focus': focus,
+                    'word_class': word_class,
+                    'variant': variant,
+                })
         if idx % 500 == 0:
             print(f"Completed {idx} of {len(word_freq)}")
+
     for word in word_details:
         word['root_freq'] = root_freq.get(word['root'])
 
@@ -92,223 +97,4 @@ def build_item_root_freq(include_examples: bool) -> dict:
         'sent_num': sent_num,
         'include_examples': include_examples,
     }
-    return results
-
-
-def build_item_root_freq_v2(include_examples: bool) -> dict:
-    word_freq = Counter()
-    root_freq = Counter()
-
-    word_details = []
-
-    sent_num, word_num = 0, 0
-
-    files = TextFile.objects.all()
-
-    for file in files:
-        text = file.read_and_decode()
-
-        sent_num += len(_split_by_sent_boundary(text))
-        word_num += len(_split_by_word_boundary(text))
-
-        text = PUNCTUATION_RE.sub('', text).lower().split()
-        word_freq.update(text)
-
-    if include_examples:
-        examples = Example.objects.all().values_list('sentence', flat=True)
-        for text in examples:
-            sent_num += len(_split_by_sent_boundary(text))
-            word_num += len(_split_by_word_boundary(text))
-
-            text = PUNCTUATION_RE.sub('', text).lower().split()
-            word_freq.update(text)
-
-    print("Completed word_freq...")
-    print(len(word_freq))
-
-    senses = Sense.objects.all().select_related('headword')
-
-    for idx, (word, freq) in enumerate(word_freq.items()):
-        query = senses.filter(Q(headword__headword=word) |
-                              Q(headword__variant__contains=[word]))
-        if not query:
-            continue
-        else:
-            sense = query[0]
-        root = sense.root
-        focus = sense.focus
-        word_class = sense.word_class
-        variant = sense.headword.variant
-        if root:
-            root_freq[root] += freq
-
-        if idx % 500 == 0:
-            print(f"Completed {idx} of {len(word_freq)}")
-
-        word_details.append({
-            'item_name': word,
-            'item_freq': freq,
-            'root': root,
-            'root_freq': None,
-            'focus': focus,
-            'word_class': word_class,
-            'variant': variant,
-        })
-    for word in word_details:
-        word['root_freq'] = root_freq.get(word['root'])
-
-    results = {
-        'word_details': word_details,
-        'word_num': word_num,
-        'sent_num': sent_num,
-        'include_examples': include_examples,
-    }
-    return results
-
-
-def get_word_details(q, freq, manager_dict=None):
-    print(q, freq)
-    # q, freq = word_freq_tup
-    query = Headword.objects.filter(Q(headword=q) | Q(variant__contains=[q])).prefetch_related('senses')
-    if not query:
-        return
-    else:
-        query = query[0]
-    sense = query.senses.all()[0]
-    root = sense.root
-    focus = sense.focus
-    word_class = sense.word_class
-    variant = query.variant
-
-    if manager_dict:
-        if root:
-            manager_dict[q] += manager_dict.get(q, 0) + freq
-
-    details = {
-        'sense': sense,
-        'root': root,
-        'root_freq': None,
-        'focus': focus,
-        'word_class': word_class,
-        'variant': variant
-    }
-
-    return details
-
-
-def build_word_details_multiproc(word_freq):
-    # root_freq = Manager().dict()
-    with Pool(processes=int(cpu_count() * .75)) as pool:
-        # get_word_details_partial = functools.partial(get_word_details, manager_dict=root_freq)
-        # results = pool.starmap(get_word_details_partial, word_freq.items())
-        # word_freq = [('usa', 1), ('lmamu', 46), ('iya', 151)] * 1000
-        word_freq = list(word_freq.items())
-        results = pool.starmap(get_word_details, word_freq)
-
-    return results
-    # for r in results:
-    #     r['root_freq'] = root_freq.get(r['root'])
-    # return results, root_freq
-
-
-def build_item_root_freq_multiproc(include_examples: bool) -> dict:
-    word_freq = Counter()
-
-    sent_num, word_num = 0, 0
-
-    files = TextFile.objects.all()
-
-    for file in files:
-        text = file.read_and_decode()
-
-        sent_num += len(_split_by_sent_boundary(text))
-        word_num += len(_split_by_word_boundary(text))
-
-        text = PUNCTUATION_RE.sub('', text).lower().split()
-        word_freq.update(text)
-
-    if include_examples:
-        examples = Example.objects.all().values_list('sentence', flat=True)
-        for text in examples:
-            sent_num += len(_split_by_sent_boundary(text))
-            word_num += len(_split_by_word_boundary(text))
-
-            text = PUNCTUATION_RE.sub('', text).lower().split()
-            word_freq.update(text)
-
-    print("Completed word_freq...")
-    print(len(word_freq))
-    word_details, root_freq = build_word_details_multiproc(word_freq)
-
-    results = {
-        'word_details': word_details,
-        'word_num': word_num,
-        'sent_num': sent_num,
-        'include_examples': include_examples,
-    }
-    return results
-
-
-def test_build_item_root_freq_multiproc(include_examples: bool) -> dict:
-    word_freq = Counter()
-
-    sent_num, word_num = 0, 0
-
-    files = TextFile.objects.all()
-
-    for file in files:
-        text = file.read_and_decode()
-
-        sent_num += len(_split_by_sent_boundary(text))
-        word_num += len(_split_by_word_boundary(text))
-
-        text = PUNCTUATION_RE.sub('', text).lower().split()
-        word_freq.update(text)
-
-    if include_examples:
-        examples = Example.objects.all().values_list('sentence', flat=True)
-        for text in examples:
-            sent_num += len(_split_by_sent_boundary(text))
-            word_num += len(_split_by_word_boundary(text))
-
-            text = PUNCTUATION_RE.sub('', text).lower().split()
-            word_freq.update(text)
-
-    print("Completed word_freq...")
-    print(len(word_freq))
-    return word_freq
-
-
-def get_word_details_test(q, freq):
-    # q, freq = word_freq_tup
-    query = Headword.objects.filter(Q(headword=q) | Q(variant__contains=[q])).prefetch_related('senses')
-    if not query:
-        return
-    else:
-        query = query[0]
-    sense = query.senses.all()[0]
-    root = sense.root
-    focus = sense.focus
-    word_class = sense.word_class
-    variant = query.variant
-
-    details = {
-        'sense': sense,
-        'root': root,
-        'root_freq': None,
-        'focus': focus,
-        'word_class': word_class,
-        'variant': variant
-    }
-
-    return details
-
-
-def test_multiproc():
-    queries = list(dict(test_build_item_root_freq_multiproc(False)).items())
-    print(type(queries))
-    print(type(queries[0]))
-
-    with Pool(processes=int(cpu_count() * .75)) as pool:
-        results = pool.starmap(get_word_details_test, queries)
     return results
