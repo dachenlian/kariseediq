@@ -6,7 +6,7 @@ from collections import Counter
 from django.db.models import Q
 
 from .models import TextFile
-from core.models import Headword, Example
+from core.models import Headword, Example, Sense
 
 sent_boundary = ['.', '。', '!', '！', '?', '？', ';', '；']
 SENT_BOUNDARY_RE = re.compile(rf'[{"".join(sent_boundary)}]')
@@ -83,6 +83,77 @@ def build_item_root_freq(include_examples: bool) -> dict:
         })
         if idx % 500 == 0:
             print(f"Completed {idx} of {len(word_freq)}")
+    for word in word_details:
+        word['root_freq'] = root_freq.get(word['root'])
+
+    results = {
+        'word_details': word_details,
+        'word_num': word_num,
+        'sent_num': sent_num,
+        'include_examples': include_examples,
+    }
+    return results
+
+
+def build_item_root_freq_v2(include_examples: bool) -> dict:
+    word_freq = Counter()
+    root_freq = Counter()
+
+    word_details = []
+
+    sent_num, word_num = 0, 0
+
+    files = TextFile.objects.all()
+
+    for file in files:
+        text = file.read_and_decode()
+
+        sent_num += len(_split_by_sent_boundary(text))
+        word_num += len(_split_by_word_boundary(text))
+
+        text = PUNCTUATION_RE.sub('', text).lower().split()
+        word_freq.update(text)
+
+    if include_examples:
+        examples = Example.objects.all().values_list('sentence', flat=True)
+        for text in examples:
+            sent_num += len(_split_by_sent_boundary(text))
+            word_num += len(_split_by_word_boundary(text))
+
+            text = PUNCTUATION_RE.sub('', text).lower().split()
+            word_freq.update(text)
+
+    print("Completed word_freq...")
+    print(len(word_freq))
+
+    senses = Sense.objects.all().select_related('headword')
+
+    for idx, (word, freq) in enumerate(word_freq.items()):
+        query = senses.filter(Q(headword__headword=word) |
+                              Q(headword__variant__contains=[word]))
+        if not query:
+            continue
+        else:
+            sense = query[0]
+        root = sense.root
+        focus = sense.focus
+        word_class = sense.word_class
+        variant = sense.headword.variant
+        if root:
+            root_freq[root] += freq
+
+        if idx % 500 == 0:
+            print(f"Completed {idx} of {len(word_freq)}")
+
+        word_details.append({
+            'item_name': word,
+            'item_freq': freq,
+            'root': root,
+            'root_freq': None,
+            'focus': focus,
+            'word_class': word_class,
+            'variant': variant,
+        })
     for word in word_details:
         word['root_freq'] = root_freq.get(word['root'])
 
