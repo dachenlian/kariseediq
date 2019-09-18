@@ -21,7 +21,9 @@
     <link rel="stylesheet" type="text/css" href="{% static 'core/web.css' %}">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-typeahead/2.10.6/jquery.typeahead.css">
-
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/open-iconic/1.1.1/font/css/open-iconic-bootstrap.min.css"
+          rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/octicons/8.5.0/build.css">
     <title>KariSeediq</title>
     {% block header %}
     {% endblock header %}
@@ -43,7 +45,8 @@
                     Pending <span id="pendingBadge" class="badge badge-secondary align-middle"></span></a>
             </li>
             <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
+                   aria-haspopup="true" aria-expanded="false">
                     FreqDist</a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                     <a href="{% url 'freq:upload' %}" class="dropdown-item">Upload</a>

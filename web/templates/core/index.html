@@ -51,12 +51,31 @@
                     <thead class="thead-dark">
                     <tr class="align-middle text-center">
                         <th class="align-middle">#</th>
-                        <th class="align-middle">詞項</th>
-                        <th class="align-middle">變體</th>
-                        <th class="align-middle">詞義</th>
-                        <th class="align-middle">詞根</th>
-                        <th class="align-middle"><a href="?order_by=uploader">輸入者</a></th>
-                        <th class="align-middle"><a href="?order_by=date">更新時間</a></th>
+                        <th class="align-middle">詞項
+                            <a href="?order-by=headword&dir=asc"><span class="oi oi-arrow-top"></span></a>
+                            <a href="?order-by=headword&dir=desc"><span class="oi oi-arrow-bottom"></span></a>
+                        </th>
+                        <th class="align-middle">變體
+                            <a href="?order-by=variant&dir=asc"><span class="oi oi-arrow-top"></span></a>
+                            <a href="?order-by=variant&dir=desc"><span class="oi oi-arrow-bottom"></span></a>
+                        </th>
+                        <th class="align-middle">詞義
+                            <a href="?order-by=meaning&dir=asc"><span class="oi oi-arrow-top"></span></a>
+                            <a href="?order-by=meaning&dir=desc"><span class="oi oi-arrow-bottom"></span></a>
+                        </th>
+                        <th class="align-middle">詞根
+                            <a href="?order-by=root&dir=asc"><span class="oi oi-arrow-top"></span></a>
+                            <a href="?order-by=root&dir=desc"><span class="oi oi-arrow-bottom"></span></a>
+                        </th>
+                        <th class="align-middle">輸入者
+                            <a href="?order-by=user&dir=asc"><span class="oi oi-arrow-top"></span></a>
+                            <a href="?order-by=user&dir=desc"><span class="oi oi-arrow-bottom"></span></a>
+
+                        </th>
+                        <th class="align-middle">更新時間
+                            <a href="?order-by=created_date&dir=asc"><span class="oi oi-arrow-top"></span></a>
+                            <a href="?order-by=created_date&dir=desc"><span class="oi oi-arrow-bottom"></span></a>
+                        </th>
                         <th class="align-middle">刪除</th>
                     </tr>
                     </thead>
@@ -67,15 +86,16 @@
                             <tr class="text-center">
                                 {% if forloop.first %}
                                     <td rowspan="{{ headword.senses.all|length }}"
-                                        class="align-middle">{{ forloop.parentloop.counter0|add:page_obj.start_index }}</td>
+                                        class="align-middle">
+                                        {{ forloop.parentloop.counter0|add:page_obj.start_index }}</td>
                                     <td style="cursor: pointer;"
                                         onclick="window.location='{% url 'core:update_headword' pk=headword.id %}';"
                                         rowspan="{{ headword.senses.all|length }}"
                                         class="align-middle">{{ headword.headword }}</td>
                                     <td class="align-middle" rowspan="{{ headword.senses.all|length }}">
-                                    {% for v in headword.variant %}
-                                    {{ v }}<br>
-                                    {% endfor %}
+                                        {% for v in headword.variant %}
+                                            {{ v }}<br>
+                                        {% endfor %}
                                     </td>
                                 {% endif %}
                                 {#                            <td style="cursor: pointer" onclick="window.location='{% url 'core:update' pk=headword.id %}';"#}
@@ -84,7 +104,8 @@
                                     onclick="window.location=
                                             '{% url 'core:update_sense' pk=headword.id sense=sense.headword_sense_no %}';"
                                     class="align-middle">
-                                    {% if headword.senses.all|length_is:"1" %}{{ sense.meaning }}{% else %}({{ forloop.counter }}) {{ sense.meaning }}{% endif %}
+                                    {% if headword.senses.all|length_is:"1" %}{{ sense.meaning }}{% else %}(
+                                        {{ forloop.counter }}) {{ sense.meaning }}{% endif %}
                                 </td>
                                 <td class="align-middle">{{ sense.root }}</td>
                                 <td class="align-middle">{{ sense.user }}</td>
@@ -101,7 +122,7 @@
                                 </td>
                             </tr>
                         {% endfor %}
-                    {% empty %}
+                        {% empty %}
                         <tr>
                             <td colspan="7">No search results match the query.</td>
                         </tr>

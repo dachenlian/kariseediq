@@ -9,6 +9,7 @@ from cihai.core import Cihai
 from django.http.request import HttpRequest
 from django.forms.models import model_to_dict
 from django.db import IntegrityError
+from django.db.models.query import QuerySet
 
 from .forms import SenseForm
 from .models import Headword, Sense, Phrase, Example
@@ -285,6 +286,9 @@ def gen_query_history(request: HttpRequest):
     search_filter = request.GET.get('search_filter', "")
     search_root = request.session.get('search_root', '')
 
+    if not any([search_name, search_filter, search_root]):  # just ordering results
+        return request
+
     query_str = f"({qs_length} hits) " \
         f"<strong>Item</strong>: {search_name} | " \
         f"<strong>Filter</strong>: {search_filter} | " \
@@ -296,8 +300,27 @@ def gen_query_history(request: HttpRequest):
     }
     history_list.append(query_dict)
     request.session['history_list'] = history_list
-    logger.debug(history_list)
     return request
+
+
+def sort_queryset(qs: QuerySet, request: HttpRequest):
+    sense_fields = [f.name for f in Sense._meta.get_fields() if not f.remote_field]
+    order_by = request.GET.get('order-by')
+    direction = request.GET.get('dir')
+
+    if not order_by:
+        return qs
+
+    if order_by in sense_fields:
+        order_by = f'senses__{order_by}'
+
+    if direction == 'desc':
+        order_by = f'-{order_by}'
+
+    qs = qs.order_by(order_by)
+    return qs
+
+
 
 
 def get_related(qs: List[Headword]) -> List[dict]:

@@ -28,10 +28,8 @@ class IndexListView(ListView):
     template_name = 'core/index.html'
 
     def get_queryset(self):
-        # return Headword.objects.prefetch_related('senses').filter(senses__gt=1)
-        # return Headword.objects.prefetch_related('senses').annotate(senses_count=Count('senses'))\
-        #     .filter(senses_count__gt=1)
-        return Headword.objects.order_by('only_letters').prefetch_related('senses')
+        qs = Headword.objects.order_by('only_letters').prefetch_related('senses')
+        return utils.sort_queryset(qs, self.request)
 
 
 class SearchResultsListView(ListView):
@@ -77,7 +75,7 @@ class SearchResultsListView(ListView):
                            Q(senses__meaning__iendswith=search_name) |
                            Q(variant__iendswith=search_name)
                            )
-        else:
+        elif search_filter == 'contains':
             qs = qs.filter(Q(headword__icontains=search_name) |
                            Q(senses__meaning__icontains=search_name) |
                            Q(variant__icontains=search_name)
@@ -86,6 +84,7 @@ class SearchResultsListView(ListView):
         qs = qs.order_by('only_letters').distinct()
 
         self.request.session['queryset'] = qs
+        qs = utils.sort_queryset(qs, self.request)
         utils.gen_query_history(self.request)
 
         return qs
@@ -247,11 +246,12 @@ class PendingListView(ListView):
 
     def get_queryset(self):
         roots = Sense.objects.all().distinct().values('root')
-        headwords = Headword.objects.filter(is_root=True).values_list('headword', flat=True).distinct()
-        roots_without_entries = roots.difference(headwords).values_list('headword', flat=True)
-        roots_without_entries = sorted(filter(bool, roots_without_entries))
-        roots_without_entries = Sense.objects.filter(root__in=roots_without_entries).order_by('root')
-        return roots_without_entries
+        return roots
+        # headwords = Headword.objects.filter(is_root=True).values_list('headword', flat=True).distinct()
+        # roots_without_entries = roots.difference(headwords).values_list('headword', flat=True)
+        # roots_without_entries = sorted(filter(bool, roots_without_entries))
+        # roots_without_entries = Sense.objects.filter(root__in=roots_without_entries).order_by('root')
+        # return roots_without_entries
 
 
 class RootAutoComplete(View):
