@@ -369,8 +369,19 @@ def _split_num_char(s):
 
 
 def export_zh_index():
-    senses = Sense.objects.all().values()
+    stroke_meaning_dict = {}
+    senses = Sense.objects.all().values('char_strokes_first', 'meaning', 'headword__headword')
     senses = sorted(senses, key=_split_num_char)
+    for s in senses:
+        key = s['char_strokes_first']
+        meaning = s['meaning']
+        headword = s['headword__headword']
+        d = stroke_meaning_dict.get(key, [])
+        d.append(' '.join([meaning, headword]))
+        stroke_meaning_dict[key] = d
+
+    return stroke_meaning_dict
+
     return senses
 
 
