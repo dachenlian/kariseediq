@@ -321,8 +321,6 @@ def sort_queryset(qs: QuerySet, request: HttpRequest):
     return qs
 
 
-
-
 def get_related(qs: List[Headword]) -> List[dict]:
     """
     Get data from related models, such as examples and phrases.
@@ -360,3 +358,19 @@ def get_related(qs: List[Headword]) -> List[dict]:
 
             results.append(sense)
     return results
+
+
+def _split_num_char(s):
+    s = s.get('char_strokes_first')
+    if not s:
+        return 0
+    char, num = s.split('/')
+    return int(num)
+
+
+def export_zh_index():
+    senses = Sense.objects.all().values()
+    senses = sorted(senses, key=_split_num_char)
+    return senses
+
+
