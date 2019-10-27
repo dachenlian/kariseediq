@@ -51,6 +51,9 @@ def build_kwic(query: str, width: int, side: str = 'left', window: int = 2, incl
 
     files = TextFile.objects.all()
     texts = " ".join(text.read_and_decode() for text in files)
+    if include_examples:
+        examples = " ".join(Example.objects.all().values_list('sentence', flat=True))
+        texts += " " + examples
     texts = re.sub('\n', ' ', texts).strip()
     texts = re.sub(pat_one, r'\1 \2', texts)
     texts = re.sub(pat_two, r'\1 \2', texts)

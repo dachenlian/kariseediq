@@ -14,11 +14,16 @@ class KwicView(View):
 
     def get(self, request, *args, **kwargs):
         query = request.GET.get('query')
-        width = int(request.GET.get('width'))
+        width = int(request.GET.get('width', 80))
         sort_side = request.GET.get('sort-side')
-        sort_window = int(request.GET.get('sort-window'))
+        sort_window = int(request.GET.get('sort-window', 2))
+        include_examples = request.GET.get('include-examples')
         if query:
-            conc_list, conc_len = build_kwic(query, width=width, side=sort_side, window=sort_window)
+            conc_list, conc_len = build_kwic(query,
+                                             width=width,
+                                             side=sort_side,
+                                             window=sort_window,
+                                             include_examples=include_examples)
             context = {
                 'conc_list': conc_list,
                 'conc_len': conc_len,
