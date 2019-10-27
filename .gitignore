@@ -451,3 +451,4 @@ web/static
 *.csv
 .~lock*
 web/freqdist/static/freqdist/results
+**/kwic.pkl
