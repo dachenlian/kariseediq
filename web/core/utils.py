@@ -382,6 +382,4 @@ def export_zh_index():
 
     return stroke_meaning_dict
 
-    return senses
-
 
