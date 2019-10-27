@@ -18,9 +18,9 @@ whitenoise = "*"
 gunicorn = "*"
 python-dotenv = "*"
 cihai = "*"
-psycopg2 = "*"
 nltk = "*"
 "psycopg2-binary" = "*"
+pyyaml = "*"
 
 [dev-packages]
 
