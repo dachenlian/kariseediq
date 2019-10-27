@@ -19,6 +19,27 @@
                             <input class="form-control" name="width" id="width" value="100">
                         </div>
                     </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="sort-side">Sort by</label>
+                            <select name="sort-side" id="sort-side" class="custom-select">
+                                <option value="left" selected>Left</option>
+                                <option value="right">Right</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="sort-window">Window</label>
+                            <select name="sort-window" id="sort-window" class="custom-select">
+                                <option value="1">1</option>
+                                <option value="2" selected>2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
                 <div class="form-row justify-content-center">
                     <div class="form-group">
@@ -30,27 +51,37 @@
     </div>
     {% if conc_list %}
         <div class="row">
-            <a href="{% url 'kwic:export' %}" class="btn btn-primary" role="button">Export to CSV</a>
-            <table class="table table-striped">
-                <thead class="thead-dark">
-                <tr>
-                    <th>#</th>
-                    <th>Left</th>
-                    <th>Center</th>
-                    <th>Right</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for c in conc_list %}
+            <div class="col">
+                <p>Total: {{ conc_len }}</p>
+            </div>
+            <div class="col text-right">
+                <a href="{% url 'kwic:export' %}" class="btn btn-primary" role="button">Export to CSV</a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+
+                <table class="table table-striped">
+                    <thead class="thead-dark">
                     <tr>
-                        <td>{{ forloop.counter }}</td>
-                        <td>{{ c.left_print }}</td>
-                        <td>{{ c.query }}</td>
-                        <td>{{ c.right_print }}</td>
+                        <th>#</th>
+                        <th class="text-right">Left</th>
+                        <th class="text-center">Center</th>
+                        <th>Right</th>
                     </tr>
-                {% endfor %}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                    {% for c in conc_list %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td class="text-right">{{ c.left_print }}</td>
+                            <td class="text-center">{{ c.query }}</td>
+                            <td>{{ c.right_print }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     {% endif %}
 

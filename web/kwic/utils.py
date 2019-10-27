@@ -2,7 +2,7 @@ from pathlib import Path
 import pickle
 import re
 import string
-from types import GeneratorType
+from typing import Generator, Tuple
 
 from django.db.models import Q
 from nltk.text import Text
@@ -22,7 +22,7 @@ def _build_variant_dict() -> dict:
     return variant_dict
 
 
-def _add_variant(words: GeneratorType) -> list:
+def _add_variant(words: Generator) -> list:
     new_words = []
     variant_dict = _build_variant_dict()
 
@@ -31,13 +31,21 @@ def _add_variant(words: GeneratorType) -> list:
         if vs:
             new_words.append(word)
             for v in vs:
-                new_words.extend(['(', v, ')'])
+                new_words.extend(['(', v, ')'])  # add parentheses as separate items so concordance will find them
         else:
             new_words.append(word)
     return new_words
 
 
-def build_kwic(query, width, include_examples=False):
+def _sort_kwic(kwic: list, side: str = 'left', window: int = 2):
+    if side == 'left':
+        kwic.sort(key=lambda line: [w.lower() for w in line.left[-window:]])
+    else:
+        kwic.sort(key=lambda line: [w.lower() for w in line.right[:window]])
+    return kwic
+
+
+def build_kwic(query: str, width: int, side: str = 'left', window: int = 2, include_examples=False) -> Tuple[list, int]:
     pat_one = r"(\w+)([{}])".format(string.punctuation)  # add space between char and punctuation
     pat_two = r"([{}])(\w+)".format(string.punctuation)  # add space between punctuation and char
 
@@ -50,10 +58,13 @@ def build_kwic(query, width, include_examples=False):
     words = _add_variant(word_gen)
     text = Text(words)
     conc_list = text.concordance_list(query, width=width, lines=9999999)  # show all lines
+    conc_list = _sort_kwic(conc_list, side=side, window=window)
+    conc_len = len(conc_list)
+
     with KWIC_PATH.open('wb') as f:
         d = {
             'query': query,
             'conc_list': conc_list
         }
         pickle.dump(d, f)
-    return conc_list
+    return conc_list, conc_len
