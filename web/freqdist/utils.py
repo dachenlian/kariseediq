@@ -91,6 +91,8 @@ def build_item_root_freq(include_examples: bool) -> dict:
     for word in word_details:
         word['root_freq'] = root_freq.get(word['root'])
 
+    word_details.sort(key=lambda d: d['item_freq'], reverse=True)
+
     results = {
         'word_details': word_details,
         'word_num': word_num,

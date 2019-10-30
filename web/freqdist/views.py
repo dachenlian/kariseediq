@@ -16,7 +16,6 @@ from .forms import TextFileUploadForm
 from .models import TextFile
 from . import utils
 
-
 RESULTS_DIR = Path(settings.BASE_DIR) / 'freqdist' / 'static' / 'freqdist' / 'results'
 if not RESULTS_DIR.exists():
     RESULTS_DIR.mkdir(parents=True)
@@ -73,6 +72,9 @@ class FreqResultsView(View):
     def get(self, request, *args, **kwargs):
         recalculate = request.GET.get('recalculate')
         include_examples = request.GET.get('includeExamples') == 'True'
+        sort_key = request.GET.get('order-by')
+        sort_dir = request.GET.get('dir') == 'desc'
+
         if recalculate or not FILE_PATH.exists():
             results = utils.build_item_root_freq(include_examples)
             now = datetime.datetime.now()
@@ -82,6 +84,12 @@ class FreqResultsView(View):
         else:
             with FILE_PATH.open('rb') as f:
                 results = pickle.load(f)
+
+        if sort_key:
+            print(sort_key, sort_dir)
+            results['word_details'].sort(
+                key=lambda d: 0 if not d.get(sort_key) else d.get(sort_key),  # Some root_freq are None
+                reverse=sort_dir)
 
         return render(request, 'freqdist/results.html', context=results)
 
