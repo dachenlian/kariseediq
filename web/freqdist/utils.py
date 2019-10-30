@@ -27,7 +27,6 @@ def _split_by_sent_boundary(text):
 
 
 def build_item_root_freq(include_examples: bool) -> dict:
-
     word_freq = Counter()
     root_freq = Counter()
 
@@ -56,13 +55,14 @@ def build_item_root_freq(include_examples: bool) -> dict:
             text = PUNCTUATION_RE.sub('', text).lower().split()
             word_freq.update(text)
 
+    # One headword can have multiple senses. Use .distinct() to only count a headword once.
     senses = Sense.objects.all().select_related('headword').values(
         'root',
         'focus',
         'word_class',
         'headword__headword',
         'headword__variant',
-    )
+    ).order_by('headword__headword').distinct('headword__headword')
 
     for idx, (word, freq) in enumerate(word_freq.items()):
         for sense in senses:
