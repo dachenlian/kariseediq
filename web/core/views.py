@@ -230,28 +230,28 @@ class SenseDeleteView(DeleteView):
         return get_object_or_404(self.model, headword=headword, headword_sense_no=self.kwargs.get('sense'))
 
 
-class PendingListView(ListView):
-    model = Headword
-    paginate_by = 1000
-    context_object_name = 'senses'
-    template_name = 'core/pending.html'
-
-    def get(self, request, *args, **kwargs):
-        if request.is_ajax():
-            logger.debug('Ajax request received!')
-            queryset = self.get_queryset()
-            return JsonResponse({'pending_count': len(queryset)})
-        else:
-            return super().get(request, *args, **kwargs)
-
-    def get_queryset(self):
-        roots = Sense.objects.all().distinct().values('root')
-        headwords = Headword.objects.filter(is_root=True).values_list('headword', flat=True).distinct()
-        roots_without_entries = roots.difference(headwords).values_list('headword', flat=True)
-        roots_without_entries = sorted(filter(bool, roots_without_entries))
-        roots_without_entries = Sense.objects.filter(root__in=roots_without_entries).order_by('root')
-        # return roots
-        return roots_without_entries
+# class PendingListView(ListView):
+#     model = Headword
+#     paginate_by = 1000
+#     context_object_name = 'senses'
+#     template_name = 'core/pending.html'
+#
+#     def get(self, request, *args, **kwargs):
+#         if request.is_ajax():
+#             logger.debug('Ajax request received!')
+#             queryset = self.get_queryset()
+#             return JsonResponse({'pending_count': len(queryset)})
+#         else:
+#             return super().get(request, *args, **kwargs)
+#
+#     def get_queryset(self):
+#         roots = Sense.objects.all().distinct().values('root')
+#         headwords = Headword.objects.filter(is_root=True).values_list('headword', flat=True).distinct()
+#         roots_without_entries = roots.difference(headwords).values_list('headword', flat=True)
+#         roots_without_entries = sorted(filter(bool, roots_without_entries))
+#         roots_without_entries = Sense.objects.filter(root__in=roots_without_entries).order_by('root')
+#         # return roots
+#         return roots_without_entries
 
 
 class RootAutoComplete(View):

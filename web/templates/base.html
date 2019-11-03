@@ -40,10 +40,10 @@
             <li class="nav-item">
                 <a class="nav-link" href="{% url 'core:create_sense' %}">New Entry</a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'core:pending' %}">
-                    Pending <span id="pendingBadge" class="badge badge-secondary align-middle"></span></a>
-            </li>
+{#            <li class="nav-item">#}
+{#                <a class="nav-link" href="{% url 'core:pending' %}">#}
+{#                    Pending <span id="pendingBadge" class="badge badge-secondary align-middle"></span></a>#}
+{#            </li>#}
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
                    aria-haspopup="true" aria-expanded="false">
@@ -140,16 +140,16 @@
         }
     });
 </script>
-<script>
-    $.ajax({
-        url: "{% url 'core:pending' %}",
-        success: function (result) {
-            const pendingBadge = $('#pendingBadge');
-            const count = result['pending_count'];
-            pendingBadge.text(count)
-        }
-    });
-</script>
+{#<script>#}
+{#    $.ajax({#}
+{#        url: "{% url 'core:pending' %}",#}
+{#        success: function (result) {#}
+{#            const pendingBadge = $('#pendingBadge');#}
+{#            const count = result['pending_count'];#}
+{#            pendingBadge.text(count)#}
+{#        }#}
+{#    });#}
+{#</script>#}
 {% block javascript %}
     <script>
         let timer, delay = 250;
