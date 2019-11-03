@@ -86,7 +86,6 @@ class FreqResultsView(View):
                 results = pickle.load(f)
 
         if sort_key:
-            print(sort_key, sort_dir)
             results['word_details'].sort(
                 key=lambda d: 0 if not d.get(sort_key) else d.get(sort_key),  # Some root_freq are None
                 reverse=sort_dir)

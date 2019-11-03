@@ -56,13 +56,14 @@ def build_item_root_freq(include_examples: bool) -> dict:
             word_freq.update(text)
 
     # One headword can have multiple senses. Use .distinct() to only count a headword once.
+    # Some senses don't have a root, so get the earliest sense since it most likely has one.
     senses = Sense.objects.all().select_related('headword').values(
         'root',
         'focus',
         'word_class',
         'headword__headword',
         'headword__variant',
-    ).order_by('headword__headword').distinct('headword__headword')
+    ).order_by('headword__headword', '-root').distinct('headword__headword')
 
     for idx, (word, freq) in enumerate(word_freq.items()):
         for sense in senses:
