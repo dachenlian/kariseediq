@@ -15,6 +15,16 @@ if not KWIC_PATH.exists():
     KWIC_PATH.mkdir(parents=True)
 
 
+def clean_texts(texts: str) -> str:
+    pat_one = r"(\w+)([{}])".format(string.punctuation)  # add space between char and punctuation
+    pat_two = r"([{}])(\w+)".format(string.punctuation)  # add space between punctuation and char
+
+    texts = re.sub('\n', ' ', texts).strip()
+    texts = re.sub(pat_one, r'\1 \2', texts)
+    texts = re.sub(pat_two, r'\1 \2', texts)
+    return texts
+
+
 def _build_variant_dict() -> dict:
     variant_dict = {}
     for h in Headword.objects.filter(~Q(variant=[''])):
@@ -48,17 +58,12 @@ def _sort_kwic(kwic: list, side: str = 'left', window: int = 2):
 
 
 def build_kwic(query: str, width: int, side: str = 'left', window: int = 2, include_examples=False) -> Tuple[list, int]:
-    pat_one = r"(\w+)([{}])".format(string.punctuation)  # add space between char and punctuation
-    pat_two = r"([{}])(\w+)".format(string.punctuation)  # add space between punctuation and char
-
     files = TextFile.objects.all()
     texts = " ".join(text.read_and_decode() for text in files)
     if include_examples:
         examples = " ".join(Example.objects.all().values_list('sentence', flat=True))
         texts += " " + examples
-    texts = re.sub('\n', ' ', texts).strip()
-    texts = re.sub(pat_one, r'\1 \2', texts)
-    texts = re.sub(pat_two, r'\1 \2', texts)
+    texts = clean_texts(texts)
     word_gen = (word for word in texts.split())
     words = _add_variant(word_gen)
     text = Text(words)

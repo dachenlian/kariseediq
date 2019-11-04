@@ -4,35 +4,56 @@
         <h1>Collocation</h1>
     </div>
     <div class="row justify-content-center">
-    <div class="col-lg-8">
-        <form action="{% url 'collocations:index' %}">
-            <div class="form-row">
-                <div class="col">
-                    <div class="form-group">
-                        <label for="query">Query</label>
-                        <input type="text" name="query" id="query">
+        <div class="col-lg-6">
+            <form action="{% url 'collocations:index' %}" method="get">
+                <div class="form-row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="n-gram">N-gram</label>
+                            <select name="n-gram" id="n-gram" class="custom-select">
+                                <option value="bigram">Bigram</option>
+                                <option value="trigram">Trigram</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="assoc-measure">Association Measure</label>
+                            <select name="assoc-measure" id="assoc-measure" class="custom-select">
+                                <option value="pmi">Pointwise Mutual Information</option>
+                                <option value="student_t">Student's T</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
-                <div class="col">
+                <div class="form-row justify-content-center">
                     <div class="form-group">
-                        <label for="n-gram">N-gram</label>
-                        <select name="n-gram" id="n-gram" class="custom-select">
-                            <option value="bigram">Bigram</option>
-                            <option value="trigram">Trigram</option>
-                        </select>
+                        <button class="btn btn-primary" type="submit">Search</button>
                     </div>
                 </div>
-                <div class="col">
-                    <div class="form-group">
-                        <label for="assoc-measure">Association Measure</label>
-                        <select name="n-gram" id="n-gram" class="custom-select">
-                            <option value="bigram">Bigram</option>
-                            <option value="trigram">Trigram</option>
-                        </select>
-                    </div>
-                </div>
+            </form>
+        </div>
+    </div>
+    {% if collocations %}
+        <div class="row">
+            <div class="col">
+                <table class="table table-striped">
+                    <thead class="thead-dark">
+                    <tr>
+                        <th>#</th>
+                        <th class="text-center">Collocate</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for c in collocations %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ c }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
             </div>
-        </form>
-    </div>
-    </div>
+        </div>
+    {% endif %}
 {% endblock content %}

@@ -1,14 +1,22 @@
 from django.shortcuts import render
 from django.views.generic import View
 
-# Create your views here.
+from .utils import get_collocates
 
 
 class CollocationView(View):
     template_name = 'collocations/index.html'
 
     def get(self, request, *args, **kwargs):
-        return render(self.template_name)
+        ngram = request.GET.get('n-gram')
+        assoc_measure = request.GET.get('assoc-measure')
+        if ngram:
+            collocations = get_collocates(ngram, assoc_measure)
+            context = {
+                'collocations': collocations,
+            }
+            return render(self.request, self.template_name, context=context)
+        return render(self.request, self.template_name)
 
 
 
