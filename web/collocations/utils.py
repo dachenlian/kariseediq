@@ -4,7 +4,8 @@ from nltk import collocations
 from typing import List, Tuple
 
 from freqdist.models import TextFile
-from kwic.utils import clean_texts
+from kwic.utils import clean_texts, get_texts
+from core.models import Example
 
 
 MEASURES_FINDERS_DICT = {
@@ -19,10 +20,9 @@ MEASURES_FINDERS_DICT = {
 }
 
 
-def get_collocates(ngram: str, assoc_measure: str) -> List[Tuple[str, str]]:
+def get_collocates(ngram: str, assoc_measure: str, include_examples: bool) -> List[Tuple[str, str]]:
     measure, finder = MEASURES_FINDERS_DICT.get(ngram)
-    files = TextFile.objects.all()
-    texts = " ".join(text.read_and_decode() for text in files)
+    texts = get_texts(include_examples)
     texts = clean_texts(texts)
     tokens = texts.split()
     finder = finder.from_words(tokens)
