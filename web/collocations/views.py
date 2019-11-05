@@ -10,8 +10,9 @@ class CollocationView(View):
     def get(self, request, *args, **kwargs):
         ngram = request.GET.get('n-gram')
         assoc_measure = request.GET.get('assoc-measure')
+        include_examples = request.GET.get('include-examples')
         if ngram:
-            collocations = get_collocates(ngram, assoc_measure)
+            collocations = get_collocates(ngram, assoc_measure, include_examples)
             context = {
                 'collocations': collocations,
             }
