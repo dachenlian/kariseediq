@@ -11,6 +11,8 @@ from core.models import Headword, Example
 from freqdist.models import TextFile
 
 KWIC_PATH = Path(__file__).parent / 'static/kwic/kwic.pkl'
+if not KWIC_PATH.exists():
+    KWIC_PATH.mkdir(parents=True)
 
 
 def _build_variant_dict() -> dict:
