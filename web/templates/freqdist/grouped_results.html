@@ -37,27 +37,46 @@
             </p>
         </div>
     </div>
-    <!-- Create tabs -->
-    <ul class="nav nav-tabs bg-dark" id="group-tabs">
-        {% for key, group in word_class_groups.items %}
-            <li class="nav-item">
-                <a href="#{{ key }}" id="{{ key }}-tab" class="nav-link">{{ key }}</a>
-            </li>
-        {% endfor %}
-    </ul>
+    <div class="row">
+        <div class="col">
+            <!-- Create tabs -->
+            <ul class="nav nav-tabs nav-justified bg-dark" id="group-tabs">
+                {% for key, group in word_class_groups.items %}
+                    {% if forloop.first %}
+                        <li class="nav-item">
+                            <a href="#{{ key }}" id="{{ key }}-tab" class="nav-link active" data-toggle="tab">{{ key }}</a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a href="#{{ key }}" id="{{ key }}-tab" class="nav-link" data-toggle="tab">{{ key }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
     <!-- Create content -->
     <div class="tab-content">
         {% for key, group in word_class_groups.items %}
-        {% if forloop.first %}
-            <div class="tab-pane fade show" id="{{ key }}">
+            {% if forloop.first %}
+                <div class="tab-pane fade show active" id="{{ key }}">
+                    {% include 'freqdist/freq_table_snippet.html' with word_details=group key=key %}
+                </div>
+            {% else %}
+                <div class="tab-pane fade" id="{{ key }}">
+                    {% include 'freqdist/freq_table_snippet.html' with word_details=group key=key %}
+                </div>
 
-            </div>
-        {% else %}
-            <div class="tab-pane fade show" id="{{ key }}">
-
-            </div>
-
-        {% endif %}
+            {% endif %}
+        {% endfor %}
     </div>
 
 {% endblock content %}
+{% block javascript %}
+    <script>
+    let url = window.location.href;
+    url = new URL(url);
+    const group = url.searchParams.get('group');
+
+    </script>
+{% endblock javascript%}

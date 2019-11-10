@@ -1,10 +1,55 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-
-</body>
-</html>
+<div class="row align-items-center">
+    <div class="col align-middle">
+        <span class="align-middle"><strong>Total: </strong> {{ word_details|length }}</span>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <table class="table table-bordered">
+            <thead class="thead-dark">
+            <tr class="align-middle text-center">
+                <th class="align-middle">#</th>
+                <th class="align-middle">Item</th>
+                <th class="align-middle">Item Freq
+                    <a href="?order-by=item_freq&dir=asc&group={{ key }}"><span class="oi oi-arrow-top"></span></a>
+                    <a href="?order-by=item_freq&dir=desc&group={{ key }}"><span class="oi oi-arrow-bottom"></span></a>
+                </th>
+                <th class="align-middle">Root</th>
+                <th class="align-middle">Root Freq
+                    <a href="?order-by=root_freq&dir=asc&group={{ key }}"><span class="oi oi-arrow-top"></span></a>
+                    <a href="?order-by=root_freq&dir=desc&group={{ key }}"><span class="oi oi-arrow-bottom"></span></a>
+                </th>
+                <th class="align-middle">Focus</th>
+                <th class="align-middle">Word Class</th>
+                <th class="align-middle">Variant</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for row in word_details %}
+                <tr class="text-center">
+                    <td class="align-middle">{{ forloop.counter }}</td>
+                    <td class="align-middle">{{ row.item_name }}</td>
+                    <td class="align-middle">{{ row.item_freq }}</td>
+                    <td class="align-middle">{{ row.root }}</td>
+                    <td class="align-middle">{{ row.root_freq }}</td>
+                    <td class="align-middle">
+                        {% for f in row.focus %}
+                            {{ f }}<br>
+                        {% endfor %}
+                    </td>
+                    <td class="align-middle">
+                        {% for w in row.word_class %}
+                            {{ w }}<br>
+                        {% endfor %}
+                    </td>
+                    <td class="align-middle">
+                        {% for v in row.variant %}
+                            {{ v }}<br>
+                        {% endfor %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
