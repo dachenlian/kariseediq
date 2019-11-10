@@ -74,9 +74,15 @@
 {% endblock content %}
 {% block javascript %}
     <script>
-    let url = window.location.href;
-    url = new URL(url);
-    const group = url.searchParams.get('group');
+    $(document).ready(function() {
+        let url = window.location.href;
+        url = new URL(url);
+        const group = url.searchParams.get('group');
+        if (group) {
+            console.log(group);
+            $("#group-tabs a[href='#$1']".replace('$1', group)).click();
+        }
+    });
 
     </script>
 {% endblock javascript%}
