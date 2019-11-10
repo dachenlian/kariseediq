@@ -97,6 +97,8 @@ def build_item_root_freq(include_examples: bool) -> dict:
     groups = groupby(word_details, lambda d: ['None'] if not d['word_class'] else d['word_class'])
     word_class_groups = {" ".join(k): list(g) for k, g in groups}
 
+    for key in word_class_groups:
+        word_class_groups[key].sort(key=lambda d: d['item_freq'], reverse=True)
     results = {
         'word_details': word_details,
         'word_class_groups': word_class_groups,

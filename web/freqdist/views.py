@@ -86,9 +86,10 @@ class FreqResultsView(View):
                 results = pickle.load(f)
 
         if sort_key:
-            results['word_details'].sort(
-                key=lambda d: 0 if not d.get(sort_key) else d.get(sort_key),  # Some root_freq are None
-                reverse=sort_dir)
+            for key in results['word_class_groups']:
+                results['word_class_groups'][key].sort(
+                    key=lambda d: 0 if not d.get(sort_key) else d.get(sort_key),  # Some root_freq are None
+                    reverse=sort_dir)
 
         return render(request, 'freqdist/grouped_results.html', context=results)
 
