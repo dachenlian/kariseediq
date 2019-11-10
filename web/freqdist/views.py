@@ -1,6 +1,7 @@
 import csv
 import pickle
 import datetime
+from urllib.parse import quote
 
 from pathlib import Path
 
@@ -11,6 +12,7 @@ from django.views.generic import DeleteView
 from django.shortcuts import render, redirect
 from django.http import JsonResponse, HttpResponse
 from django.urls import reverse_lazy
+from django.utils.http import urlencode
 
 from .forms import TextFileUploadForm
 from .models import TextFile
@@ -97,10 +99,16 @@ class FreqResultsView(View):
 def export_results_to_csv(request):
     with FILE_PATH.open('rb') as f:
         results = pickle.load(f)
-    word_details = results.get('word_details')
-    date = results.get('date')
-    filename = f'freq_results.csv'
-
+    group = request.GET.get('group')
+    date = results.get('date').strftime('%Y%m%d')
+    if group:
+        word_details = results.get('word_class_groups').get(group)
+        filename = f'{date}_{group}_freq_results.csv'
+    else:
+        word_details = results.get('word_details')
+        filename = f'{date}_freq_results.csv'
+    # filename = 'freq_results.csv'
+    filename = f'{date}_freq_results.csv'
     fieldnames = word_details[0].keys()
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = f'attachment; filename="{filename}"'

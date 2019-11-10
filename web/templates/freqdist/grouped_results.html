@@ -44,7 +44,8 @@
                 {% for key, group in word_class_groups.items %}
                     {% if forloop.first %}
                         <li class="nav-item">
-                            <a href="#{{ key }}" id="{{ key }}-tab" class="nav-link active" data-toggle="tab">{{ key }}</a>
+                            <a href="#{{ key }}" id="{{ key }}-tab" class="nav-link active"
+                               data-toggle="tab">{{ key }}</a>
                         </li>
                     {% else %}
                         <li class="nav-item">
@@ -66,7 +67,6 @@
                 <div class="tab-pane fade" id="{{ key }}">
                     {% include 'freqdist/freq_table_snippet.html' with word_details=group key=key %}
                 </div>
-
             {% endif %}
         {% endfor %}
     </div>
@@ -74,15 +74,15 @@
 {% endblock content %}
 {% block javascript %}
     <script>
-    $(document).ready(function() {
-        let url = window.location.href;
-        url = new URL(url);
-        const group = url.searchParams.get('group');
-        if (group) {
-            console.log(group);
-            $("#group-tabs a[href='#$1']".replace('$1', group)).click();
-        }
-    });
+        $(document).ready(function () {
+            let url = window.location.href;
+            url = new URL(url);
+            const group = url.searchParams.get('group');
+            if (group) {
+                console.log(group);
+                $("#group-tabs a[href='#$1']".replace('$1', group)).click();
+            }
+        });
 
     </script>
-{% endblock javascript%}
+{% endblock javascript %}
