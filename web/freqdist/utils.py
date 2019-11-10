@@ -2,6 +2,7 @@ import functools
 from multiprocessing import Pool, cpu_count, Manager
 import re
 from collections import Counter
+from itertools import groupby
 
 from django.db.models import Q
 
@@ -92,10 +93,13 @@ def build_item_root_freq(include_examples: bool) -> dict:
     for word in word_details:
         word['root_freq'] = root_freq.get(word['root'])
 
-    word_details.sort(key=lambda d: d['item_freq'], reverse=True)
+    word_details.sort(key=lambda d: d['word_class'], reverse=True)
+    groups = groupby(word_details, lambda d: ['None'] if not d['word_class'] else d['word_class'])
+    word_class_groups = {" ".join(k): list(g) for k, g in groups}
 
     results = {
         'word_details': word_details,
+        'word_class_groups': word_class_groups,
         'word_num': word_num,
         'sent_num': sent_num,
         'include_examples': include_examples,

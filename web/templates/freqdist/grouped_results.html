@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="row">
+        <div class="col">
+            <h1>Results</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <p><strong>Number of sentences: </strong>{{ sent_num }} | <strong>Number of words: </strong>{{ word_num }} |
+                <strong>Include examples: </strong> {{ include_examples }}</p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <p><strong>Last calculated: </strong>{{ date }}</p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <form action="{% url 'freqdist:results' %}">
+                <div class="form-check form-check-inline">
+                    <input id="id_includeExamples" type="checkbox" class="form-check-input" value="True"
+                           name="includeExamples">
+                    <label class="form-check-label" for="id_includeExamples">
+                        Include Dictionary Examples
+                    </label>
+                </div>
+                <input type="hidden" name="recalculate" value="True">
+                <button class="btn btn-info" type="submit">Recalculate Now</button>
+            </form>
+        </div>
+        <div class="col-lg-6 col-sm-12">
+            <p class="text-right">
+                <a class="btn btn-success" href="{% url 'freq:export' %}">Export to CSV</a>
+            </p>
+        </div>
+    </div>
+    <!-- Create tabs -->
+    <ul class="nav nav-tabs bg-dark" id="group-tabs">
+        {% for key, group in word_class_groups.items %}
+            <li class="nav-item">
+                <a href="#{{ key }}" id="{{ key }}-tab" class="nav-link">{{ key }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+    <!-- Create content -->
+    <div class="tab-content">
+        {% for key, group in word_class_groups.items %}
+        {% if forloop.first %}
+            <div class="tab-pane fade show" id="{{ key }}">
+
+            </div>
+        {% else %}
+            <div class="tab-pane fade show" id="{{ key }}">
+
+            </div>
+
+        {% endif %}
+    </div>
+
+{% endblock content %}

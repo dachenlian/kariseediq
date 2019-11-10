@@ -90,7 +90,7 @@ class FreqResultsView(View):
                 key=lambda d: 0 if not d.get(sort_key) else d.get(sort_key),  # Some root_freq are None
                 reverse=sort_dir)
 
-        return render(request, 'freqdist/results.html', context=results)
+        return render(request, 'freqdist/grouped_results.html', context=results)
 
 
 def export_results_to_csv(request):
