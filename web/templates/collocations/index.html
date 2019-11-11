@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="row">
+        <div class="col">
+            <h1>Collocation</h1>
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <form action="{% url 'collocations:index' %}" method="get">
+                <div class="form-row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="query">Query</label>
+                            <input type="text" name="query" id="query" class="form-control">
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="ngram">N-gram</label>
+                            <select name="ngram" id="ngram" class="custom-select">
+                                <option value="bigram">Bigram</option>
+                                <option value="trigram">Trigram</option>
+                                <option value="quadgram">Quadgram</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="assoc_measure">Association Measure</label>
+                            <select name="assoc_measure" id="assoc_measure" class="custom-select">
+                                <option value="pmi">Pointwise Mutual Information</option>
+                                <option value="student_t">Student's T</option>
+                                <option value="mi_like">MI Like</option>
+                                <option value="likelihood_ratio">Likelihood Ratio</option>
+                                <option value="poisson_stirling">Poisson Stirling</option>
+                                <option value="jaccard">Jaccard</option>
+                                <!-- TODO: Add conditional options for ngram selected -->
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-2">
+                        <div class="form-group">
+                            <label for="freq_filter">Frequency filter</label>
+                            <input class="form-control text-center" name="freq_filter" id="freq_filter" type="number" min="1" value="3">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-row justify-content-center">
+                    <div class="form-group">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" name="include_examples" type="checkbox" value="true"
+                                   id="examples">
+                            <label class="form-check-label" for="examples">Include Dictionary Examples</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-row justify-content-center">
+                    <div class="form-group">
+                        <button class="btn btn-primary" type="submit">Search</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% if collocations %}
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+            <p><strong>Query:</strong> {{ request.GET.query }} | <strong>Ngram:</strong> {{ request.GET.ngram }} |
+            <strong>Assoc measure: </strong>{{ request.GET.assoc_measure }} |
+                <strong>Freq filter: </strong> {{ request.GET.freq_filter }} | <strong>Include examples: </strong> {{ request.GET.include_examples }}</p>
+                <div class="table-responsive">
+                    <table class="table table-striped text-center">
+                        <thead class="thead-dark">
+                        <tr>
+                            <th>#</th>
+                            <th>Frequency</th>
+                            <th>Ngram</th>
+                            <th>Score</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for c in collocations %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ c.0 }}</td>
+                                <td>{{ c.1 }}</td>
+                                <td>{{ c.2 }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock content %}
