@@ -1,5 +1,6 @@
 import functools
 from multiprocessing import Pool, cpu_count, Manager
+from typing import Sequence
 import re
 from collections import Counter
 from itertools import groupby
@@ -25,6 +26,12 @@ def _split_by_word_boundary(text):
 def _split_by_sent_boundary(text):
     text = SENT_BOUNDARY_RE.sub('.', text)
     return text.split('.')
+
+
+# def _get_word_details_multiproc(word_freq_items: Sequence, senses: list):
+#     max_workers = cpu_count() // 4*3 + (cpu_count() % 4*3 > 0)
+#     with Pool(max_workers=max_workers) as pool:
+
 
 
 def build_item_root_freq(include_examples: bool) -> dict:
