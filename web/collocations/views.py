@@ -8,11 +8,13 @@ class CollocationView(View):
     template_name = 'collocations/index.html'
 
     def get(self, request, *args, **kwargs):
-        ngram = request.GET.get('n-gram')
-        assoc_measure = request.GET.get('assoc-measure')
-        include_examples = request.GET.get('include-examples')
+        query = request.GET.get('query')
+        freq_filter = int(request.GET.get('freq_filter', 1))
+        ngram = request.GET.get('ngram')
+        assoc_measure = request.GET.get('assoc_measure')
+        include_examples = request.GET.get('include_examples')
         if ngram:
-            collocations = get_collocates(ngram, assoc_measure, include_examples)
+            collocations = get_collocates(ngram, assoc_measure, include_examples, query=query, freq_filter=freq_filter)
             context = {
                 'collocations': collocations,
             }
