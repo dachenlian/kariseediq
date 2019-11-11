@@ -98,7 +98,7 @@ def build_item_root_freq(include_examples: bool) -> dict:
     word_class_groups = {" ".join(k): list(g) for k, g in groups}
 
     for key in word_class_groups:
-        word_class_groups[key].sort(key=lambda d: d['item_freq'], reverse=True)
+        word_class_groups[key].sort(key=lambda d: (d['item_freq'], d['item_name']), reverse=True)
     results = {
         'word_details': word_details,
         'word_class_groups': word_class_groups,

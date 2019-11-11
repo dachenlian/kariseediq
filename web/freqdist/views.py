@@ -90,7 +90,8 @@ class FreqResultsView(View):
         if sort_key:
             for key in results['word_class_groups']:
                 results['word_class_groups'][key].sort(
-                    key=lambda d: 0 if not d.get(sort_key) else d.get(sort_key),  # Some root_freq are None
+                    key=lambda d: (0, d.get('item_name')) if not d.get(sort_key) else (  # Some root_freq are None
+                        d.get(sort_key), d.get('item_name')),  # sort by frequency then alphabetically
                     reverse=sort_dir)
 
         return render(request, 'freqdist/grouped_results.html', context=results)
