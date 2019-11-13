@@ -83,7 +83,7 @@ class Sense(models.Model):
         PARTICLE = '助詞'
         INTERJECTION = '嘆詞'
         MULTI = '多重詞性'
-        OTHER = '其他'
+        OTHER = '其它'
 
     class TagChoices(Enum):
         HAN_BORROWED = '漢語借字'
