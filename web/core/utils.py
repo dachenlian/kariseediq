@@ -28,6 +28,11 @@ def _add_tag(entry: dict, user: str, tag: str) -> list:
     return tags
 
 
+def _normalize(s):
+    s = re.sub(r'\s?;\s?', '；', s)
+    return s
+
+
 def _clean_entry(entry: dict) -> dict:
     headword, headword_sense_no = _split_item_name(entry.pop('item_name'))
     root, root_sense_no = _split_item_name(entry.pop('item_root'))
@@ -42,6 +47,7 @@ def _clean_entry(entry: dict) -> dict:
     entry['word_class']: list = entry.pop('word_class').split()
     entry['focus']: list = entry.pop('focus').split()
     entry['root_sense_no'] = root_sense_no
+    entry['meaning'] = _normalize(entry['meaning'])
     entry['created_date'] = _parse_date(entry['created_date'])
     entry['refer_to'] = entry.pop('source')
     entry['tag']: list = _add_tag(entry, 'Kcjason2', '植物')
@@ -112,7 +118,7 @@ def only_letters(string):
     return "".join(char for char in string if char.isalpha() or char == ' ')
 
 
-def load_items(file="../seediq_items_updated-20190726-sung.csv"):
+def load_items(file="../seediq_items_updated-20191031-sung.csv"):
     start = time.time()
 
     with open(file) as fp:
@@ -187,16 +193,16 @@ def load_items(file="../seediq_items_updated-20190726-sung.csv"):
     logger.debug(f'Completed in {datetime.timedelta(seconds=end - start)}.')
 
 
-def load_extra_meaning(file='../seediq_extra_meaning_updated-20190726-sung.csv'):
+def load_extra_meaning(file='../seediq_extra_meaning_updated-20191031-sung.csv'):
     with open(file) as fp:
         reader = csv.reader(fp)
         header = next(reader)
 
         for idx, row in enumerate(reader, 1):
-            row = [r.strip() for r in row]
+            row = [_normalize(r.strip()) for r in row]
             new_entry = dict(zip(header, row))
             headword, headword_sense_no = _split_item_name(new_entry.pop('item_name'))
-            meaning = new_entry.pop('meaning')
+            meaning = _normalize(new_entry.pop('meaning'))
             char_strokes_first, char_strokes_all = get_char_strokes(meaning)
             meaning_en = new_entry.pop('meaning_en')
             is_root = new_entry.pop('is_root') == 'yes'
@@ -246,10 +252,10 @@ def load_extra_phrases(file='../seediq_extra_phrases_updated-20190617-sung.csv')
         header = next(reader)
 
         for idx, row in enumerate(reader, 1):
-            row = [r.strip() for r in row]
+            row = [_normalize(r.strip()) for r in row]
             new_entry = dict(zip(header, row))
             headword, _ = _split_item_name(new_entry.pop('item_name'))
-            meaning = new_entry.pop('meaning')
+            meaning = _normalize(new_entry.pop('meaning'))
 
             if not new_entry['phrase']:
                 logger.debug(f'{headword}: empty row.')
