@@ -12,4 +12,3 @@ services:
     environment:
       - DJANGO_SETTINGS_MODULE=web.settings.local
       - DJANGO_LOG_LEVEL=DEBUG
-      - PYTHONUNBUFFERED=1
