@@ -60,6 +60,7 @@ class SenseForm(ModelForm):
             'word_class': 'Word class',
             'meaning': 'Meaning (Chinese)',
             'meaning_en': 'Meaning (English)',
+            'focus': '構詞標記',
             'word_root': 'Word root',
             'truku': 'Truku headword',
             'toda': 'Toda headword'
