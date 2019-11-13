@@ -40,20 +40,30 @@
     <div class="row">
         <div class="col">
             <!-- Create tabs -->
-            <ul class="nav nav-tabs nav-justified bg-dark" id="group-tabs">
-                {% for key, group in word_class_groups.items %}
-                    {% if forloop.first %}
-                        <li class="nav-item">
-                            <a href="#{{ key }}" id="{{ key }}-tab" class="nav-link active"
-                               data-toggle="tab">{{ key }}</a>
-                        </li>
-                    {% else %}
-                        <li class="nav-item">
-                            <a href="#{{ key }}" id="{{ key }}-tab" class="nav-link" data-toggle="tab">{{ key }}</a>
-                        </li>
-                    {% endif %}
-                {% endfor %}
-            </ul>
+            <nav class="nav nav-tabs nav-justified bg-dark" id="group-tabs">
+                <div class="container">
+                    <div class="row no-gutters">
+                        {% for key, group in word_class_groups.items %}
+                            {% if forloop.first %}
+                                <li class="nav-item col">
+                                    <a href="#{{ key }}" id="{{ key }}-tab" class="nav-link active"
+                                       data-toggle="tab">{{ key }}</a>
+                                </li>
+                            {% else %}
+                                <li class="nav-item col">
+                                    <a href="#{{ key }}" id="{{ key }}-tab" class="nav-link"
+                                       data-toggle="tab">{{ key }}</a>
+                                </li>
+                            {% endif %}
+                            {% if forloop.counter|divisibleby:"10" %}
+                            <div class="w-100"></div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+
+
+            </nav>
         </div>
     </div>
     <!-- Create content -->
