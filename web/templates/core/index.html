@@ -104,8 +104,8 @@
                                     onclick="window.location=
                                             '{% url 'core:update_sense' pk=headword.id sense=sense.headword_sense_no %}';"
                                     class="align-middle">
-                                    {% if headword.senses.all|length_is:"1" %}{{ sense.meaning }}{% else %}(
-                                        {{ forloop.counter }}) {{ sense.meaning }}{% endif %}
+                                    {% if headword.senses.all|length_is:"1" %}{{ sense.meaning }}{% else %}
+                                        ({{ forloop.counter }}) {{ sense.meaning }}{% endif %}
                                 </td>
                                 <td class="align-middle">{{ sense.root }}</td>
                                 <td class="align-middle">{{ sense.user }}</td>
@@ -122,7 +122,7 @@
                                 </td>
                             </tr>
                         {% endfor %}
-                        {% empty %}
+                    {% empty %}
                         <tr>
                             <td colspan="7">No search results match the query.</td>
                         </tr>
