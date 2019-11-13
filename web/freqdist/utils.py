@@ -1,14 +1,17 @@
 import functools
+import logging
 from multiprocessing import Pool, cpu_count, Manager
 from typing import Sequence
 import re
-from collections import Counter
-from itertools import groupby
+from collections import Counter, OrderedDict
+from itertools import groupby, chain
 
 from django.db.models import Q
 
 from .models import TextFile
 from core.models import Headword, Example, Sense
+
+logger = logging.getLogger(__name__)
 
 sent_boundary = ['.', '。', '!', '！', '?', '？', ';', '；']
 SENT_BOUNDARY_RE = re.compile(rf'[{"".join(sent_boundary)}]')
@@ -31,7 +34,6 @@ def _split_by_sent_boundary(text):
 # def _get_word_details_multiproc(word_freq_items: Sequence, senses: list):
 #     max_workers = cpu_count() // 4*3 + (cpu_count() % 4*3 > 0)
 #     with Pool(max_workers=max_workers) as pool:
-
 
 
 def build_item_root_freq(include_examples: bool) -> dict:
@@ -101,11 +103,16 @@ def build_item_root_freq(include_examples: bool) -> dict:
         word['root_freq'] = root_freq.get(word['root'])
 
     word_details.sort(key=lambda d: d['word_class'], reverse=True)
-    groups = groupby(word_details, lambda d: ['None'] if not d['word_class'] else d['word_class'])
-    word_class_groups = {" ".join(k): list(g) for k, g in groups}
-
-    for key in word_class_groups:
-        word_class_groups[key].sort(key=lambda d: (d['item_freq'], d['item_name']), reverse=True)
+    word_class_sorting_key = {w.value: idx for idx, w in enumerate(Sense.WordClassChoices)}
+    logger.debug(word_class_sorting_key)
+    logger.debug('代名詞' in word_class_sorting_key)
+    groups = groupby(word_details, lambda d: ['無'] if not d['word_class'] else d['word_class'])
+    word_class_groups = [(" ".join(k), list(g)) for k, g in groups]
+    word_class_groups.sort(key=lambda k: word_class_sorting_key.get(k[0], 100))
+    word_class_groups = [('所有', list(chain.from_iterable(w[1] for w in word_class_groups)))] + word_class_groups
+    for i in range(len(word_class_groups)):
+        word_class_groups[i][1].sort(key=lambda d: (d['item_freq'], d['item_name']), reverse=True)
+    word_class_groups = OrderedDict(word_class_groups)
     results = {
         'word_details': word_details,
         'word_class_groups': word_class_groups,
