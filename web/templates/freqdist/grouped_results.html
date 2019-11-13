@@ -45,18 +45,14 @@
                     <div class="row no-gutters">
                         {% for key, group in word_class_groups.items %}
                             {% if forloop.first %}
-                                <li class="nav-item col">
-                                    <a href="#{{ key }}" id="{{ key }}-tab" class="nav-link active"
-                                       data-toggle="tab">{{ key }}</a>
-                                </li>
+                                <a href="#{{ key }}" id="{{ key }}-tab" class="nav-item col nav-link active"
+                                   data-toggle="tab">{{ key }}</a>
                             {% else %}
-                                <li class="nav-item col">
-                                    <a href="#{{ key }}" id="{{ key }}-tab" class="nav-link"
-                                       data-toggle="tab">{{ key }}</a>
-                                </li>
+                                <a href="#{{ key }}" id="{{ key }}-tab" class="nav-item col nav-link"
+                                   data-toggle="tab">{{ key }}</a>
                             {% endif %}
                             {% if forloop.counter|divisibleby:"10" %}
-                            <div class="w-100"></div>
+                                <div class="w-100"></div>
                             {% endif %}
                         {% endfor %}
                     </div>
@@ -85,6 +81,7 @@
 {% block javascript %}
     <script>
         $(document).ready(function () {
+            // Switch to tab on page load after sorting by a particular column.
             let url = window.location.href;
             url = new URL(url);
             const group = url.searchParams.get('group');
@@ -93,6 +90,13 @@
                 $("#group-tabs a[href='#$1']".replace('$1', group)).click();
             }
         });
-
+        // Tabs only work the first time they're clicked for some reason, so this fixes the problem.
+        $("#group-tabs .nav-item").click(function () {
+            $(".nav-item").removeClass("active show");
+            $(".tab-pane").removeClass("active show");
+            $(this).addClass("active show");
+            const href = $(this).attr("href");
+            $('$1'.replace('$1', href)).addClass("active show");
+        });
     </script>
 {% endblock javascript %}
