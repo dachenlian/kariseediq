@@ -89,14 +89,14 @@
                 console.log(group);
                 $("#group-tabs a[href='#$1']".replace('$1', group)).click();
             }
-        });
-        // Tabs only work the first time they're clicked for some reason, so this fixes the problem.
-        $("#group-tabs .nav-item").click(function () {
-            $(".nav-item").removeClass("active show");
-            $(".tab-pane").removeClass("active show");
-            $(this).addClass("active show");
-            const href = $(this).attr("href");
-            $('$1'.replace('$1', href)).addClass("active show");
+            // Tabs only work the first time they're clicked for some reason, so this fixes the problem.
+            $("#group-tabs .nav-item").click(function () {
+                $(".nav-item").removeClass("active show");
+                $(".tab-pane").removeClass("active show");
+                $(this).addClass("active show");
+                const href = $(this).attr("href");
+                $('$1'.replace('$1', href)).addClass("active show");
+            });
         });
     </script>
 {% endblock javascript %}
