@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'core',
     'freqdist',
     'kwic',
+    'collocations',
     'django_extensions',
     'rest_framework',
     # 'api',
