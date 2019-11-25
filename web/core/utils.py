@@ -118,7 +118,7 @@ def only_letters(string):
     return "".join(char for char in string if char.isalpha() or char == ' ')
 
 
-def load_items(file="../seediq_items_updated-20191031-sung.csv"):
+def load_items(file="../seediq_items_updated-20191120-sung.csv"):
     start = time.time()
 
     with open(file) as fp:
@@ -193,7 +193,7 @@ def load_items(file="../seediq_items_updated-20191031-sung.csv"):
     logger.debug(f'Completed in {datetime.timedelta(seconds=end - start)}.')
 
 
-def load_extra_meaning(file='../seediq_extra_meaning_updated-20191031-sung.csv'):
+def load_extra_meaning(file='../seediq_extra_meaning_updated-20191114-sung.csv'):
     with open(file) as fp:
         reader = csv.reader(fp)
         header = next(reader)
@@ -209,7 +209,11 @@ def load_extra_meaning(file='../seediq_extra_meaning_updated-20191031-sung.csv')
             item_root = new_entry.pop('item_root')
             word_class = new_entry.pop('word_class').split()
 
-            if not meaning and not new_entry['sentence']:
+            phrase = new_entry.pop('phrase')
+            phrase_ch = new_entry.pop('phrase_ch')
+            phrase_en = new_entry.pop('phrase_en')
+
+            if not meaning and not new_entry['sentence'] and not phrase:
                 logger.debug(f'{headword}: Empty row.')
                 continue
 
@@ -238,9 +242,21 @@ def load_extra_meaning(file='../seediq_extra_meaning_updated-20191031-sung.csv')
 
             if new_entry['sentence']:
                 if sense.examples.filter(sentence=new_entry['sentence']).exists():
-                    logger.debug(f"{headword.headword} ({sense.headword_sense_no}) -- {new_entry['sentence']} already exists.")
-                    continue
-                Example.objects.create(sense=sense, **new_entry)
+                    logger.debug(
+                        f"{headword.headword} ({sense.headword_sense_no}) -- {new_entry['sentence']} already exists.")
+                else:
+                    Example.objects.create(sense=sense, **new_entry)
+
+            if phrase:
+                if sense.phrases.filter(phrase=phrase).exists():
+                    logger.debug(f"{headword.headword} ({sense.headword_sense_no}) -- {phrase} already exists.")
+                else:
+                    Phrase.objects.create(
+                        sense=sense,
+                        phrase=phrase,
+                        phrase_ch=phrase_ch,
+                        phrase_en=phrase_en
+                    )
             if idx % 100 == 0:
                 logger.debug(f'Processed {idx}...')
 
@@ -296,9 +312,9 @@ def gen_query_history(request: HttpRequest):
         return request
 
     query_str = f"({qs_length} hits) " \
-        f"<strong>Item</strong>: {search_name} | " \
-        f"<strong>Filter</strong>: {search_filter} | " \
-        f"<strong>Roots</strong>: {search_root}"
+                f"<strong>Item</strong>: {search_name} | " \
+                f"<strong>Filter</strong>: {search_filter} | " \
+                f"<strong>Roots</strong>: {search_root}"
 
     query_dict = {
         'query_str': query_str,
@@ -387,5 +403,3 @@ def export_zh_index():
         stroke_meaning_dict[key] = d
 
     return stroke_meaning_dict
-
-
