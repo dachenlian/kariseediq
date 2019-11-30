@@ -16,7 +16,6 @@
         </form>
     </div>
     <div class="row">
-        {# 3. TABLE TO DISPLAY THE UPLOADED PHOTOS #}
         <table id="gallery" class="table table-bordered">
             <thead class="thead-dark">
             <tr>
@@ -43,6 +42,29 @@
             {% endfor %}
             </tbody>
         </table>
+        <div class="modal fade" id="deleteSingleModal" tabindex="-1" role="dialog"
+             aria-labelledby="deleteSingleModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteSingleModalLabel">Delete?</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-primary">Delete</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <div class="modal fade" id="deleteAllModal" tabindex="-1" role="dialog" aria-labelledby="deleteAllModalLabel"
              aria-hidden="true">
