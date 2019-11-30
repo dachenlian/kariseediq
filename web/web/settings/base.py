@@ -50,6 +50,8 @@ INSTALLED_APPS = [
     'crispy_forms',
     'extra_views',
     'debug_toolbar',
+    'django_file_form',
+    'django_file_form.ajaxuploader',
 ]
 
 MIDDLEWARE = [

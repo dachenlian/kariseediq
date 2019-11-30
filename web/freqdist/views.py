@@ -29,7 +29,8 @@ class TextFileUploadView(View):
 
     def get(self, request):
         text_list = TextFile.objects.all()
-        return render(self.request, 'freqdist/upload.html', context={'text_list': text_list})
+        form = TextFileUploadForm()
+        return render(self.request, 'freqdist/upload.html', context={'text_list': text_list, 'form': form})
 
     def post(self, request):
         form = TextFileUploadForm(self.request.POST, self.request.FILES)

@@ -21,6 +21,7 @@ cihai = "*"
 nltk = "*"
 "psycopg2-binary" = "*"
 pyyaml = "*"
+django-file-form = "*"
 
 [dev-packages]
 

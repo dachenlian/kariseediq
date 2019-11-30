@@ -1,24 +1,26 @@
 {% extends 'base.html' %}
 {% load static %}
+{% include 'django_file_form/upload_template.html' %}
+
 
 {% block content %}
     <div class="row">
         <h1>Upload</h1>
     </div>
-        <div id="modal-progress" class="modal fade" data-backdrop="static" data-keyboard="false">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title">Uploading...</h4>
-                    </div>
-                    <div class="modal-body">
-                        <div class="progress">
-                            <div class="progress-bar" role="progressbar" style="width: 0;">0%</div>
-                        </div>
+    <div id="modal-progress" class="modal fade" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Uploading...</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="progress">
+                        <div class="progress-bar" role="progressbar" style="width: 0;">0%</div>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
     {# 1. BUTTON TO TRIGGER THE ACTION #}
     <div class="row">
         <button type="button" class="btn btn-primary js-upload-text">
@@ -63,6 +65,12 @@
             {% endfor %}
             </tbody>
         </table>
+        <div class="row">
+            <form id="fileupload" action="" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ form }}
+            </form>
+        </div>
         <div class="modal fade" id="deleteSingleModal" tabindex="-1" role="dialog"
              aria-labelledby="deleteSingleModalLabel"
              aria-hidden="true">
@@ -112,14 +120,24 @@
     </div>
 {% endblock content %}
 {% block javascript %}
-    <script src="{% static 'freqdist/js/jquery-file-upload/js/vendor/jquery.ui.widget.js' %}"></script>
-    <script src="{% static 'freqdist/js/jquery-file-upload/js/jquery.iframe-transport.js' %}"></script>
-    <script src="{% static 'freqdist/js/jquery-file-upload/js/jquery.fileupload.js' %}"></script>
+    {#    <script src="{% static 'freqdist/js/jQuery-File-Upload-10.4.0/js/jquery.fileupload.js' %}"></script>#}
+    <script src="{% static "ajaxuploader/js/fileuploader.js" %}"></script>
+    <script src="{% static "file_form/file_form.js" %}"></script>
+    <link rel="stylesheet" href="{% static "ajaxuploader/css/fileuploader.css" %}">
+    {#    <script src="{% static 'freqdist/js/jQuery-File-Upload-10.4.0/js/jquery.iframe-transport.js' %}"></script>#}
+    {#    <script src="{% static 'freqdist/js/jQuery-File-Upload-10.4.0/js/jquery.fileupload.js' %}"></script>#}
+    {#    <script src="{% static 'freqdist/js/jQuery-File-Upload-10.4.0/js/jquery.fileupload-process.js' %}"></script>#}
+    {#    <script src="{% static 'freqdist/js/jQuery-File-Upload-10.4.0/js/jquery.fileupload-ui.js' %}"></script>#}
+    {#    <script src="{% static 'freqdist/js/jQuery-File-Upload-10.4.0/js/vendor/jquery.ui.widget.js' %}"></script>#}
 
     {# PHOTOS PAGE SCRIPTS #}
-    <script src="{% static 'freqdist/js/upload.js' %}"></script>
+    {#    <script src="{% static 'freqdist/js/upload.js' %}"></script>#}
     {# Delete script #}
     <script>
+        {#$('#fileupload').fileupload();#}
+        $(function () {
+            initUploadFields($('#fileupload'));
+        });
         $('#deleteSingleModal').on('show.bs.modal', function (event) {
             let button = $(event.relatedTarget);
             let pk = button.data('pk');
