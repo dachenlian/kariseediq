@@ -1,7 +1,7 @@
 import functools
 import logging
 from multiprocessing import Pool, cpu_count, Manager
-from typing import Sequence
+from typing import Sequence, Tuple
 import re
 from collections import Counter, OrderedDict
 from itertools import groupby, chain
@@ -23,12 +23,12 @@ PUNCTUATION_RE = re.compile(rf'[{"".join(punctuations)}]')
 
 
 def _split_by_word_boundary(text):
-    return text.split()
+    return list(filter(bool, text.split()))
 
 
 def _split_by_sent_boundary(text):
     text = SENT_BOUNDARY_RE.sub('.', text)
-    return text.split('.')
+    return list(filter(bool, text.split('.')))
 
 
 # def _get_word_details_multiproc(word_freq_items: Sequence, senses: list):
