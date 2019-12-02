@@ -11,7 +11,7 @@ from django.views import View
 from django.views.generic import DeleteView
 from django.shortcuts import render, redirect
 from django.http import JsonResponse, HttpResponse
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.utils.http import urlencode
 
 from .forms import TextFileUploadForm
@@ -42,7 +42,7 @@ class TextFileUploadView(View):
                 text_file.name = file.name
                 text_file.save()
 
-        return redirect(self.template_name)
+        return redirect(reverse('freqdist:upload'))
 
 
 class TextSingleDeleteView(DeleteView):
