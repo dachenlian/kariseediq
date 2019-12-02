@@ -22,13 +22,21 @@ punctuations = "".join(['，', '。', '？', '！', '：', '；', '（', '）', 
 PUNCTUATION_RE = re.compile(rf'[{"".join(punctuations)}]')
 
 
+def _has_content(s):
+    if not s:
+        return False
+    if s.isspace():
+        return False
+    return True
+
+
 def _split_by_word_boundary(text):
-    return text.split()
+    return list(filter(_has_content, text.split()))
 
 
 def _split_by_sent_boundary(text):
     text = SENT_BOUNDARY_RE.sub('.', text)
-    return text.split('.')
+    return list(filter(_has_content, text.split('.')))
 
 
 # def _get_word_details_multiproc(word_freq_items: Sequence, senses: list):
