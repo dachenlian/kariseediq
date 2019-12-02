@@ -1,7 +1,7 @@
 import functools
 import logging
 from multiprocessing import Pool, cpu_count, Manager
-from typing import Sequence
+from typing import Sequence, Tuple
 import re
 from collections import Counter, OrderedDict
 from itertools import groupby, chain

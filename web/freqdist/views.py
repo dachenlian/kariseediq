@@ -26,22 +26,23 @@ FILE_PATH = RESULTS_DIR.joinpath(FILE_NAME)
 
 
 class TextFileUploadView(View):
+    template_name = 'freqdist/simple-upload.html'
 
     def get(self, request):
         text_list = TextFile.objects.all()
         form = TextFileUploadForm()
-        return render(self.request, 'freqdist/upload.html', context={'text_list': text_list, 'form': form})
+        return render(self.request, self.template_name, context={'text_list': text_list, 'form': form})
 
     def post(self, request):
         form = TextFileUploadForm(self.request.POST, self.request.FILES)
+
         if form.is_valid():
-            text_file = form.save(commit=False)
-            text_file.name = self.request.FILES.get('file').name
-            text_file.save()
-            data = {'is_valid': True, 'name': text_file.name, 'url': text_file.file.url}
-        else:
-            data = {'is_valid': False}
-        return JsonResponse(data)
+            for file in self.request.FILES.getlist('file'):
+                text_file = TextFile(file=file)
+                text_file.name = file.name
+                text_file.save()
+
+        return redirect(self.template_name)
 
 
 class TextSingleDeleteView(DeleteView):
