@@ -1,6 +1,7 @@
 import functools
 import logging
 from multiprocessing import Pool, cpu_count, Manager
+from pathlib import Path
 from typing import Sequence, Tuple
 import re
 from collections import Counter, OrderedDict
@@ -25,7 +26,9 @@ PUNCTUATION_RE = re.compile(rf'[{"".join(punctuations)}]')
 def _has_content(s):
     if not s:
         return False
-    if s.isspace():
+    elif s.isspace():
+        return False
+    elif s == 'NULL':
         return False
     return True
 
@@ -34,9 +37,12 @@ def _split_by_word_boundary(text):
     return list(filter(_has_content, text.split()))
 
 
-def _split_by_sent_boundary(text):
-    text = SENT_BOUNDARY_RE.sub('.', text)
-    return list(filter(_has_content, text.split('.')))
+def _split_by_sent_boundary(text: str):
+    r = list(filter(_has_content, (t.strip() for t in SENT_BOUNDARY_RE.split(text))))
+    # with open('test_dict_sent_split.txt', 'a') as f:
+    #     for s in r:
+    #         print(s, file=f)
+    return r
 
 
 # def _get_word_details_multiproc(word_freq_items: Sequence, senses: list):
@@ -55,13 +61,16 @@ def build_item_root_freq(include_examples: bool) -> dict:
     files = TextFile.objects.all()
 
     # Get text from uploaded files
+    path = Path('test_dict_sent_split.txt')
+    if path.exists():
+        path.unlink()
     for file in files:
         text = file.read_and_decode()
 
         sent_num += len(_split_by_sent_boundary(text))
         word_num += len(_split_by_word_boundary(text))
 
-        text = PUNCTUATION_RE.sub('', text).lower().split()
+        text = PUNCTUATION_RE.sub(' ', text).lower().split()
         word_freq.update(text)
 
     if include_examples:

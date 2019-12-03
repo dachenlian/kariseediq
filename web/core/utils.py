@@ -199,7 +199,7 @@ def load_extra_meaning(file='../seediq_extra_meaning_updated-20191114-sung.csv')
         header = next(reader)
 
         for idx, row in enumerate(reader, 1):
-            row = [_normalize(r.strip().replace('\n')) for r in row]
+            row = [_normalize(r.strip().replace('\n', '')) for r in row]
             new_entry = dict(zip(header, row))
             headword, headword_sense_no = _split_item_name(new_entry.pop('item_name'))
             meaning = _normalize(new_entry.pop('meaning'))
@@ -268,7 +268,7 @@ def load_extra_phrases(file='../seediq_extra_phrases_updated-20190617-sung.csv')
         header = next(reader)
 
         for idx, row in enumerate(reader, 1):
-            row = [_normalize(r.strip().replace('\n')) for r in row]
+            row = [_normalize(r.strip().replace('\n', '')) for r in row]
             new_entry = dict(zip(header, row))
             headword, _ = _split_item_name(new_entry.pop('item_name'))
             meaning = _normalize(new_entry.pop('meaning'))

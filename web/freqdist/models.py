@@ -6,5 +6,8 @@ class TextFile(models.Model):
     file = models.FileField(upload_to='uploads/freq/')
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
-    def read_and_decode(self):
-        return "".join(self.file.read().decode('utf-8-sig').strip().splitlines())
+    def read_and_decode(self, as_list=False):
+        text = self.file.read().decode('utf-8-sig').splitlines()
+        if as_list:
+            return text
+        return ".".join(text)
