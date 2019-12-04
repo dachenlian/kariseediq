@@ -1,11 +1,12 @@
+from collections import Counter, OrderedDict
 import functools
+from itertools import groupby, chain
 import logging
 from multiprocessing import Pool, cpu_count, Manager
 from pathlib import Path
-from typing import Sequence, Tuple
 import re
-from collections import Counter, OrderedDict
-from itertools import groupby, chain
+from typing import Sequence, Tuple, List
+from typing import OrderedDict as TypingOrderedDict
 
 import chardet
 from django.db.models import Q
@@ -49,6 +50,24 @@ def _split_by_sent_boundary(text: str):
 # def _get_word_details_multiproc(word_freq_items: Sequence, senses: list):
 #     max_workers = cpu_count() // 4*3 + (cpu_count() % 4*3 > 0)
 #     with Pool(max_workers=max_workers) as pool:
+
+
+def _compile_attr_groups(word_details: List[dict], attr: str) -> TypingOrderedDict:
+    sorting_key = {
+        'word_class': Sense.WordClassChoices,
+        'focus': Sense.FocusChoices
+    }
+    word_details.sort(key=lambda d: d[attr], reverse=True)
+    sorting_key = {s.value: idx for idx, s in enumerate(sorting_key.get(attr))}
+    groups = groupby(word_details, lambda d: ['無'] if not d[attr] else d[attr])
+    groups = [(" ".join(k), list(g)) for k, g in groups]
+    groups.sort(key=lambda k: sorting_key.get(k[0], 100))
+    groups = [('所有', list(chain.from_iterable(w[1] for w in groups)))] + groups
+    for i in range(len(groups)):
+        groups[i][1].sort(key=lambda d: (d['item_freq'], d['item_name']),
+                          reverse=True)  # Sort within each group by frequency, then alphabetical order
+    groups = OrderedDict(groups)
+    return groups
 
 
 def build_item_root_freq(include_examples: bool) -> dict:
@@ -120,17 +139,7 @@ def build_item_root_freq(include_examples: bool) -> dict:
     for word in word_details:
         word['root_freq'] = root_freq.get(word['root'])
 
-    word_details.sort(key=lambda d: d['word_class'], reverse=True)
-    word_class_sorting_key = {w.value: idx for idx, w in enumerate(Sense.WordClassChoices)}
-    logger.debug(word_class_sorting_key)
-    logger.debug('代名詞' in word_class_sorting_key)
-    groups = groupby(word_details, lambda d: ['無'] if not d['word_class'] else d['word_class'])
-    word_class_groups = [(" ".join(k), list(g)) for k, g in groups]
-    word_class_groups.sort(key=lambda k: word_class_sorting_key.get(k[0], 100))
-    word_class_groups = [('所有', list(chain.from_iterable(w[1] for w in word_class_groups)))] + word_class_groups
-    for i in range(len(word_class_groups)):
-        word_class_groups[i][1].sort(key=lambda d: (d['item_freq'], d['item_name']), reverse=True)
-    word_class_groups = OrderedDict(word_class_groups)
+    word_class_groups = _compile_attr_groups(word_details, 'word_class')
     results = {
         'word_details': word_details,
         'word_class_groups': word_class_groups,
