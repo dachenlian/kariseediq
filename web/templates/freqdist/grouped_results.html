@@ -45,10 +45,10 @@
                     <div class="row no-gutters">
                         {% for key, group in word_class_groups.items %}
                             {% if forloop.first %}
-                                <a href="#{{ key }}" id="{{ key }}-tab" class="nav-item col nav-link active"
+                                <a href="#{{ key }}" id="{{ key }}-tab" class="nav-item p-2 col nav-link active"
                                    data-toggle="tab">{{ key }}</a>
                             {% else %}
-                                <a href="#{{ key }}" id="{{ key }}-tab" class="nav-item col nav-link"
+                                <a href="#{{ key }}" id="{{ key }}-tab" class="nav-item p-2 col nav-link"
                                    data-toggle="tab">{{ key }}</a>
                             {% endif %}
                             {% if forloop.counter|divisibleby:"10" %}
