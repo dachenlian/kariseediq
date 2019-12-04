@@ -7,6 +7,7 @@ import re
 from collections import Counter, OrderedDict
 from itertools import groupby, chain
 
+import chardet
 from django.db.models import Q
 
 from .models import TextFile
