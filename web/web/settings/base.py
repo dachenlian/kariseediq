@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     'kwic',
     'collocations',
     'django_extensions',
-    'rest_framework',
+    # 'rest_framework',
     # 'api',
     'crispy_forms',
     'extra_views',
