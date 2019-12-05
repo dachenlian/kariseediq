@@ -2,11 +2,13 @@ version: '3'
 
 services:
   db:
+    container_name: ks_db
     image: postgres
     restart: always
     volumes:
       - kariseediq-volume:/var/lib/postgresql/data
   web:
+    container_name: ks_web
     build: .
     volumes:
       - ./:/app/
@@ -20,5 +22,11 @@ services:
     stdin_open: true
     depends_on:
       - db
+  memcached:
+    container_name: ks_memcached
+    image: memcached
+    entrypoint:
+      - memcached
+      - -m 64
 volumes:
   kariseediq-volume:
