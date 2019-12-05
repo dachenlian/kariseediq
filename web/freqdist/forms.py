@@ -1,7 +1,5 @@
 from django import forms
 
-from django_file_form.forms import FileFormMixin, UploadedFileField
-
 from .models import TextFile
 
 
