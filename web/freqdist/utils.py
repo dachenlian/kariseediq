@@ -57,6 +57,7 @@ def _compile_attr_groups(word_details: List[dict], attr: str) -> TypingOrderedDi
         'word_class': Sense.WordClassChoices,
         'focus': Sense.FocusChoices
     }
+    logger.debug(f'Compiling {attr}')
     word_details.sort(key=lambda d: d[attr], reverse=True)
     sorting_key = {s.value: idx for idx, s in enumerate(sorting_key.get(attr))}
     groups = groupby(word_details, lambda d: ['無'] if not d[attr] else d[attr])
@@ -67,6 +68,7 @@ def _compile_attr_groups(word_details: List[dict], attr: str) -> TypingOrderedDi
         groups[i][1].sort(key=lambda d: (d['item_freq'], d['item_name']),
                           reverse=True)  # Sort within each group by frequency, then alphabetical order
     groups = OrderedDict(groups)
+    logger.debug(f'Compiling complete.')
     return groups
 
 
@@ -134,7 +136,7 @@ def build_item_root_freq(include_examples: bool) -> dict:
                     'variant': variant,
                 })
         if idx % 500 == 0:
-            print(f"Completed {idx} of {len(word_freq)}")
+            logger.debug(f"Completed {idx} of {len(word_freq)}")
 
     for word in word_details:
         word['root_freq'] = root_freq.get(word['root'])

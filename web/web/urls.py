@@ -24,7 +24,6 @@ urlpatterns = [
                   path('freq/', include('freqdist.urls', namespace='freq')),
                   path('kwic/', include('kwic.urls', namespace='kwic')),
                   path('collocation/', include('collocations.urls', namespace='collocations')),
-                  path('upload/', include('django_file_form.urls')),
                   path('', include('core.urls', namespace='core')),
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
