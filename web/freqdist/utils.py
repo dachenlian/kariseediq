@@ -59,7 +59,9 @@ def _compile_attr_groups(word_details: List[dict], attr: str) -> TypingOrderedDi
     }
     logger.debug(f'Compiling {attr}')
     word_details.sort(key=lambda d: d[attr], reverse=True)
+    # Sort keys by order found in models.py
     sorting_key = {s.value: idx for idx, s in enumerate(sorting_key.get(attr))}
+    # todo: have each key as its own key: value pair instead of combining them (i.e. k1, k2: value)
     groups = groupby(word_details, lambda d: ['無'] if not d[attr] else d[attr])
     groups = [(" ".join(k), list(g)) for k, g in groups]
     groups.sort(key=lambda k: sorting_key.get(k[0], 100))
@@ -76,7 +78,7 @@ def build_item_root_freq(include_examples: bool) -> dict:
     word_freq = Counter()
     root_freq = Counter()
 
-    word_details = []
+    word_details, not_found = [], []
 
     sent_num, word_num = 0, 0
 
@@ -135,6 +137,17 @@ def build_item_root_freq(include_examples: bool) -> dict:
                     'word_class': word_class,
                     'variant': variant,
                 })
+                break
+        else:
+            not_found.append({
+                'item_name': word,
+                'item_freq': freq,
+                'root': '',
+                'root_freq': '',
+                'focus': '',
+                'word_class': '',
+                'variant': '',
+            })
         if idx % 500 == 0:
             logger.debug(f"Completed {idx} of {len(word_freq)}")
 
@@ -142,9 +155,13 @@ def build_item_root_freq(include_examples: bool) -> dict:
         word['root_freq'] = root_freq.get(word['root'])
 
     word_class_groups = _compile_attr_groups(word_details, 'word_class')
+    focus_groups = _compile_attr_groups(word_details, 'focus')
+
     results = {
         'word_details': word_details,
         'word_class_groups': word_class_groups,
+        'focus_groups': focus_groups,
+        'not_found': not_found,
         'word_num': word_num,
         'sent_num': sent_num,
         'include_examples': include_examples,
