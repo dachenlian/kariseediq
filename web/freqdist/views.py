@@ -1,6 +1,7 @@
 import csv
 import pickle
 import datetime
+from typing import List
 from urllib.parse import quote
 
 from pathlib import Path
@@ -99,6 +100,17 @@ class FreqResultsView(View):
         return render(request, 'freqdist/grouped_results.html', context=results)
 
 
+def _format_csv_rows(results: List[dict]) -> List[dict]:
+    formatted_rows = []
+    for row in results:
+        for key in row:
+            if isinstance(row[key], list):
+                row[key] = ", ".join(row[key])
+        formatted_rows.append(row)
+
+    return formatted_rows
+
+
 def export_results_to_csv(request):
     with FILE_PATH.open('rb') as f:
         results = pickle.load(f)
@@ -111,6 +123,7 @@ def export_results_to_csv(request):
         word_details = results.get('word_details')
         filename = f'{date}_freq_results.csv'
     # filename = 'freq_results.csv'
+    word_details = _format_csv_rows(word_details)
     filename = f'{date}_freq_results.csv'
     fieldnames = word_details[0].keys()
     response = HttpResponse(content_type='text/csv')
