@@ -123,6 +123,7 @@ def export_results_to_csv(request):
         word_details = results.get('word_details')
         filename = f'{date}_freq_results.csv'
     # filename = 'freq_results.csv'
+    not_found = results.get('not_found')
     word_details = _format_csv_rows(word_details)
     filename = f'{date}_freq_results.csv'
     fieldnames = word_details[0].keys()
@@ -132,4 +133,5 @@ def export_results_to_csv(request):
     writer = csv.DictWriter(response, fieldnames=fieldnames)
     writer.writeheader()
     writer.writerows(word_details)
+    writer.writerows(not_found)
     return response
