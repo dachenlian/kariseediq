@@ -231,6 +231,7 @@ class SenseDeleteView(DeleteView):
 
 
 class PendingListView(ListView):
+    """Show roots of senses that do not have their own entries as headwords."""
     model = Headword
     paginate_by = 1000
     context_object_name = 'senses'
