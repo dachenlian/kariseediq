@@ -44,13 +44,13 @@ class Sense(models.Model):
         ZERO = '零焦點標記'
         AGENT = '主事焦點'
         PATIENT = '受事焦點'
-        PATIENT_IMPERATIVE = '受事焦點（-i/-e/-o 祈使）'
+        PATIENT_IMPERATIVE = '受事焦點（-i/-e/-o祈使）'
         N_PERFECT = '<n>完成貌'
         LOCATIVE = '處所焦點'
         REF_BENE = '參考焦點（受惠）'
         REF_INSTRUMENTAL = '參考焦點（工具）'
         REF_CAUSAL = '參考焦點（因為）'
-        REF_IMPERATIVE = '參考焦點（-ani/-ane/-ano 祈使）'
+        REF_IMPERATIVE = '參考焦點（-ani/-ane/-ano祈使）'
         REF_OTHER = '參考焦點（其他）'
         M_MP_M_FUTURE = 'm-/mp-/<m>未來'
         MG_RESEMBLE = 'mg-像；猶如'
@@ -59,6 +59,7 @@ class Sense(models.Model):
         N_BELONG = 'n-屬於'
         P_MAKE = 'p-使動'
         P_FUTURE = 'p-未來'
+        P_ = 'p-'  # todo: to be determined
         PN = 'pn-'
         T_ = 't-'
         TG_ = 'tg-'
@@ -116,13 +117,11 @@ class Sense(models.Model):
     meaning_en = models.CharField(max_length=255, blank=True, default="")
     main_meaning_word_class = models.CharField(max_length=255, blank=True, default="")
     word_class = ArrayField(
-        models.CharField(max_length=255, blank=True, choices=[(w.value, w.value) for w in WordClassChoices]),
-        default=list,
-        blank=True)
+        models.CharField(max_length=255, choices=[(w.value, w.value) for w in WordClassChoices]),
+        default=list)
     cultural_notes = models.CharField(max_length=255, blank=True, default="")
-    focus = ArrayField(models.CharField(max_length=255, blank=True, choices=[(f.value, f.value) for f in FocusChoices]),
-                       default=list,
-                       blank=True)
+    focus = ArrayField(models.CharField(max_length=255, choices=[(f.value, f.value) for f in FocusChoices]),
+                       default=list)
     char_strokes_first = models.CharField(max_length=255, blank=True, default="")  # strokes for first char of meaning
     char_strokes_all = models.CharField(max_length=255, blank=True, default="")  # strokes for all chars of meaning
     frequency = models.IntegerField(blank=True, default=0)
@@ -130,14 +129,10 @@ class Sense(models.Model):
     sound = models.FileField(upload_to='sound/', blank=True)
     grammar_notes = models.CharField(max_length=255, blank=True, default="")  # 語法註記
     refer_to = models.CharField(max_length=255, blank=True, default="")  # 參照
-    tag = ArrayField(models.CharField(max_length=255, blank=True, choices=[(t.value, t.value) for t in TagChoices]),
-                     default=list,
-                     blank=True)  # 標籤
+    tag = ArrayField(models.CharField(max_length=255, choices=[(t.value, t.value) for t in TagChoices]),
+                     default=list)  # 標籤
     toda = models.CharField(max_length=255, blank=True, default="")
-    # toda_root = models.CharField(max_length=255, blank=True, default="")  # todar
     truku = models.CharField(max_length=255, blank=True, default="")
-
-    # truku_root = models.CharField(max_length=255, blank=True, default="")  # trukur
 
     class Meta:
         unique_together = ('headword', 'headword_sense_no')
