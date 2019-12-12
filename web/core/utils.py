@@ -15,22 +15,27 @@ from .forms import SenseForm
 from .models import Headword, Sense, Phrase, Example
 
 logger = logging.getLogger(__name__)
+SEP_RE = re.compile(r'[;；,]')
 
 C = Cihai()
 if not C.unihan.is_bootstrapped:
     C.unihan.bootstrap()
 
 
-def _add_tag(entry: dict, user: str, tag: str) -> list:
-    tags = [e.strip() for e in entry.get('tag', '').split(',')]
+def _add_tag(entry: dict, user: str, tag: str) -> List[str]:
+    tags = _sep_and_filter(entry.get('tag', ''))
     if entry['user'] == user and tag not in tags:
         tags.append(tag)
     return tags
 
 
-def _normalize(s):
+def _normalize(s: str) -> str:
     s = re.sub(r'\s?;\s?', '；', s)
     return s
+
+
+def _sep_and_filter(s: str) -> List[str]:
+    return list(filter(bool, (p.strip() for p in SEP_RE.split(s))))
 
 
 def _clean_entry(entry: dict) -> dict:
@@ -44,15 +49,15 @@ def _clean_entry(entry: dict) -> dict:
     entry['headword'] = headword
     entry['headword_sense_no'] = headword_sense_no
     entry['root'] = root
-    entry['word_class']: list = entry.pop('word_class').split()
-    entry['focus']: list = entry.pop('focus').split()
+    entry['word_class']: list = _sep_and_filter(entry.pop('word_class'))
+    entry['focus']: list = _sep_and_filter(entry.pop('focus'))
     entry['root_sense_no'] = root_sense_no
     entry['meaning'] = _normalize(entry['meaning'])
     entry['created_date'] = _parse_date(entry['created_date'])
     entry['refer_to'] = entry.pop('source')
     entry['tag']: list = _add_tag(entry, 'Kcjason2', '植物')
     entry['is_root'] = _convert_to_bool(entry.pop('is_root'))
-    entry['variant'] = [e.strip() for e in entry.pop('variant').split(';')]
+    entry['variant'] = _sep_and_filter(entry.pop('variant'))
     del entry['toda_root']
     del entry['truku_root']
 
@@ -62,15 +67,16 @@ def _clean_entry(entry: dict) -> dict:
     return entry
 
 
-def _contains_digit(s):
+def _contains_digit(s: str) -> bool:
+    """Check if any char in string is a digit."""
     return any(c.isdigit() for c in s)
 
 
-def _convert_to_bool(cell):
+def _convert_to_bool(cell: str) -> bool:
     return cell.lower() == 'yes'
 
 
-def _parse_date(str_date):
+def _parse_date(str_date: str) -> datetime.datetime:
     try:
         parsed = datetime.datetime.strptime(str_date, '%Y-%m-%d')
     except ValueError as e:
@@ -80,7 +86,7 @@ def _parse_date(str_date):
         return parsed
 
 
-def _split_item_name(s):
+def _split_item_name(s: str) -> Tuple[str, int]:
     if _contains_digit(s):
         m = re.match(r'([A-Za-z\-\s]+)_?(\d)?', s)
         headword, sense = m.group(1).strip(), m.group(2).strip()
@@ -114,7 +120,7 @@ def build_autocomplete_response(qs: List[Headword]) -> List[str]:
     return [f'{hw.headword}\n ({idx}) {s.meaning}' for hw in qs for idx, s in enumerate(hw.senses.all(), 1)]
 
 
-def only_letters(string):
+def only_letters(string) -> str:
     return "".join(char for char in string if char.isalpha() or char == ' ')
 
 
@@ -207,7 +213,7 @@ def load_extra_meaning(file='../seediq_extra_meaning_updated-20191114-sung.csv')
             meaning_en = new_entry.pop('meaning_en')
             is_root = new_entry.pop('is_root') == 'yes'
             item_root = new_entry.pop('item_root')
-            word_class = new_entry.pop('word_class').split()
+            word_class = _sep_and_filter(new_entry.pop('word_class'))
 
             phrase = new_entry.pop('phrase')
             phrase_ch = new_entry.pop('phrase_ch')
