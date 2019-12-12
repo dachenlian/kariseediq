@@ -5,7 +5,7 @@ import logging
 from multiprocessing import Pool, cpu_count, Manager
 from pathlib import Path
 import re
-from typing import Sequence, Tuple, List
+from typing import Sequence, Tuple, List, Dict
 from typing import OrderedDict as TypingOrderedDict
 
 import chardet
@@ -52,24 +52,50 @@ def _split_by_sent_boundary(text: str):
 #     with Pool(max_workers=max_workers) as pool:
 
 
-def _compile_attr_groups(word_details: List[dict], attr: str) -> TypingOrderedDict:
+# def _compile_attr_groups(word_details: List[dict], attr: str) -> TypingOrderedDict:
+#     sorting_key = {
+#         'word_class': Sense.WordClassChoices,
+#         'focus': Sense.FocusChoices
+#     }
+#     logger.debug(f'Compiling {attr}')
+#     word_details.sort(key=lambda d: d[attr], reverse=True)
+#     # Sort keys by order found in models.py
+#     sorting_key = {s.value: idx for idx, s in enumerate(sorting_key.get(attr))}
+#     # todo: have each key as its own key: value pair instead of combining them (i.e. k1, k2: value)
+#     groups = groupby(word_details, lambda d: ['無'] if not d[attr] else d[attr])
+#     groups = [(" ".join(k), list(g)) for k, g in groups]
+#     groups.sort(key=lambda k: sorting_key.get(k[0], 100))
+#     groups = [('所有', list(chain.from_iterable(w[1] for w in groups)))] + groups
+#     for i in range(len(groups)):
+#         groups[i][1].sort(key=lambda d: (d['item_freq'], d['item_name']),
+#                           reverse=True)  # Sort within each group by frequency, then alphabetical order
+#     groups = OrderedDict(groups)
+#     logger.debug(f'Compiling complete.')
+#     return groups
+
+
+def _compile_attr_groups(word_details: List[dict], attr: str) -> Dict[str, List[dict]]:
     sorting_key = {
         'word_class': Sense.WordClassChoices,
         'focus': Sense.FocusChoices
     }
     logger.debug(f'Compiling {attr}')
-    word_details.sort(key=lambda d: d[attr], reverse=True)
-    # Sort keys by order found in models.py
-    sorting_key = {s.value: idx for idx, s in enumerate(sorting_key.get(attr))}
-    # todo: have each key as its own key: value pair instead of combining them (i.e. k1, k2: value)
-    groups = groupby(word_details, lambda d: ['無'] if not d[attr] else d[attr])
-    groups = [(" ".join(k), list(g)) for k, g in groups]
-    groups.sort(key=lambda k: sorting_key.get(k[0], 100))
-    groups = [('所有', list(chain.from_iterable(w[1] for w in groups)))] + groups
-    for i in range(len(groups)):
-        groups[i][1].sort(key=lambda d: (d['item_freq'], d['item_name']),
-                          reverse=True)  # Sort within each group by frequency, then alphabetical order
-    groups = OrderedDict(groups)
+    groups = {key.value: list() for key in list(sorting_key.get(attr))}
+    groups['無'] = list()
+
+    for word in word_details:
+        features = word.get(attr)
+        if not features:
+            groups['無'].append(word)
+            continue
+        for f in features:
+            groups[f].append(word)
+
+    merged = {'所有': list(chain.from_iterable(g for g in groups.values()))}
+    groups = {**merged, **groups}
+    for group in groups:
+        groups[group].sort(key=lambda d: (d['item_freq'], d['item_name']),
+                           reverse=True)  # Sort within each group by frequency, then alphabetical order
     logger.debug(f'Compiling complete.')
     return groups
 
