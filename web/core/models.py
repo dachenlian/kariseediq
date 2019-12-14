@@ -59,7 +59,7 @@ class Sense(models.Model):
         N_BELONG = 'n-屬於'
         P_MAKE = 'p-使動'
         P_FUTURE = 'p-未來'
-        P_ = 'p-'  # todo: to be determined
+        P_ = 'p-'  # todo: should be removed
         PN = 'pn-'
         T_ = 't-'
         TG_ = 'tg-'
