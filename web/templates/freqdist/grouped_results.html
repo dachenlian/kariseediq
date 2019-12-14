@@ -19,7 +19,7 @@
     </div>
     <div class="row">
         <div class="col">
-            <form action="{% url 'freqdist:results' %}">
+            <form>
                 <div class="form-check form-check-inline">
                     <input id="id_includeExamples" type="checkbox" class="form-check-input" value="True"
                            name="includeExamples">
@@ -33,7 +33,8 @@
         </div>
         <div class="col-lg-6 col-sm-12">
             <p class="text-right">
-                <a class="btn btn-success" href="{% url 'freq:export' %}">Export All to CSV</a>
+                <a class="btn btn-success" href="{% url 'freq:export' %}?group={{ selected_group }}">Export All to
+                    CSV</a>
             </p>
         </div>
     </div>
@@ -43,7 +44,7 @@
             <nav class="nav nav-tabs nav-justified bg-dark" id="group-tabs">
                 <div class="container">
                     <div class="row no-gutters">
-                        {% for key, group in word_class_groups.items %}
+                        {% for key, group in groups.items %}
                             {% if forloop.first %}
                                 <a href="#{{ key }}" id="{{ key }}-tab" class="nav-item p-2 col nav-link active"
                                    data-toggle="tab">{{ key }}</a>
@@ -64,7 +65,7 @@
     </div>
     <!-- Create content -->
     <div class="tab-content">
-        {% for key, group in word_class_groups.items %}
+        {% for key, group in groups.items %}
             {% if forloop.first %}
                 <div class="tab-pane fade show active" id="{{ key }}">
                     {% include 'freqdist/freq_table_snippet.html' with word_details=group key=key %}

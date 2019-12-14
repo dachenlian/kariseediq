@@ -184,7 +184,7 @@ def build_item_root_freq(include_examples: bool) -> dict:
     focus_groups = _compile_attr_groups(word_details, 'focus')
 
     results = {
-        'word_details': word_details,
+        # 'word_details': word_details,
         'word_class_groups': word_class_groups,
         'focus_groups': focus_groups,
         'not_found': not_found,

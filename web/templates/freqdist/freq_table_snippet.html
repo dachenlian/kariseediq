@@ -4,7 +4,8 @@
     </div>
     <div class="col-4 align-middle">
         <p class="text-right mb-0">
-            <a class="btn btn-success align-middle mb-0" href="{% url 'freq:export' %}?group={{ key }}">Export Group to
+            <a class="btn btn-success align-middle mb-0"
+               href="{% url 'freq:export' %}?tab={{ key }}?group={{ selected_group }}">Export Group to
                 CSV</a>
         </p>
     </div>

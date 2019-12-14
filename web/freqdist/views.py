@@ -74,7 +74,11 @@ class TextAllDeleteView(View):
 
 
 class FreqResultsView(View):
+    selected_group = None
+
     def get(self, request, *args, **kwargs):
+        group_list = ['word_class_groups', 'focus_groups']
+        group_list.remove(self.selected_group)
         recalculate = request.GET.get('recalculate')
         include_examples = request.GET.get('includeExamples') == 'True'
         sort_key = request.GET.get('order-by')
@@ -91,13 +95,26 @@ class FreqResultsView(View):
                 results = pickle.load(f)
 
         if sort_key:
-            for key in results['word_class_groups']:
-                results['word_class_groups'][key].sort(
+            for key in results[self.selected_group]:
+                results[self.selected_group][key].sort(
                     key=lambda d: (0, d.get('item_name')) if not d.get(sort_key) else (  # Some root_freq are None
                         d.get(sort_key), d.get('item_name')),  # sort by frequency then alphabetically
                     reverse=sort_dir)
 
+        results['groups'] = results.pop(self.selected_group)
+        results['selected_group'] = self.selected_group
+        for key in group_list:
+            results.pop(key)
+
         return render(request, 'freqdist/grouped_results.html', context=results)
+
+
+class FreqResultsWordClassView(FreqResultsView):
+    selected_group = "word_class_groups"
+
+
+class FreqResultsMorphoView(FreqResultsView):
+    selected_group = "focus_groups"
 
 
 def _format_csv_rows(results: List[dict]) -> List[dict]:
