@@ -91,7 +91,7 @@ def _compile_attr_groups(word_details: List[dict], attr: str) -> Dict[str, List[
         for f in features:
             groups[f].append(word)
 
-    merged = {'所有': list(chain.from_iterable(g for g in groups.values()))}
+    merged = {'所有': word_details}
     groups = {**merged, **groups}
     for group in groups:
         groups[group].sort(key=lambda d: (d['item_freq'], d['item_name']),
