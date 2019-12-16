@@ -1,8 +1,9 @@
 import csv
-import pickle
 import datetime
+import logging
+from itertools import chain
+import pickle
 from typing import List
-from urllib.parse import quote
 
 from pathlib import Path
 
@@ -24,6 +25,8 @@ if not RESULTS_DIR.exists():
     RESULTS_DIR.mkdir(parents=True)
 FILE_NAME = 'freq_results.pkl'
 FILE_PATH = RESULTS_DIR.joinpath(FILE_NAME)
+
+logger = logging.getLogger(__name__)
 
 
 class TextFileUploadView(View):
@@ -131,18 +134,20 @@ def _format_csv_rows(results: List[dict]) -> List[dict]:
 def export_results_to_csv(request):
     with FILE_PATH.open('rb') as f:
         results = pickle.load(f)
-    group = request.GET.get('group')
+    group = request.GET.get('group')  # e.g. word_class or morphological (focus)
+    tab = request.GET.get('tab')  # e.g. nouns or verbs
     date = results.get('date').strftime('%Y%m%d')
-    if group:
-        word_details = results.get('word_class_groups').get(group)
-        filename = f'{date}_{group}_freq_results.csv'
+    logger.debug(f'{group}{tab}')
+    if tab:
+        word_details = results.get(group).get(tab)
+        filename = f'{date}_{group}_{tab}_freq_results.csv'
     else:
-        word_details = results.get('word_details')
-        filename = f'{date}_freq_results.csv'
+        word_details = results.get(group)
+        filename = f'{date}_{group}_freq_results.csv'
     # filename = 'freq_results.csv'
     not_found = results.get('not_found')
     word_details = _format_csv_rows(word_details)
-    filename = f'{date}_freq_results.csv'
+    filename = f'{date}_{group}_freq_results.csv'
     fieldnames = word_details[0].keys()
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = f'attachment; filename="{filename}"'
