@@ -1,12 +1,9 @@
-from collections import Counter, OrderedDict
-import functools
-from itertools import groupby, chain
+from collections import Counter
 import logging
-from multiprocessing import Pool, cpu_count, Manager
+from itertools import chain
 from pathlib import Path
 import re
-from typing import Sequence, Tuple, List, Dict
-from typing import OrderedDict as TypingOrderedDict
+from typing import Dict, List, Iterator, Set
 
 import chardet
 from django.db.models import Q
@@ -47,33 +44,6 @@ def _split_by_sent_boundary(text: str):
     return r
 
 
-# def _get_word_details_multiproc(word_freq_items: Sequence, senses: list):
-#     max_workers = cpu_count() // 4*3 + (cpu_count() % 4*3 > 0)
-#     with Pool(max_workers=max_workers) as pool:
-
-
-# def _compile_attr_groups(word_details: List[dict], attr: str) -> TypingOrderedDict:
-#     sorting_key = {
-#         'word_class': Sense.WordClassChoices,
-#         'focus': Sense.FocusChoices
-#     }
-#     logger.debug(f'Compiling {attr}')
-#     word_details.sort(key=lambda d: d[attr], reverse=True)
-#     # Sort keys by order found in models.py
-#     sorting_key = {s.value: idx for idx, s in enumerate(sorting_key.get(attr))}
-#     # todo: have each key as its own key: value pair instead of combining them (i.e. k1, k2: value)
-#     groups = groupby(word_details, lambda d: ['無'] if not d[attr] else d[attr])
-#     groups = [(" ".join(k), list(g)) for k, g in groups]
-#     groups.sort(key=lambda k: sorting_key.get(k[0], 100))
-#     groups = [('所有', list(chain.from_iterable(w[1] for w in groups)))] + groups
-#     for i in range(len(groups)):
-#         groups[i][1].sort(key=lambda d: (d['item_freq'], d['item_name']),
-#                           reverse=True)  # Sort within each group by frequency, then alphabetical order
-#     groups = OrderedDict(groups)
-#     logger.debug(f'Compiling complete.')
-#     return groups
-
-
 def _compile_attr_groups(word_details: List[dict], attr: str) -> Dict[str, List[dict]]:
     sorting_key = {
         'word_class': Sense.WordClassChoices,
@@ -111,9 +81,6 @@ def build_item_root_freq(include_examples: bool) -> dict:
     files = TextFile.objects.all()
 
     # Get text from uploaded files
-    path = Path('test_dict_sent_split.txt')
-    if path.exists():
-        path.unlink()
     for file in files:
         text = file.read_and_decode()
 
@@ -192,4 +159,33 @@ def build_item_root_freq(include_examples: bool) -> dict:
         'sent_num': sent_num,
         'include_examples': include_examples,
     }
+    return results
+
+
+def _flatten(qs: Iterator) -> Set[str]:
+    r = set()
+    for q in qs:
+        if isinstance(q, list):
+            r.update(q)
+        else:
+            r.add(q)
+    return r
+
+
+def calculate_coverage() -> List[dict]:
+    results = []
+    files = TextFile.objects.all()
+    vocab = _flatten(filter(bool, chain.from_iterable(Headword.objects.all().values_list('headword', 'variant'))))
+    for f in files:
+        text = set(_split_by_word_boundary(f.read_and_decode()))
+        covered_vocab = vocab.intersection(text)
+        coverage_percent = len(covered_vocab) / len(vocab) * 100
+        not_covered = text.difference(vocab)
+        results.append({
+            'file': f,
+            'covered_vocab': covered_vocab,
+            'coverage_percent': coverage_percent,
+            'not_covered': not_covered,
+        })
+
     return results

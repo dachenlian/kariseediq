@@ -120,6 +120,17 @@ class FreqResultsMorphoView(FreqResultsView):
     selected_group = "focus_groups"
 
 
+class CoverageView(View):
+    template_name = "freqdist/coverage.html"
+
+    def get(self, request, *args, **kwargs):
+        coverage = utils.calculate_coverage()
+        context = {
+            'coverage_list': coverage,
+        }
+        return render(request, self.template_name, context=context)
+
+
 def _format_csv_rows(results: List[dict]) -> List[dict]:
     formatted_rows = []
     for row in results:
