@@ -180,7 +180,7 @@ def calculate_coverage() -> List[dict]:
         text = set(_split_by_word_boundary(f.read_and_decode()))
         covered_vocab = vocab.intersection(text)
         coverage_percent = len(covered_vocab) / len(vocab) * 100
-        not_covered = text.difference(vocab)
+        not_covered = list(text.difference(vocab))
         results.append({
             'file': f,
             'covered_vocab': covered_vocab,

@@ -22,7 +22,15 @@
                         <td class="text-center">{{ forloop.counter }}</td>
                         <td><a href="{{ c.file.file.url }}" target="_blank">{{ c.file.name }}</a></td>
                         <td class="text-center">{{ c.coverage_percent }}%</td>
-                        <td>Button</td>
+                        <td class="text-center">
+                            <button style="padding: 0;" type="button" class="btn btn-primary align-middle"
+                                    data-toggle="modal"
+                                    data-target="#coverageDiffModal"
+                                    data-notcov="{{ c.not_covered }}"
+                            ><i class="material-icons align-middle">open_in_new</i>
+
+                            </button>
+                        </td>
                     </tr>
                 {% endfor %}
                 </tbody>
@@ -32,4 +40,31 @@
             <p>Nothing to see here.</p>
         {% endif %}
     </div>
+    <div class="modal fade" id="coverageDiffModal" tabindex="-1" role="dialog" aria-labelledby="coverageDiffModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="coverageDiffModalLabel">Out of Vocabulary</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p></p>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock content %}
+{% block javascript %}
+    <script>
+        $('#coverageDiffModal').on('show.bs.modal', function (event) {
+            let button = $(event.relatedTarget);
+            let modal = $(this);
+            let not_covered = button.data('notcov');
+            console.log(not_covered);
+            $(modal).find('.modal-body p').text(not_covered);
+        });
+    </script>
+{% endblock javascript %}
