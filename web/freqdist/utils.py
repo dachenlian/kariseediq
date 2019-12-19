@@ -3,10 +3,12 @@ import logging
 from itertools import chain
 from pathlib import Path
 import re
+import string
 from typing import Dict, List, Iterator, Set
 
 import chardet
 from django.db.models import Q
+from zhon import hanzi
 
 from .models import TextFile
 from core.models import Headword, Example, Sense
@@ -16,10 +18,13 @@ logger = logging.getLogger(__name__)
 sent_boundary = ['.', '。', '!', '！', '?', '？', ';', '；']
 SENT_BOUNDARY_RE = re.compile(rf'[{"".join(sent_boundary)}]')
 
-punctuations = "".join(['，', '。', '？', '！', '：', '；', '（', '）', '「', '』',
-                        ',', '.', '?', '!', ':', ';', '(', ')', '"', '“',
-                        '”', '~', '/', '-'])  # 共17個
+punctuations = hanzi.punctuation + string.punctuation
 PUNCTUATION_RE = re.compile(rf'[{"".join(punctuations)}]')
+
+
+def _remove_punctuation_and_norm(s: str) -> Iterator[str]:
+    return filter(lambda x: x.isascii() and not x.isdigit(),
+                  PUNCTUATION_RE.sub(' ', s).lower().split())
 
 
 def _has_content(s):
@@ -87,7 +92,7 @@ def build_item_root_freq(include_examples: bool) -> dict:
         sent_num += len(_split_by_sent_boundary(text))
         word_num += len(_split_by_word_boundary(text))
 
-        text = PUNCTUATION_RE.sub(' ', text).lower().split()
+        text = _remove_punctuation_and_norm(text)
         word_freq.update(text)
 
     if include_examples:
@@ -96,7 +101,7 @@ def build_item_root_freq(include_examples: bool) -> dict:
             sent_num += len(_split_by_sent_boundary(text))
             word_num += len(_split_by_word_boundary(text))
 
-            text = PUNCTUATION_RE.sub('', text).lower().split()
+            text = _remove_punctuation_and_norm(text)
             word_freq.update(text)
 
     # One headword can have multiple senses. Use .distinct() to only count a headword once.
@@ -177,9 +182,9 @@ def calculate_coverage() -> List[dict]:
     files = TextFile.objects.all()
     vocab = _flatten(filter(bool, chain.from_iterable(Headword.objects.all().values_list('headword', 'variant'))))
     for f in files:
-        text = set(_split_by_word_boundary(f.read_and_decode()))
+        text = set(_remove_punctuation_and_norm(f.read_and_decode()))
         covered_vocab = vocab.intersection(text)
-        coverage_percent = len(covered_vocab) / len(vocab) * 100
+        coverage_percent = round(len(covered_vocab) / len(text) * 100, 2)
         not_covered = list(text.difference(vocab))
         results.append({
             'file': f,
