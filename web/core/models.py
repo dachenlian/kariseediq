@@ -1,5 +1,7 @@
 import datetime
 from enum import Enum
+from itertools import chain
+from typing import Iterator, Set
 
 from django.db import models
 from django.urls import reverse
@@ -27,6 +29,20 @@ class Headword(models.Model):
             models.Index(fields=['headword']),
             models.Index(fields=['variant'])
         ]
+
+    @staticmethod
+    def _flatten(qs: Iterator) -> Set[str]:
+        r = set()
+        for q in qs:
+            if isinstance(q, list):
+                r.update(q)
+            else:
+                r.add(q)
+        return r
+
+    @classmethod
+    def get_vocab(cls) -> Set[str]:
+        return cls._flatten(filter(bool, chain.from_iterable(cls.objects.all().values_list('headword', 'variant'))))
 
 
 class Sense(models.Model):

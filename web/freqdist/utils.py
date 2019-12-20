@@ -22,9 +22,12 @@ punctuations = hanzi.punctuation + string.punctuation
 PUNCTUATION_RE = re.compile(rf'[{"".join(punctuations)}]')
 
 
-def _remove_punctuation_and_norm(s: str) -> Iterator[str]:
-    return filter(lambda x: x.isascii() and not x.isdigit(),
-                  PUNCTUATION_RE.sub(' ', s).lower().split())
+def _remove_punctuation_and_norm(s: str, vocab: Set[str]) -> Iterator[str]:
+    """Keep capitalization for proper words found in dictionary."""
+    r = PUNCTUATION_RE.sub(' ', s).split()
+    r = [s.lower() if s not in vocab else s for s in r]
+    r = filter(lambda x: x.isascii() and not x.isdigit(), r)
+    return r
 
 
 def _has_content(s):
@@ -78,6 +81,7 @@ def _compile_attr_groups(word_details: List[dict], attr: str) -> Dict[str, List[
 def build_item_root_freq(include_examples: bool) -> dict:
     word_freq = Counter()
     root_freq = Counter()
+    vocab = Headword.get_vocab()
 
     word_details, not_found = [], []
 
@@ -92,7 +96,7 @@ def build_item_root_freq(include_examples: bool) -> dict:
         sent_num += len(_split_by_sent_boundary(text))
         word_num += len(_split_by_word_boundary(text))
 
-        text = _remove_punctuation_and_norm(text)
+        text = _remove_punctuation_and_norm(text, vocab)
         word_freq.update(text)
 
     if include_examples:
@@ -101,7 +105,7 @@ def build_item_root_freq(include_examples: bool) -> dict:
             sent_num += len(_split_by_sent_boundary(text))
             word_num += len(_split_by_word_boundary(text))
 
-            text = _remove_punctuation_and_norm(text)
+            text = _remove_punctuation_and_norm(text, vocab)
             word_freq.update(text)
 
     # One headword can have multiple senses. Use .distinct() to only count a headword once.
@@ -167,22 +171,12 @@ def build_item_root_freq(include_examples: bool) -> dict:
     return results
 
 
-def _flatten(qs: Iterator) -> Set[str]:
-    r = set()
-    for q in qs:
-        if isinstance(q, list):
-            r.update(q)
-        else:
-            r.add(q)
-    return r
-
-
 def calculate_coverage() -> List[dict]:
     results = []
     files = TextFile.objects.all()
-    vocab = _flatten(filter(bool, chain.from_iterable(Headword.objects.all().values_list('headword', 'variant'))))
+    vocab = Headword.get_vocab()
     for f in files:
-        text = set(_remove_punctuation_and_norm(f.read_and_decode()))
+        text = set(_remove_punctuation_and_norm(f.read_and_decode(), vocab))
         covered_vocab = vocab.intersection(text)
         coverage_percent = round(len(covered_vocab) / len(text) * 100, 2)
         not_covered = list(text.difference(vocab))
