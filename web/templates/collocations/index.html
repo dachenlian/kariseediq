@@ -42,7 +42,15 @@
                     <div class="col-2">
                         <div class="form-group">
                             <label for="freq_filter">Frequency filter</label>
-                            <input class="form-control text-center" name="freq_filter" id="freq_filter" type="number" min="1" value="3">
+                            <input class="form-control text-center" name="freq_filter" id="freq_filter" type="number"
+                                   min="1" value="3">
+                        </div>
+                    </div>
+                    <div class="col-2">
+                        <div class="form-group">
+                            <label for="window_size">Window size</label>
+                            <input class="form-control text-center" name="window_size" id="window_size" type="number"
+                                   min="2" value="2">
                         </div>
                     </div>
                 </div>
@@ -66,9 +74,11 @@
     {% if collocations %}
         <div class="row justify-content-center">
             <div class="col-lg-8">
-            <p><strong>Query:</strong> {{ request.GET.query }} | <strong>Ngram:</strong> {{ request.GET.ngram }} |
-            <strong>Assoc measure: </strong>{{ request.GET.assoc_measure }} |
-                <strong>Freq filter: </strong> {{ request.GET.freq_filter }} | <strong>Include examples: </strong> {{ request.GET.include_examples }}</p>
+                <p><strong>Query:</strong> {{ request.GET.query }} | <strong>Ngram:</strong> {{ request.GET.ngram }} |
+                    <strong>Assoc measure: </strong>{{ request.GET.assoc_measure }} |
+                    <strong>Freq filter: </strong> {{ request.GET.freq_filter }} | <strong>Include
+                        examples: </strong> {{ request.GET.include_examples }} | <strong>Window
+                        size: </strong> {{ request.GET.window_size }}</p>
                 <div class="table-responsive">
                     <table class="table table-striped text-center">
                         <thead class="thead-dark">
@@ -95,3 +105,21 @@
         </div>
     {% endif %}
 {% endblock content %}
+{% block javascript %}
+    <script>
+        const ngramValPairs = {
+            bigram: 2,
+            trigram: 3,
+            quadgram: 4
+        };
+        $("#ngram").change(function () {
+            let ngram = this.value;
+            let val = ngramValPairs[ngram];
+            let windowSize = $("#window_size");
+            console.log(val);
+            windowSize.attr("min", val);
+            windowSize.attr("value", val);
+            windowSize.val(val);
+        })
+    </script>
+{% endblock javascript %}
