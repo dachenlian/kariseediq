@@ -7,6 +7,7 @@ from typing import List
 
 from pathlib import Path
 
+import chardet
 from django.conf import settings
 from django.contrib import messages
 from django.views import View
@@ -44,6 +45,7 @@ class TextFileUploadView(View):
             for file in self.request.FILES.getlist('file'):
                 text_file = TextFile(file=file)
                 text_file.name = file.name
+                text_file.encoding = chardet.detect(file).get('encoding')
                 text_file.save()
 
         return redirect(reverse('freqdist:upload'))
