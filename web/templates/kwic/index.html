@@ -16,7 +16,7 @@
                     <div class="col">
                         <div class="form-group">
                             <label for="width">Width</label>
-                            <input class="form-control" name="width" id="width" value="100">
+                            <input class="form-control" name="width" id="width" value="10">
                         </div>
                     </div>
                     <div class="col">
@@ -82,7 +82,7 @@
                         <tr>
                             <td>{{ forloop.counter }}</td>
                             <td class="text-right">{{ c.left_print }}</td>
-                            <td class="text-center">{{ c.query }}</td>
+                            <td class="text-center"><strong>{{ c.query }}</strong></td>
                             <td>{{ c.right_print }}</td>
                         </tr>
                     {% endfor %}
