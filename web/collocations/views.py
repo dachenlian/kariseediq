@@ -12,7 +12,7 @@ class CollocationView(View):
         freq_filter = int(request.GET.get('freq_filter', 1))
         ngram = request.GET.get('ngram')
         assoc_measure = request.GET.get('assoc_measure')
-        window_size = int(request.GET.get('window_size'))
+        window_size = int(request.GET.get('window_size', 1))
         include_examples = request.GET.get('include_examples')
         if ngram:
             collocations = get_collocates(ngram,
