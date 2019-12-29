@@ -31,25 +31,19 @@
                 <button class="btn btn-info" type="submit">Recalculate Now</button>
             </form>
         </div>
-{#        <div class="col-lg-6 col-sm-12">#}
-{#            <p class="text-right">#}
-{#                <a class="btn btn-success" href="{% url 'freq:export' %}?group={{ selected_group }}">Export All to#}
-{#                    CSV</a>#}
-{#            </p>#}
-{#        </div>#}
     </div>
     <div class="row">
         <div class="col">
             <!-- Create tabs -->
-            <nav class="nav nav-tabs nav-justified bg-dark" id="group-tabs">
+            <nav class="nav nav-tabs flex-column nav-justified bg-dark" id="group-tabs">
                 <div class="container">
-                    <div class="row no-gutters">
+                    <div class="row no-gutters d-flex align-items-center">
                         {% for key, group in groups.items %}
                             {% if forloop.first %}
-                                <a href="#{{ key }}" id="{{ key }}-tab" class="nav-item p-2 col nav-link active"
+                                <a href="#{{ key }}" id="{{ key }}-tab" class="nav-item p-2 col nav-link active align-middle"
                                    data-toggle="tab">{{ key }}</a>
                             {% else %}
-                                <a href="#{{ key }}" id="{{ key }}-tab" class="nav-item p-2 col nav-link"
+                                <a href="#{{ key }}" id="{{ key }}-tab" class="nav-item p-2 col nav-link text-nowrap"
                                    data-toggle="tab">{{ key }}</a>
                             {% endif %}
                             {% if forloop.counter|divisibleby:"10" %}
@@ -58,8 +52,6 @@
                         {% endfor %}
                     </div>
                 </div>
-
-
             </nav>
         </div>
     </div>
