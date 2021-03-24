@@ -3,10 +3,12 @@ version: '3'
 services:
   db:
     container_name: ks_db
-    image: postgres
+    image: postgres:9.6.21-alpine
     restart: always
     volumes:
       - kariseediq-volume:/var/lib/postgresql/data
+    env_file:
+      - ./web/web-variables.env
   web:
     container_name: ks_web
     build: .
@@ -24,7 +26,7 @@ services:
       - db
   memcached:
     container_name: ks_memcached
-    image: memcached
+    image: memcached:1.6.9
     entrypoint:
       - memcached
       - -m 64
