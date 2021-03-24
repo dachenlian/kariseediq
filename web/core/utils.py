@@ -124,10 +124,10 @@ def only_letters(string) -> str:
     return "".join(char for char in string if char.isalpha() or char == ' ')
 
 
-def load_items(file="../seediq_items_updated-20191120-sung.csv"):
+def load_items(file="../seediq_items_updated-20210401-sung.csv"):
     start = time.time()
 
-    with open(file) as fp:
+    with open(file, encoding='utf-8-sig') as fp:
         reader = csv.reader(fp)
         header = next(reader)
 
@@ -200,7 +200,7 @@ def load_items(file="../seediq_items_updated-20191120-sung.csv"):
 
 
 def load_extra_meaning(file='../seediq_extra_meaning_updated-20191114-sung.csv'):
-    with open(file) as fp:
+    with open(file, encoding='utf-8-sig') as fp:
         reader = csv.reader(fp)
         header = next(reader)
 
@@ -269,7 +269,7 @@ def load_extra_meaning(file='../seediq_extra_meaning_updated-20191114-sung.csv')
 
 def load_extra_phrases(file='../seediq_extra_phrases_updated-20190617-sung.csv'):
     """Assuming all phrases relate to the first large items.csv"""
-    with open(file) as fp:
+    with open(file, encoding='utf-8-sig') as fp:
         reader = csv.reader(fp)
         header = next(reader)
 
