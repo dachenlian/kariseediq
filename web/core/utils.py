@@ -1,7 +1,9 @@
 import csv
 import datetime
-import re
+import io
 import logging
+from pathlib import Path
+import re
 import time
 from typing import List, Tuple, Iterator, Set
 
@@ -15,6 +17,7 @@ from .forms import SenseForm
 from .models import Headword, Sense, Phrase, Example
 
 logger = logging.getLogger(__name__)
+
 SEP_RE = re.compile(r'[;；,]')
 
 C = Cihai()
@@ -125,6 +128,7 @@ def only_letters(string) -> str:
 
 
 def load_items(file="../seediq_items_updated-20210401-sung.csv"):
+    errors = []
     start = time.time()
 
     with open(file, encoding='utf-8-sig') as fp:
@@ -175,6 +179,7 @@ def load_items(file="../seediq_items_updated-20210401-sung.csv"):
                 logger.error(e, headword.headword, new_entry)
                 new_entry['headword_sense_no'] = headword.senses.count() + 1
                 sense = Sense.objects.create(headword=headword, **new_entry)
+                errors.append([idx, headword, e])
 
             if sentence:
                 Example.objects.create(
@@ -198,8 +203,18 @@ def load_items(file="../seediq_items_updated-20210401-sung.csv"):
     end = time.time()
     logger.debug(f'Completed in {datetime.timedelta(seconds=end - start)}.')
 
+    if errors:
+        error_path = Path('.').joinpath('items_errors.csv')
+        with error_path.open('w') as f:
+            writer = csv.writer(f)
+            writer.writerow(['row', 'headword', 'error'])
+            writer.writerows(errors)
+        
+        logger.info(f'Error log written to {error_path.resolve()}')
+
 
 def load_extra_meaning(file='../seediq_extra_meaning_updated-20191114-sung.csv'):
+    errors = []
     with open(file, encoding='utf-8-sig') as fp:
         reader = csv.reader(fp)
         header = next(reader)
@@ -234,18 +249,35 @@ def load_extra_meaning(file='../seediq_extra_meaning_updated-20191114-sung.csv')
             if created:
                 logger.debug(f'Created headword: {headword}')
 
-            sense, created = Sense.objects.get_or_create(
-                headword=headword,
-                meaning=meaning,
-                defaults={
-                    'headword_sense_no': headword.senses.count() + 1,
-                    'char_strokes_first': char_strokes_first,
-                    'char_strokes_all': char_strokes_all,
-                    'word_class': word_class,
-                    'meaning_en': meaning_en,
-                    'root': item_root,
-                }
-            )
+            try:
+                sense, created = Sense.objects.get_or_create(
+                    headword=headword,
+                    meaning=meaning,
+                    defaults={
+                        'headword_sense_no': headword_sense_no,
+                        'char_strokes_first': char_strokes_first,
+                        'char_strokes_all': char_strokes_all,
+                        'word_class': word_class,
+                        'meaning_en': meaning_en,
+                        'root': item_root,
+                    }
+                )
+            except IntegrityError as e:
+                sense, created = Sense.objects.get_or_create(
+                    headword=headword,
+                    meaning=meaning,
+                    defaults={
+                        'headword_sense_no': headword.senses.count() + 1,
+                        'char_strokes_first': char_strokes_first,
+                        'char_strokes_all': char_strokes_all,
+                        'word_class': word_class,
+                        'meaning_en': meaning_en,
+                        'root': item_root,
+                    }
+                )
+
+                errors.append([idx, headword, e])
+
 
             if new_entry['sentence']:
                 if sense.examples.filter(sentence=new_entry['sentence']).exists():
@@ -267,9 +299,19 @@ def load_extra_meaning(file='../seediq_extra_meaning_updated-20191114-sung.csv')
             if idx % 100 == 0:
                 logger.debug(f'Processed {idx}...')
 
+    if errors:
+        error_path = Path('.').joinpath('extra_meaning_errors.csv')
+        with error_path.open('w') as f:
+            writer = csv.writer(f)
+            writer.writerow(['row', 'headword', 'error'])
+            writer.writerows(errors)
+        
+        logger.info(f'Error log written to {error_path.resolve()}')
+
 
 def load_extra_phrases(file='../seediq_extra_phrases_updated-20190617-sung.csv'):
     """Assuming all phrases relate to the first large items.csv"""
+    
     with open(file, encoding='utf-8-sig') as fp:
         reader = csv.reader(fp)
         header = next(reader)
