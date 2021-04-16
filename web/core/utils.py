@@ -179,7 +179,7 @@ def load_items(file="../seediq_items_updated-20210401-sung.csv"):
                 logger.error(e, headword.headword, new_entry)
                 new_entry['headword_sense_no'] = headword.senses.count() + 1
                 sense = Sense.objects.create(headword=headword, **new_entry)
-                errors.append([idx, headword, e])
+                errors.append([idx + 1, headword, e])
 
             if sentence:
                 Example.objects.create(
@@ -276,7 +276,7 @@ def load_extra_meaning(file='../seediq_extra_meaning_updated-20191114-sung.csv')
                     }
                 )
 
-                errors.append([idx, headword, e])
+                errors.append([idx + 1, headword, e])
 
 
             if new_entry['sentence']:
