@@ -88,7 +88,7 @@ def _parse_date(str_date: str) -> datetime.datetime:
 
 def _split_item_name(s: str) -> Tuple[str, int]:
     if _contains_digit(s):
-        m = re.match(r'([A-Za-z\-\s]+)_?(\d)?', s)
+        m = re.match(r'([A-Za-z\-\s]+)_?(\d)?', s)  # headword and sense may be separated by an underline
         headword, sense = m.group(1).strip(), m.group(2).strip()
     else:
         headword = s.strip()
@@ -203,6 +203,7 @@ def load_extra_meaning(file='../seediq_extra_meaning_updated-20191114-sung.csv')
     with open(file, encoding='utf-8-sig') as fp:
         reader = csv.reader(fp)
         header = next(reader)
+        header = list(filter(bool, header))
 
         for idx, row in enumerate(reader, 1):
             row = [_normalize(r.strip().replace('\n', '')) for r in row]
@@ -295,13 +296,14 @@ def load_extra_phrases(file='../seediq_extra_phrases_updated-20190617-sung.csv')
             Phrase.objects.create(sense=sense, **new_entry)
 
 
-def load():
+def load(items_path=None, extra_meaning_path=None, extra_phrases_path=None):
     logger.debug('Starting load_items()')
-    load_items()
+    load_items(file=items_path)
     logger.debug('Starting load_extra_meaning()')
-    load_extra_meaning()
-    logger.debug('Starting load_extra_phrases()')
-    load_extra_phrases()
+    load_extra_meaning(file=extra_meaning_path)
+    if extra_phrases_path:
+        logger.debug('Starting load_extra_phrases()')
+        load_extra_phrases(file=extra_phrases_path)
 
 
 def gen_query_history(request: HttpRequest):
