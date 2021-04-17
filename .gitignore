@@ -452,3 +452,11 @@ web/static
 .~lock*
 web/freqdist/static/freqdist/results
 **/kwic.pkl
+
+### vscode ###
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
