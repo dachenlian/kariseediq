@@ -1,10 +1,12 @@
 from django.shortcuts import render
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
 from django.views.generic import View
 
 from .utils import get_collocates
 
 
-class CollocationView(View):
+class CollocationView(LoginRequiredMixin, View):
     template_name = 'collocations/index.html'
 
     def get(self, request, *args, **kwargs):

@@ -10,6 +10,8 @@ from pathlib import Path
 import chardet
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
 from django.views import View
 from django.views.generic import DeleteView
 from django.shortcuts import render, redirect
@@ -30,7 +32,7 @@ FILE_PATH = RESULTS_DIR.joinpath(FILE_NAME)
 logger = logging.getLogger(__name__)
 
 
-class TextFileUploadView(View):
+class TextFileUploadView(LoginRequiredMixin, View):
     template_name = 'freqdist/simple-upload.html'
 
     def get(self, request):
@@ -51,7 +53,7 @@ class TextFileUploadView(View):
         return redirect(reverse('freqdist:upload'))
 
 
-class TextSingleDeleteView(DeleteView):
+class TextSingleDeleteView(LoginRequiredMixin, DeleteView):
     model = TextFile
     success_url = reverse_lazy('freq:upload')
     success_message = "Text successfully deleted!"
@@ -65,7 +67,7 @@ class TextSingleDeleteView(DeleteView):
         return super().delete(request, *args, **kwargs)
 
 
-class TextAllDeleteView(View):
+class TextAllDeleteView(LoginRequiredMixin, View):
     success_url = reverse_lazy('freq:upload')
     success_message = "All texts successfully deleted!"
 
@@ -78,7 +80,7 @@ class TextAllDeleteView(View):
         return redirect(self.success_url)
 
 
-class FreqResultsView(View):
+class FreqResultsView(LoginRequiredMixin, View):
     selected_group = None
 
     def get(self, request, *args, **kwargs):
@@ -122,7 +124,7 @@ class FreqResultsMorphoView(FreqResultsView):
     selected_group = "focus_groups"
 
 
-class CoverageView(View):
+class CoverageView(LoginRequiredMixin, View):
     template_name = "freqdist/coverage.html"
 
     def get(self, request, *args, **kwargs):
@@ -144,6 +146,7 @@ def _format_csv_rows(results: List[dict]) -> List[dict]:
     return formatted_rows
 
 
+@login_required
 def export_results_to_csv(request):
     with FILE_PATH.open('rb') as f:
         results = pickle.load(f)

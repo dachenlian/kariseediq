@@ -3,6 +3,8 @@ import logging
 import re
 
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.db.models.functions import Lower
 from django.http import HttpResponse, JsonResponse
@@ -21,7 +23,7 @@ logger = logging.getLogger(__name__)
 print(logger)
 
 
-class IndexListView(ListView):
+class IndexListView(LoginRequiredMixin, ListView):
     model = Headword
     paginate_by = 100
     context_object_name = 'headwords'
@@ -32,7 +34,7 @@ class IndexListView(ListView):
         return utils.sort_queryset(qs, self.request)
 
 
-class SearchResultsListView(ListView):
+class SearchResultsListView(LoginRequiredMixin, ListView):
     model = Headword
     paginate_by = 100
     context_object_name = 'headwords'
@@ -90,7 +92,7 @@ class SearchResultsListView(ListView):
         return qs
 
 
-class HeadwordUpdateView(View):
+class HeadwordUpdateView(LoginRequiredMixin, View):
     template_name = 'core/update_headword.html'
     success_message = 'Headword successfully updated!'
 
@@ -114,7 +116,7 @@ class HeadwordUpdateView(View):
             return redirect(headword)
 
 
-class SenseCreateView(View):
+class SenseCreateView(LoginRequiredMixin, View):
     template_name = 'core/create_sense.html'
     success_message = 'New entry saved!'
 
@@ -171,7 +173,7 @@ class SenseCreateView(View):
         return redirect('core:create_sense')
 
 
-class SenseUpdateView(View):
+class SenseUpdateView(LoginRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
         headword = get_object_or_404(Headword, pk=kwargs.get('pk'))
@@ -216,7 +218,7 @@ class SenseUpdateView(View):
         return redirect(sense)
 
 
-class SenseDeleteView(DeleteView):
+class SenseDeleteView(LoginRequiredMixin, DeleteView):
     model = Sense
     success_url = reverse_lazy('core:index')
     success_message = 'Entry successfully deleted!'
@@ -230,7 +232,7 @@ class SenseDeleteView(DeleteView):
         return get_object_or_404(self.model, headword=headword, headword_sense_no=self.kwargs.get('sense'))
 
 
-class PendingListView(ListView):
+class PendingListView(LoginRequiredMixin, ListView):
     """Show roots of senses that do not have their own entries as headwords."""
     model = Headword
     paginate_by = 1000
@@ -254,7 +256,7 @@ class PendingListView(ListView):
         return roots_without_entries
 
 
-class RootAutoComplete(View):
+class RootAutoComplete(LoginRequiredMixin, View):
     def get(self, *args, **kwargs):
         logger.debug('Autocomplete Called')
         q = self.request.GET.get('q')
@@ -272,7 +274,7 @@ class RootAutoComplete(View):
         return JsonResponse(list(queryset), safe=False)
 
 
-class RootSenseAutoComplete(View):
+class RootSenseAutoComplete(LoginRequiredMixin, View):
     def get(self, *args, **kwargs):
         logger.debug('Autocomplete Called')
         q = self.request.GET.get('q')
@@ -290,7 +292,7 @@ class RootSenseAutoComplete(View):
         return JsonResponse(list(queryset), safe=False)
 
 
-class HeadwordAutoComplete(View):
+class HeadwordAutoComplete(LoginRequiredMixin, View):
     def get(self, *args, **kwargs):
         logger.debug('Item name autocomplete called')
         q = self.request.GET.get('q')
@@ -305,6 +307,7 @@ class HeadwordAutoComplete(View):
         return JsonResponse(list(queryset), safe=False)
 
 
+@login_required
 def export_search_to_csv(request, query_idx):
     query_dict = request.session.get('history_list')[query_idx]
 
@@ -328,6 +331,7 @@ def export_search_to_csv(request, query_idx):
     return response
 
 
+@login_required
 def get_root_senses(request):
     root = request.GET.get('root', None)
     try:

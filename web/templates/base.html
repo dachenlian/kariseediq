@@ -65,6 +65,13 @@
                 <a class="nav-link" href="{% url 'core:pending' %}">
                     Pending <span id="pendingBadge" class="badge badge-secondary align-middle"></span></a>
             </li>
+            {% if user.is_authenticated %}
+                {% comment %} <span class="navbar-text">Welcome, {{ user.get_username}}!
+                </span> {% endcomment %}
+                <li class="nav-item">
+                    <a class="btn btn-outline-info" href="{% url 'logout' %}">Logout</a>
+                </li>
+            {% endif %}
         </ul>
         <form action="{% url 'core:results' %}" class="form-inline">
             <div class="form-check form-check-inline text-white">

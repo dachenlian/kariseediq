@@ -2,6 +2,8 @@ import csv
 from pathlib import Path
 import pickle
 
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.views.generic import View
 from django.shortcuts import render
@@ -9,7 +11,7 @@ from django.shortcuts import render
 from .utils import build_kwic, KWIC_PATH
 
 
-class KwicView(View):
+class KwicView(LoginRequiredMixin, View):
     template_name = 'kwic/index.html'
 
     def get(self, request, *args, **kwargs):
@@ -33,6 +35,7 @@ class KwicView(View):
             return render(request, self.template_name)
 
 
+@login_required
 def export_results_to_csv(request):
     with KWIC_PATH.open('rb') as f:
         d = pickle.load(f)
