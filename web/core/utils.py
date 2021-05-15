@@ -1,11 +1,13 @@
 import csv
 import datetime
+from dataclasses import dataclass
 import io
 import logging
 from pathlib import Path
 import re
 import time
-from typing import List, Tuple, Iterator, Set
+from tqdm import tqdm
+from typing import List, Optional, Tuple, Iterator, Set
 
 from cihai.core import Cihai
 from django.http.request import HttpRequest
@@ -23,6 +25,26 @@ SEP_RE = re.compile(r'[;；,]')
 C = Cihai()
 if not C.unihan.is_bootstrapped:
     C.unihan.bootstrap()
+
+
+@dataclass
+class Entry:
+    headword: str
+    headword_sense_no: int
+    char_strokes_first: str
+    char_strokes_all: str
+    only_letters: str
+    root: str
+    root_sense_no: int
+    word_class: list
+    focus: list
+    meaning: str
+    created_date: datetime
+    refer_to: str
+    tag: list
+    is_root: bool
+    variant: str
+    frequency: int
 
 
 def _add_tag(entry: dict, user: str, tag: str) -> List[str]:
@@ -52,13 +74,13 @@ def _clean_entry(entry: dict) -> dict:
     entry['headword'] = headword
     entry['headword_sense_no'] = headword_sense_no
     entry['root'] = root
-    entry['word_class']: list = _sep_and_filter(entry.pop('word_class'))
-    entry['focus']: list = _sep_and_filter(entry.pop('focus'))
+    entry['word_class'] = _sep_and_filter(entry.pop('word_class'))
+    entry['focus'] = _sep_and_filter(entry.pop('focus'))
     entry['root_sense_no'] = root_sense_no
     entry['meaning'] = _normalize(entry['meaning'])
     entry['created_date'] = _parse_date(entry['created_date'])
     entry['refer_to'] = entry.pop('source')
-    entry['tag']: list = _add_tag(entry, 'Kcjason2', '植物')
+    entry['tag'] = _add_tag(entry, 'Kcjason2', '植物')
     entry['is_root'] = _convert_to_bool(entry.pop('is_root'))
     entry['variant'] = _sep_and_filter(entry.pop('variant'))
     del entry['toda_root']
@@ -69,6 +91,41 @@ def _clean_entry(entry: dict) -> dict:
 
     return entry
 
+
+def _clean_entry_for_combined(entry: dict) -> dict:
+    for key in ['id', 'meaning_no', 'sentence_no', 'item_name']:
+        entry.pop(key)
+
+    headword = entry.pop('word_str')
+    headword_sense_no = entry.pop('sense_id_str').split('-')[0]
+    # headword, headword_sense_no = _split_item_name(entry.pop('item_name'))
+    root, root_sense_no = _split_item_name(entry.pop('item_root'))
+    char_strokes_first, char_strokes_all = get_char_strokes(entry['meaning'])
+
+    entry['char_strokes_first'] = char_strokes_first
+    entry['char_strokes_all'] = char_strokes_all
+    # entry['only_letters'] = only_letters(headword)
+    # entry['only_letters'] = entry.pop('word_str')
+    entry['only_letters'] = headword
+    entry['headword'] = headword
+    entry['headword_sense_no'] = headword_sense_no
+    entry['root'] = root
+    entry['root_sense_no'] = root_sense_no
+    entry['word_class'] = _sep_and_filter(entry.pop('word_class'))
+    entry['focus'] = _sep_and_filter(entry.pop('focus'))
+    entry['meaning'] = _normalize(entry['meaning'])
+    entry['created_date'] = _parse_date(entry['created_date'])
+    entry['refer_to'] = entry.pop('source')
+    entry['tag'] = _add_tag(entry, 'Kcjason2', '植物')
+    entry['is_root'] = _convert_to_bool(entry.pop('is_root'))
+    entry['variant'] = _sep_and_filter(entry.pop('variant'))
+    del entry['toda_root']
+    del entry['truku_root']
+
+    if not entry['frequency']:
+        entry['frequency'] = 0
+
+    return entry
 
 def _contains_digit(s: str) -> bool:
     """Check if any char in string is a digit."""
@@ -127,7 +184,121 @@ def only_letters(string) -> str:
     return "".join(char for char in string if char.isalpha() or char == ' ')
 
 
-def load_items(file="../seediq_items_updated-20210401-sung.csv"):
+def load_items_from_combined(file: str):
+    errors = []
+    start = time.time()
+
+    with open(file, encoding='utf-8-sig') as fp:
+        reader = csv.reader(fp)
+        header = next(reader)
+
+        # for idx, row in tqdm(enumerate(reader ,1)):
+        for idx, row in enumerate(tqdm(reader) ,1):
+            row = [r.strip().replace('\n', '') for r in row]
+            new_entry = _clean_entry_for_combined(dict(zip(header, row)))
+            headword = new_entry.pop('headword')
+            variant = new_entry.pop('variant')
+            is_root = new_entry.pop('is_root')
+            only_lttrs = new_entry.pop('only_letters')
+
+            meaning = new_entry.pop('meaning')
+            headword_sense_no = new_entry.pop('headword_sense_no')
+            char_strokes_first = new_entry.pop('char_strokes_first')
+            char_strokes_all = new_entry.pop('char_strokes_all')
+            word_class = new_entry.pop('word_class')
+            meaning_en = new_entry.pop('meaning_en')
+            item_root = new_entry.pop('root')
+
+            headword, created = Headword.objects.get_or_create(
+                headword=headword,
+                # is_root=is_root,
+                defaults={
+                    'only_letters': only_lttrs,
+                    'variant': variant,
+                    'is_root': is_root,
+                    'user': new_entry.get('user'),
+                    'created_date': new_entry.get('created_date')
+                }       
+            )
+            if not created:
+                logger.debug(f'{headword.headword} already exists. Retrieving from DB.')
+
+            try:
+                sense, created = Sense.objects.get_or_create(
+                    headword=headword,
+                    meaning=meaning,
+                    defaults={
+                        'headword_sense_no': headword_sense_no,
+                        'char_strokes_first': char_strokes_first,
+                        'char_strokes_all': char_strokes_all,
+                        'word_class': word_class,
+                        'meaning_en': meaning_en,
+                        'root': item_root,
+                    }
+                )
+            
+            except IntegrityError as e:
+                sense, created = Sense.objects.get_or_create(
+                    headword=headword,
+                    meaning=meaning,
+                    defaults={
+                        'headword_sense_no': headword.senses.count() + 1,
+                        'char_strokes_first': char_strokes_first,
+                        'char_strokes_all': char_strokes_all,
+                        'word_class': word_class,
+                        'meaning_en': meaning_en,
+                        'root': item_root,
+                    }
+                )
+
+            sentence = new_entry.pop('sentence')
+            sentence_en = new_entry.pop('sentence_en')
+            sentence_ch = new_entry.pop('sentence_ch')
+
+            phrase = new_entry.pop('phrase')
+            phrase_ch = new_entry.pop('phrase_ch')
+            phrase_en = new_entry.pop('phrase_en')
+
+            # try:
+            #     sense = Sense.objects.create(headword=headword, **new_entry)
+            # except IntegrityError as e:
+            #     # Possibly caused by an extra space in item name that was eventually stripped during pre-processing.
+            #     logger.error(e, headword.headword, new_entry)
+            #     new_entry['headword_sense_no'] = headword.senses.count() + 1
+            #     sense = Sense.objects.create(headword=headword, **new_entry)
+            #     errors.append([idx + 1, headword, e])
+
+            if sentence:
+                Example.objects.create(
+                    sense=sense,
+                    sentence=sentence,
+                    sentence_ch=sentence_ch,
+                    sentence_en=sentence_en,
+                )
+
+            if phrase:
+                Phrase.objects.create(
+                    sense=sense,
+                    phrase=phrase,
+                    phrase_ch=phrase_ch,
+                    phrase_en=phrase_en,
+                )
+
+            if idx % 500 == 0:
+                logger.debug(f'Processed {idx} rows...')
+
+            if errors:
+                fname = f'items_errors_{datetime.datetime.now().strftime("%Y%m%d")}.csv'
+                error_path = Path('.').joinpath(fname)
+                with error_path.open('w') as f:
+                    writer = csv.writer(f)
+                    writer.writerow(['row', 'headword', 'error'])
+                    writer.writerows(errors)
+                
+                logger.info(f'Error log written to {error_path.resolve()}')
+
+
+def load_items(file: str ="../seediq_items_updated-20210401-sung.csv"):
     errors = []
     start = time.time()
 
@@ -213,7 +384,7 @@ def load_items(file="../seediq_items_updated-20210401-sung.csv"):
         logger.info(f'Error log written to {error_path.resolve()}')
 
 
-def load_extra_meaning(file='../seediq_extra_meaning_updated-20191114-sung.csv'):
+def load_extra_meaning(file: str ='../seediq_extra_meaning_updated-20191114-sung.csv'):
     errors = []
     with open(file, encoding='utf-8-sig') as fp:
         reader = csv.reader(fp)
@@ -316,7 +487,7 @@ def load_extra_phrases(file='../seediq_extra_phrases_updated-20190617-sung.csv')
         reader = csv.reader(fp)
         header = next(reader)
 
-        for idx, row in enumerate(reader, 1):
+        for idx, row in tqdm(enumerate(reader, 1)):
             row = [_normalize(r.strip().replace('\n', '')) for r in row]
             new_entry = dict(zip(header, row))
             headword, _ = _split_item_name(new_entry.pop('item_name'))
@@ -338,11 +509,19 @@ def load_extra_phrases(file='../seediq_extra_phrases_updated-20190617-sung.csv')
             Phrase.objects.create(sense=sense, **new_entry)
 
 
-def load(items_path=None, extra_meaning_path=None, extra_phrases_path=None):
+def load(
+    items_path: Optional[str] = None, combined_file: bool = True, 
+    extra_meaning_path: Optional[str] = None, extra_phrases_path: Optional[str] = None
+    ) -> None:
+
     logger.debug('Starting load_items()')
-    load_items(file=items_path)
-    logger.debug('Starting load_extra_meaning()')
-    load_extra_meaning(file=extra_meaning_path)
+    if combined_file:
+        load_items_from_combined(file=items_path)
+    else:
+        load_items(file=items_path)
+    if extra_meaning_path:
+        logger.debug('Starting load_extra_meaning()')
+        load_extra_meaning(file=extra_meaning_path)
     if extra_phrases_path:
         logger.debug('Starting load_extra_phrases()')
         load_extra_phrases(file=extra_phrases_path)

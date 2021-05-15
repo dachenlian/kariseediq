@@ -10,7 +10,8 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         path = Path('../')
-        items_path = list(path.glob('seediq_items_*'))[0]
+        items_path = list(path.glob('seediq_items_updated_*'))[0]
+        # items_path = list(path.glob('seediq_items_updated-*'))[0]
         extra_meaning_path = list(path.glob('seediq_extra_meaning_*'))[0]
         extra_phrases_path = list(path.glob('seediq_extra_phrases_*'))[0]
 
@@ -23,7 +24,8 @@ class Command(BaseCommand):
 
         self.stdout.write("Deleted Headwords!")
         self.stdout.write("Loading new data...")
-        load(items_path=options['items'], extra_meaning_path=options['meaning'], extra_phrases_path=options['phrases'])
+        # load(items_path=options['items'], extra_meaning_path=options['meaning'], extra_phrases_path=options['phrases'])
+        load(items_path=options['items'], combined_file=True, extra_phrases_path=options['phrases'])
         self.stdout.write("Done!")
 
 
