@@ -449,6 +449,7 @@ static/*
 web/static
 *migrations*
 *.csv
+*.xlsx
 .~lock*
 web/freqdist/static/freqdist/results
 **/kwic.pkl
