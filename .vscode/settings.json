@@ -1,4 +1,5 @@
 {
     "jupyter.jupyterServerType": "local",
-    "python.pythonPath": "/home/richard/miniconda3/envs/karis/bin/python"
+    "python.pythonPath": "/home/richard/miniconda3/envs/karis/bin/python",
+    "python.formatting.provider": "black"
 }
