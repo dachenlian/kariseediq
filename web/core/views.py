@@ -230,7 +230,78 @@ class SenseUpdateView(LoginRequiredMixin, View):
 
 
 class HeadwordSenseUpdateView(LoginRequiredMixin, View):
-    pass
+    template_name = 'core/update_sense_and_headword.html'
+    success_message = '' 
+
+    def get(self, request, *args, **kwargs):
+        headword = Headword.objects.get(id=kwargs.get('pk'))
+        sense = get_object_or_404(Sense, headword=headword, headword_sense_no=kwargs.get('sense'))
+
+        sense_form = SenseUpdateForm(instance=sense)
+        example_formset = ExampleFormset(instance=sense)
+        phrase_formset = PhraseFormset(instance=sense)
+        headword_form = HeadwordForm(instance=headword)
+
+        context = {
+            'headword': headword,
+            'headword_sense_no': sense.headword_sense_no,
+            'headword_form': headword_form,
+            'sense_form': sense_form,
+            'example_formset': example_formset,
+            'phrase_formset': phrase_formset
+            }
+
+        return render(self.request, self.template_name, context=context)
+
+    def post(self, request, *args, **kwargs):
+        logger.debug('Inside Update view.')
+        headword = get_object_or_404(Headword, id=kwargs.get('pk'))
+        sense = get_object_or_404(Sense, headword=headword, headword_sense_no=kwargs.get('sense'))
+        headword_form = HeadwordForm(instance=headword, data=request.POST)
+        sense_form = SenseUpdateForm(instance=sense, data=request.POST)
+        example_formset = ExampleFormset(instance=sense, data=request.POST)
+        phrase_formset = PhraseFormset(instance=sense, data=request.POST)
+
+        if headword_form.has_changed():
+            if headword_form.is_valid():
+                headword = headword_form.save()
+                print(type(headword), headword)
+                self.success_message += 'Headword updated!. '
+                messages.success(request, self.success_message)
+                # return redirect(headword)
+            else:
+                messages.error(request, 'Something happened with headword. Please try again.')
+                logger.debug(headword_form.errors)
+                return redirect(sense)
+        
+        if sense_form.has_changed() or example_formset.has_changed() or phrase_formset.has_changed():
+            if sense_form.is_valid() and example_formset.is_valid() and phrase_formset.is_valid():
+                logger.debug(sense_form.cleaned_data)
+                sense = sense_form.save(commit=False)
+                meaning = sense_form.cleaned_data.get('meaning')
+                char_strokes_first, char_strokes_all = utils.get_char_strokes(meaning)
+                sense.char_strokes_all = char_strokes_all
+                sense.char_strokes_first = char_strokes_first
+                sense.save()
+                example_formset.save()
+                phrase_formset.save()
+                self.success_message += 'Sense updated!'
+                messages.success(request, "Sense updated!")
+            else:
+                logger.warning(sense_form.errors)
+                # logger.warning(example_formset.errors)
+                # logger.warning(phrase_formset.errors)
+                messages.error(request, 'An error occurred while updated sense. Please try again.')
+                return redirect(sense)
+        # if not headword_form.has_changed() \
+        #     and not sense_form.has_changed() \
+        #     and not example_formset.has_changed() \
+        #     and not phrase_formset.has_changed():
+        #     self.success_message = 'Nothing updated.'
+
+        return redirect(sense)
+
+
 
 
 class SenseDeleteView(LoginRequiredMixin, DeleteView):

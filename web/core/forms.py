@@ -90,6 +90,9 @@ class SenseUpdateForm(SenseForm):
         self.fields.pop('headword')
         # self.fields['headword'].disabled = True
         self.fields['headword_sense_no'].disabled = True
+        self.fields['word_class'].required = False
+        self.fields['tag'].required = False
+        self.fields['focus'].required = False
 
     class Meta(SenseForm.Meta):
         fields = SenseForm.Meta.fields + ('headword_sense_no', 'char_strokes_all', 'char_strokes_first')
