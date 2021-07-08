@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+    <div class="row">
+        <div class="col">
+            <h1>Update Headword</h1>
+            <form action="" method="post">
+                {% csrf_token %}
+                {{ form|crispy }}
+                <div class="row justify-content-center">
+                    <button class="btn btn-primary btn-lg active w-50" type="submit">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col">
+            <h1>Update <span class="headword">{{ headword.headword }}</span> <sup>{{ headword_sense_no }}</sup></h1>
+            <p>
+                <strong>Headword: </strong>{{ headword.headword }} |
+                <strong>Variant: </strong>{{ headword.variant }} |
+                <strong>Is root? </strong>{{ headword.is_root }}
+            </p>
+            <form action="" method="post">
+                {% csrf_token %}
+                {% include 'core/sense_form_snippet.html' %}
+            </form>
+        </div>
+    </div>
+
+{% endblock content %}
+{% block javascript %}
+    {{ block.super }}
+{% endblock javascript %}
