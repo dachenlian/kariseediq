@@ -196,7 +196,7 @@ class SenseUpdateView(LoginRequiredMixin, View):
         context = {
             'headword': headword,
             'headword_sense_no': sense.headword_sense_no,
-            'form': sense_form,
+            'sense_form': sense_form,
             'example_formset': example_formset,
             'phrase_formset': phrase_formset,
         }
@@ -227,6 +227,10 @@ class SenseUpdateView(LoginRequiredMixin, View):
             # logger.warning(phrase_formset.errors)
             messages.error(request, 'An error occurred. Please try again.')
         return redirect(sense)
+
+
+class HeadwordSenseUpdateView(LoginRequiredMixin, View):
+    pass
 
 
 class SenseDeleteView(LoginRequiredMixin, DeleteView):
