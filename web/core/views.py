@@ -71,23 +71,26 @@ class SearchResultsListView(LoginRequiredMixin, ListView):
             qs = qs.filter(
                 Q(headword__istartswith=search_name) |
                 Q(senses__meaning__istartswith=search_name) |
-                Q(variant__istartswith=search_name)
+                Q(variant__istartswith=search_name) | 
+                Q(senses__root__istartswith=search_name)           
                 )
         elif search_filter == 'endswith':
             qs = qs.filter(
                 Q(headword__iendswith=search_name) |
                 Q(senses__meaning__iendswith=search_name) |
-                Q(variant__iendswith=search_name)
+                Q(variant__iendswith=search_name) |
+                Q(senses__root__iendswith=search_name)           
                 )
         elif search_filter == 'contains':
             qs = qs.filter(
                 Q(headword__icontains=search_name) |
                 Q(senses__meaning__icontains=search_name) |
-                Q(variant__icontains=search_name)
+                Q(variant__icontains=search_name) |
+                Q(senses__root__icontains=search_name)           
                 )
         elif search_filter == 'root-deriv':
             qs = qs.filter(
-                Q(headword__iexact=search_name) |
+                # Q(headword__icontains=search_name) |
                 Q(senses__root__iexact=search_name)           
                 )
 
