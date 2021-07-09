@@ -2,19 +2,6 @@
 {% load crispy_forms_tags %}
 {% block content %}
 
-{% comment %} <div class="row">
-    <div class="col">
-        <h1>Update Headword</h1>
-        <form action="" method="post">
-            {% csrf_token %}
-            {{ headword_form|crispy }}
-            {% comment %} <div class="row justify-content-center">
-                <button class="btn btn-primary btn-lg active w-50" type="submit">Submit</button>
-            </div> {% endcomment %}
-            {% comment %} </form>
-    </div>
-</div> {% endcomment %}
-
 <div class="row">
     <div class="col">
         <h1>Update <span class="headword">{{ headword.headword }}</span> <sup>{{ headword_sense_no }}</sup></h1>
@@ -27,8 +14,10 @@
             {% csrf_token %}
             <div class="form-group">
                 {{ headword_form|crispy }}
+                {% comment %} {% crispy headword_form headword_form.helper %} {% endcomment %}
+                {% comment %} {% crispy headword_form %} {% endcomment %}
             </div>
-            <hr/>
+            <hr />
             <div class="form-group">
                 {% include 'core/sense_form_snippet.html' with form=sense_form %}
             </div>

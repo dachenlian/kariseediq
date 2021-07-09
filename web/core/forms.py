@@ -1,6 +1,8 @@
 import logging
 import re
 
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Layout, Div
 from django import forms
 from django.utils.encoding import force_text
 from django.forms import ModelForm, inlineformset_factory
@@ -23,6 +25,19 @@ class ArraySelectMultiple(SelectMultiple):
 
 
 class HeadwordForm(ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # self.helper = FormHelper()
+        # self.helper.form_class = 'form-inline'
+        # self.helper.field_template = 'bootstrap3/layout/inline_field.html'
+        # self.helper.layout = Layout(
+        #     Div(
+        #         Div('headword', css_class='col-5'),
+        #         Div('variant', css_class='col-5'),
+        #         Div('is_root', css_class='col-2'),
+        #     )
+        # )
+
     class Meta:
         model = Headword
         fields = ('headword', 'variant', 'is_root',)
