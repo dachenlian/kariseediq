@@ -137,10 +137,12 @@ def _convert_to_bool(cell: str) -> bool:
 
 
 def _parse_date(str_date: str) -> datetime.datetime:
+    if str_date:
+        str_date = str_date.split()[0]  # remove trailing 00:00:00 time
     try:
-        parsed = datetime.datetime.strptime(str_date, '%Y-%m-%d')
-    except ValueError as e:
-        logger.exception(e)
+        parsed = datetime.datetime.strptime(str_date, '%Y-%m-%d')  
+    except ValueError:
+        # logger.exception(e)
         return datetime.datetime.min
     else:
         return parsed
@@ -196,18 +198,21 @@ def load_items_from_combined(file: str):
         for idx, row in enumerate(tqdm(reader) ,1):
             row = [r.strip().replace('\n', '') for r in row]
             new_entry = _clean_entry_for_combined(dict(zip(header, row)))
+            copy_entry = dict(new_entry)
             headword = new_entry.pop('headword')
             variant = new_entry.pop('variant')
             is_root = new_entry.pop('is_root')
             only_lttrs = new_entry.pop('only_letters')
 
             meaning = new_entry.pop('meaning')
-            headword_sense_no = new_entry.pop('headword_sense_no')
-            char_strokes_first = new_entry.pop('char_strokes_first')
-            char_strokes_all = new_entry.pop('char_strokes_all')
-            word_class = new_entry.pop('word_class')
-            meaning_en = new_entry.pop('meaning_en')
-            item_root = new_entry.pop('root')
+
+            sentence = new_entry.pop('sentence')
+            sentence_en = new_entry.pop('sentence_en')
+            sentence_ch = new_entry.pop('sentence_ch')
+
+            phrase = new_entry.pop('phrase')
+            phrase_ch = new_entry.pop('phrase_ch')
+            phrase_en = new_entry.pop('phrase_en')
 
             headword, created = Headword.objects.get_or_create(
                 headword=headword,
@@ -221,43 +226,27 @@ def load_items_from_combined(file: str):
                 }       
             )
             if not created:
-                logger.debug(f'{headword.headword} already exists. Retrieving from DB.')
+                logger.debug(f'{headword.headword} already exists. Retrieved from DB.')
 
             try:
                 sense, created = Sense.objects.get_or_create(
                     headword=headword,
                     meaning=meaning,
                     defaults={
-                        'headword_sense_no': headword_sense_no,
-                        'char_strokes_first': char_strokes_first,
-                        'char_strokes_all': char_strokes_all,
-                        'word_class': word_class,
-                        'meaning_en': meaning_en,
-                        'root': item_root,
+                        **new_entry
                     }
                 )
             
-            except IntegrityError as e:
+            except (IntegrityError, ValueError):  # headword_sense_no may be blank or not numbered properly
+                new_entry['headword_sense_no'] = headword.senses.count() + 1
+
                 sense, created = Sense.objects.get_or_create(
                     headword=headword,
                     meaning=meaning,
                     defaults={
-                        'headword_sense_no': headword.senses.count() + 1,
-                        'char_strokes_first': char_strokes_first,
-                        'char_strokes_all': char_strokes_all,
-                        'word_class': word_class,
-                        'meaning_en': meaning_en,
-                        'root': item_root,
+                        **new_entry
                     }
                 )
-
-            sentence = new_entry.pop('sentence')
-            sentence_en = new_entry.pop('sentence_en')
-            sentence_ch = new_entry.pop('sentence_ch')
-
-            phrase = new_entry.pop('phrase')
-            phrase_ch = new_entry.pop('phrase_ch')
-            phrase_en = new_entry.pop('phrase_en')
 
             # try:
             #     sense = Sense.objects.create(headword=headword, **new_entry)
@@ -284,8 +273,8 @@ def load_items_from_combined(file: str):
                     phrase_en=phrase_en,
                 )
 
-            if idx % 500 == 0:
-                logger.debug(f'Processed {idx} rows...')
+            # if idx % 500 == 0:
+            #     logger.debug(f'Processed {idx} rows...')
 
             if errors:
                 fname = f'items_errors_{datetime.datetime.now().strftime("%Y%m%d")}.csv'
