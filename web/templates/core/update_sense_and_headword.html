@@ -2,7 +2,7 @@
 {% load crispy_forms_tags %}
 {% block content %}
 
-<div class="row">
+<div class="form-row">
     <div class="col">
         <h1>Update <span class="headword">{{ headword.headword }}</span> <sup>{{ headword_sense_no }}</sup></h1>
         <p>
@@ -14,32 +14,32 @@
             {% csrf_token %}
             <div class="row">
                 <div class="col-3">
-                    <label for="id_headword">Headword</label>
+                    <label class="bmd-label-static" for="id_headword">Headword</label>
                     <input type="text" name="headword" class="form-control" id="id_headword" value={{ headword_form.headword.value }} required>
                 </div>
 
                 <div class="col-3">
-                    <label for="id_variant">Variant</label>
+                    <label class="bmd-label-static" for="id_variant">Variant</label>
                     <input type="text" name="variant" class="form-control" id="id_headword" value={{ headword_form.variant.value }}>
                 </div>
 
+                {% comment %} <div class="col-1 form-check align-self-center">
+                    <input type="checkbox" name="is_root" class="form-check-input" id="id_headword" {% if headword_form.is_root.value %} checked {% endif %} >
+                    <label class="form-check-label" for="id_headword">Is root</label>
+                </div> {% endcomment %}
                 <div class="col-1">
-                    <label for="id_headword">Is root</label>
+                    <label class="bmd-label-static" for="id_headword">Is root?</label>
                     <input type="checkbox" name="is_root" class="form-control" id="id_headword" {% if headword_form.is_root.value %} checked {% endif %} >
-                </div>
+                </div> 
                 <div class="col-2">
-                    <label for="id_toda">Toda headword</label>
+                    <label class="bmd-label-static" for="id_toda">Toda headword</label>
                     <input type="text" name="toda" class="form-control" id="id_toda" value={{sense_form.toda.value}}>
                 </div>
                 <div class="col-3">
-                    <label for="id_truku">Truku headword</label>
+                    <label class="bmd-label-static" for="id_truku">Truku headword</label>
                     <input type="text" name="truku" class="form-control" id="id_truku" value={{sense_form.truku.value}}>
                 </div>
             </div>
-
-            {% comment %} {{ headword_form|crispy }} {% endcomment %}
-            {% comment %} {% crispy headword_form headword_form.helper %} {% endcomment %}
-            {% comment %} {% crispy headword_form %} {% endcomment %}
             <div class="form-group">
                 {% include 'core/sense_form_snippet.html' with form=sense_form %}
             </div>

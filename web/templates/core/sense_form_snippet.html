@@ -12,20 +12,8 @@
         {{ form.root|as_crispy_field }}
     </div>
     <div class="col">
-        {{ form.root_sense_no|as_crispy_field }}
-        <small><span id="rootSensesMessage"></span></small>
-    </div>
-    <div class="col">
         {{ form.refer_to|as_crispy_field }}
     </div>
-    <div class="col">
-        {{ form.toda|as_crispy_field }}
-    </div>
-    <div class="col">
-        {{ form.truku|as_crispy_field }}
-    </div>
-</div>
-<div class="form-row">
     <div class="col">
         {{ form.meaning|as_crispy_field }}
     </div>
@@ -51,17 +39,17 @@
     <div class="col">
         {{ form.tag|as_crispy_field }}
     </div>
+    <div class="col text-center">
+        <!-- Button trigger modal -->
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#phrase-modal">
+            Phrases
+        </button>
+    </div>
     <div class="col-lg-2">
         {{ form.sound|as_crispy_field }}
     </div>
     <div class="col-lg-2">
         {{ form.picture|as_crispy_field }}
-    </div>
-    <div class="col">
-        <!-- Button trigger modal -->
-        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#phrase-modal">
-            Phrases
-        </button>
     </div>
 </div>
 
